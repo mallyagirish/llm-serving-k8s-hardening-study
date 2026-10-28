@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vhcu-pytorch-demo
+  annotations:
+    # You can run command: kubectl get node $node -o jsonpath='{.metadata.annotations.hami\.io/node-hcu-register}' to get HCU UUID.
+    # UUID is like HCU-TPXS320016070601
+    hygon.com/nouse-gpuuuid: "HCU-TPXS320016070601,HCU-TPXS320010040501" # Specify the blacklist card UUIDs for this job, use comma to separate, will not launch job on specified cards
+    # In this job, we don't want our job to run on HCU-TPXS320016070601 and HCU-TPXS320010040501.
+spec:
+  containers:
+    - name: vhcu-pytorch-demo
+      image: image.sourcefind.cn:5000/hcu/admin/base/pytorch:2.1.0-ubuntu22.04-dtk24.04.2-py3.10
+      command: [ "/bin/bash", "-c", "--" ]
+      args: [ "sleep infinity & wait" ]
+      resources:
+        limits:
+          hygon.com/hcunum: 1
+          hygon.com/hcucores: 60
+          hygon.com/hcumem: 2000

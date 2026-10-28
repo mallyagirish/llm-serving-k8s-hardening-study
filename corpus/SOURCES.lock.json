@@ -1,0 +1,1305 @@
+{
+  "collected_at": "2026-10-28T16:34:08-07:00",
+  "timezone": "America/Los_Angeles",
+  "phase": "2-fetch-render",
+  "counts": {
+    "sources": 27,
+    "rendered_bundles": 202,
+    "failures_or_skips": 5,
+    "breakdown": {
+      "helm_default": 20,
+      "helm_values_overlays": 28,
+      "manifests": 154,
+      "vllm_related": 38,
+      "vllm_tutorials": 26,
+      "kserve_related": 79,
+      "kuberay_related": 9,
+      "ollama_related": 6,
+      "tgi_related": 9,
+      "hami_examples_all": 66,
+      "hami_nvidia_or_vllm": 17,
+      "sglang_related": 5,
+      "litellm_related": 2,
+      "core_llm_serving_excl_non_nvidia_hami": 154
+    }
+  },
+  "sources": [
+    {
+      "name": "vllm-project/production-stack",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/vllm-project/production-stack",
+      "pin": "2f879ef8a7c21f975ac0b2675267b7ba681b2cfa",
+      "notes": "helm/ + tutorials/assets",
+      "status": "ok"
+    },
+    {
+      "name": "kserve/kserve",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/kserve/kserve",
+      "pin": "e8c1c3a779ad4294e181ee4c61c2b48bd4db2017",
+      "notes": "samples + charts",
+      "status": "ok"
+    },
+    {
+      "name": "ray-project/kuberay",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/ray-project/kuberay",
+      "pin": "3ec5cbb8d8d3c6b249eaa06258f1369cf2172dcc",
+      "notes": "LLM RayService samples",
+      "status": "ok"
+    },
+    {
+      "name": "shalb/charts",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/shalb/charts",
+      "pin": "7c29f2185336ed8d9cb14ffae9942f6b95462d12",
+      "notes": "huggingface-model TGI",
+      "status": "ok"
+    },
+    {
+      "name": "louis030195/text-generation-inference-helm",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/louis030195/text-generation-inference-helm",
+      "pin": "f4f30d8e66d23301abdf1fe9c9f787ee5bff683f",
+      "notes": "stale; helm template broken on defaults \u2014 raw templates kept",
+      "status": "ok"
+    },
+    {
+      "name": "otwld/ollama-helm",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/otwld/ollama-helm",
+      "pin": "61462e4d5163b2e1aed437f5cef41ed92d483b2a",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "Project-HAMi/HAMi",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/Project-HAMi/HAMi",
+      "pin": "385626edc77fa3aaff75b17420555cb239601f84",
+      "notes": "examples incl. nvidia/vllm_cross_vgpu",
+      "status": "ok"
+    },
+    {
+      "name": "sgl-project/sglang",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/sgl-project/sglang",
+      "pin": "f5c23b47693c3f0c7557900dfa8d65b43d401741",
+      "notes": "docker/k8s-*.yaml",
+      "status": "ok"
+    },
+    {
+      "name": "BerriAI/litellm",
+      "type": "git",
+      "version": "HEAD",
+      "url": "https://github.com/BerriAI/litellm",
+      "pin": "9e878cfae2edb7a66ecb3d977b2f3320c5955e6d",
+      "notes": "deploy helm",
+      "status": "ok"
+    },
+    {
+      "name": "vllm-stack",
+      "type": "helm",
+      "version": "0.1.13",
+      "url": "https://vllm-project.github.io/production-stack",
+      "pin": "helm:0.1.13",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "vllm-stack",
+      "type": "helm",
+      "version": "0.1.12",
+      "url": "https://vllm-project.github.io/production-stack",
+      "pin": "helm:0.1.12",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "vllm-stack",
+      "type": "helm",
+      "version": "0.1.11",
+      "url": "https://vllm-project.github.io/production-stack",
+      "pin": "helm:0.1.11",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "vllm-stack",
+      "type": "helm",
+      "version": "0.1.10",
+      "url": "https://vllm-project.github.io/production-stack",
+      "pin": "helm:0.1.10",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "kuberay-operator",
+      "type": "helm",
+      "version": "1.7.1",
+      "url": "https://ray-project.github.io/kuberay-helm/",
+      "pin": "helm:1.7.1",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "ray-cluster",
+      "type": "helm",
+      "version": "1.7.1",
+      "url": "https://ray-project.github.io/kuberay-helm/",
+      "pin": "helm:1.7.1",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "otwld/ollama",
+      "type": "helm",
+      "version": "1.93.0",
+      "url": "https://helm.otwld.com/",
+      "pin": "helm:1.93.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "otwld/ollama",
+      "type": "helm",
+      "version": "1.18.0",
+      "url": "https://helm.otwld.com/",
+      "pin": "helm:1.18.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "otwld/ollama",
+      "type": "helm",
+      "version": "1.11.0",
+      "url": "https://helm.otwld.com/",
+      "pin": "helm:1.11.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "otwld/ollama",
+      "type": "helm",
+      "version": "1.8.0",
+      "url": "https://helm.otwld.com/",
+      "pin": "helm:1.8.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "hami",
+      "type": "helm",
+      "version": "2.10.0",
+      "url": "https://project-hami.github.io/HAMi/",
+      "pin": "helm:2.10.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "infracloud/vllm",
+      "type": "helm",
+      "version": "0.4.1",
+      "url": "infracloud charts",
+      "pin": "helm:0.4.1",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "infracloud/text-generation-inference",
+      "type": "helm",
+      "version": "0.3.0",
+      "url": "infracloud charts",
+      "pin": "helm:0.3.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "kserve",
+      "type": "helm-oci",
+      "version": "v0.15.0",
+      "url": "oci://ghcr.io/kserve/charts/kserve",
+      "pin": "oci:v0.15.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "opea/tgi",
+      "type": "helm-oci",
+      "version": "1.2.0",
+      "url": "oci://ghcr.io/opea-project/charts/tgi",
+      "pin": "oci:1.2.0",
+      "notes": "",
+      "status": "ok"
+    },
+    {
+      "name": "shalb/huggingface-model",
+      "type": "helm-oci",
+      "version": "0.1.4",
+      "url": "oci://registry-1.docker.io/shalb/huggingface-model",
+      "pin": "oci:0.1.4",
+      "notes": "library chart \u2014 not installable alone; git chart rendered instead",
+      "status": "partial"
+    },
+    {
+      "name": "litellm-helm",
+      "type": "helm-oci",
+      "version": "1.107.0-rc.2",
+      "url": "oci://ghcr.io/berriai/litellm-helm",
+      "pin": "sha256:89bcb6a3bfdfc06c6b78f85c7c659ed4d55daf4c62d10e178cd862e86d87b2ad",
+      "notes": "gateway chart",
+      "status": "ok"
+    },
+    {
+      "name": "sglang k8s-sglang-service.yaml",
+      "type": "raw-yaml",
+      "version": "master",
+      "url": "https://raw.githubusercontent.com/sgl-project/sglang/master/docker/k8s-sglang-service.yaml",
+      "pin": "f5c23b47693c3f0c7557900dfa8d65b43d401741",
+      "notes": "",
+      "status": "ok"
+    }
+  ],
+  "failures": [
+    {
+      "name": "shalb/huggingface-model-0.1.4-oci",
+      "reason": "library chart \u2014 not installable; used git application chart instead"
+    },
+    {
+      "name": "louis030195-tgi helm template",
+      "reason": "chart templates assume .Values.model.* but root values use models[] \u2014 kept raw templates"
+    },
+    {
+      "name": "NVIDIA NIM Operator",
+      "reason": "skipped candidate \u2014 NGC entitlement"
+    },
+    {
+      "name": "AMD/SiloGen SGLang Helm",
+      "reason": "skipped candidate \u2014 not verified fetch this pass"
+    },
+    {
+      "name": "Open WebUI Helm",
+      "reason": "skipped candidate \u2014 only if paired with inference"
+    }
+  ],
+  "bundles": [
+    {
+      "path": "rendered/hami-2.10.0/default.yaml",
+      "source": "hami-2.10.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/hami-example-ascend_job-310P/manifest.yaml",
+      "source": "hami-example-ascend_job-310P",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-ascend_job-910A/manifest.yaml",
+      "source": "hami-example-ascend_job-910A",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-ascend_job-910B2/manifest.yaml",
+      "source": "hami-example-ascend_job-910B2",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-ascend_job-910B3/manifest.yaml",
+      "source": "hami-example-ascend_job-910B3",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-ascend_job-910B4/manifest.yaml",
+      "source": "hami-example-ascend_job-910B4",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-ascend_job-910C/manifest.yaml",
+      "source": "hami-example-ascend_job-910C",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-awsneuron_allocate_core/manifest.yaml",
+      "source": "hami-example-awsneuron_allocate_core",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-awsneuron_allocate_dev/manifest.yaml",
+      "source": "hami-example-awsneuron_allocate_dev",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-awsneuron_multi_containers/manifest.yaml",
+      "source": "hami-example-awsneuron_multi_containers",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-biren_default_use/manifest.yaml",
+      "source": "hami-example-biren_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-enflame_gcu_use/manifest.yaml",
+      "source": "hami-example-enflame_gcu_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-enflame_vgcu_use/manifest.yaml",
+      "source": "hami-example-enflame_vgcu_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-hygon_default_use/manifest.yaml",
+      "source": "hami-example-hygon_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-hygon_specify_card_type_not_use/manifest.yaml",
+      "source": "hami-example-hygon_specify_card_type_not_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-hygon_specify_card_type_to_use/manifest.yaml",
+      "source": "hami-example-hygon_specify_card_type_to_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-hygon_specify_uuid_not_use/manifest.yaml",
+      "source": "hami-example-hygon_specify_uuid_not_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-hygon_specify_uuid_to_use/manifest.yaml",
+      "source": "hami-example-hygon_specify_uuid_to_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-hygon_use_exclusive_card/manifest.yaml",
+      "source": "hami-example-hygon_use_exclusive_card",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_default_use_BI-V100/manifest.yaml",
+      "source": "hami-example-iluvatar_default_use_BI-V100",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_default_use_BI-V150/manifest.yaml",
+      "source": "hami-example-iluvatar_default_use_BI-V150",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_default_use_MR-V100/manifest.yaml",
+      "source": "hami-example-iluvatar_default_use_MR-V100",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_multi-containers_BI-V100/manifest.yaml",
+      "source": "hami-example-iluvatar_multi-containers_BI-V100",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_multi-containers_BI-V150/manifest.yaml",
+      "source": "hami-example-iluvatar_multi-containers_BI-V150",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_multi-containers_MR-V100/manifest.yaml",
+      "source": "hami-example-iluvatar_multi-containers_MR-V100",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_multi-devices_BI-V100/manifest.yaml",
+      "source": "hami-example-iluvatar_multi-devices_BI-V100",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_multi-devices_BI-V150/manifest.yaml",
+      "source": "hami-example-iluvatar_multi-devices_BI-V150",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-iluvatar_multi-devices_MR-V100/manifest.yaml",
+      "source": "hami-example-iluvatar_multi-devices_MR-V100",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-kunlun_allocate_exclusive/manifest.yaml",
+      "source": "hami-example-kunlun_allocate_exclusive",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-kunlun_default_use/manifest.yaml",
+      "source": "hami-example-kunlun_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_gpu_binpack/manifest.yaml",
+      "source": "hami-example-metax_gpu_binpack",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_gpu_default_use/manifest.yaml",
+      "source": "hami-example-metax_gpu_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_gpu_spread/manifest.yaml",
+      "source": "hami-example-metax_gpu_spread",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_allocate_exclusive/manifest.yaml",
+      "source": "hami-example-metax_sgpu_allocate_exclusive",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_allocate_specific_gpu/manifest.yaml",
+      "source": "hami-example-metax_sgpu_allocate_specific_gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_allocate_specific_qos/manifest.yaml",
+      "source": "hami-example-metax_sgpu_allocate_specific_qos",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_allocate_vmemory_MiB/manifest.yaml",
+      "source": "hami-example-metax_sgpu_allocate_vmemory_MiB",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_default_use/manifest.yaml",
+      "source": "hami-example-metax_sgpu_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_enable_topology_aware/manifest.yaml",
+      "source": "hami-example-metax_sgpu_enable_topology_aware",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_multi-containers/manifest.yaml",
+      "source": "hami-example-metax_sgpu_multi-containers",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_offline/manifest.yaml",
+      "source": "hami-example-metax_sgpu_offline",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-metax_sgpu_online/manifest.yaml",
+      "source": "hami-example-metax_sgpu_online",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-mlu_allocate_whole/manifest.yaml",
+      "source": "hami-example-mlu_allocate_whole",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-mlu_default_use/manifest.yaml",
+      "source": "hami-example-mlu_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-mthreads_default_use/manifest.yaml",
+      "source": "hami-example-mthreads_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-mthreads_multi_cards/manifest.yaml",
+      "source": "hami-example-mthreads_multi_cards",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-mthreads_use_exclusive/manifest.yaml",
+      "source": "hami-example-mthreads_use_exclusive",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_default_use/manifest.yaml",
+      "source": "hami-example-nvidia_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_default_use_legacy/manifest.yaml",
+      "source": "hami-example-nvidia_default_use_legacy",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_dynamic_mig_example/manifest.yaml",
+      "source": "hami-example-nvidia_dynamic_mig_example",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_dynamic_mig_profile_preference/manifest.yaml",
+      "source": "hami-example-nvidia_dynamic_mig_profile_preference",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_example/manifest.yaml",
+      "source": "hami-example-nvidia_example",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_mig_example/manifest.yaml",
+      "source": "hami-example-nvidia_mig_example",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_specify_card_type_not_use/manifest.yaml",
+      "source": "hami-example-nvidia_specify_card_type_not_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_specify_card_type_to_use/manifest.yaml",
+      "source": "hami-example-nvidia_specify_card_type_to_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_specify_scheduling_policy/manifest.yaml",
+      "source": "hami-example-nvidia_specify_scheduling_policy",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_specify_uuid_not_use/manifest.yaml",
+      "source": "hami-example-nvidia_specify_uuid_not_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_specify_uuid_to_use/manifest.yaml",
+      "source": "hami-example-nvidia_specify_uuid_to_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_use_as_normal/manifest.yaml",
+      "source": "hami-example-nvidia_use_as_normal",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_use_exclusive_card/manifest.yaml",
+      "source": "hami-example-nvidia_use_exclusive_card",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_use_memory_fraction/manifest.yaml",
+      "source": "hami-example-nvidia_use_memory_fraction",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_use_sharing_card/manifest.yaml",
+      "source": "hami-example-nvidia_use_sharing_card",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-nvidia_vllm_cross_vgpu/manifest.yaml",
+      "source": "hami-example-nvidia_vllm_cross_vgpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-remotegpu_default_use/manifest.yaml",
+      "source": "hami-example-remotegpu_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-remotegpu_port_forward_session/manifest.yaml",
+      "source": "hami-example-remotegpu_port_forward_session",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-remotegpu_vllm_deployment/manifest.yaml",
+      "source": "hami-example-remotegpu_vllm_deployment",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/hami-example-vastai_default_use/manifest.yaml",
+      "source": "hami-example-vastai_default_use",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/infracloud-charts-text-generation-inference-0.3.0/default.yaml",
+      "source": "infracloud-charts-text-generation-inference-0.3.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/infracloud-charts-vllm-0.4.1/default.yaml",
+      "source": "infracloud-charts-vllm-0.4.1",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/infracloud-text-generation-inference-0.3.0/default.yaml",
+      "source": "infracloud-text-generation-inference-0.3.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/infracloud-vllm-0.4.1/default.yaml",
+      "source": "infracloud-vllm-0.4.1",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/kserve-manifest-autoscaling/manifest.yaml",
+      "source": "kserve-manifest-autoscaling",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-bert/manifest.yaml",
+      "source": "kserve-manifest-bert",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-bert_gpu/manifest.yaml",
+      "source": "kserve-manifest-bert_gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-bloom-560m/manifest.yaml",
+      "source": "kserve-manifest-bloom-560m",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-canary/manifest.yaml",
+      "source": "kserve-manifest-canary",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-decode-template/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-decode-template",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-decode-worker-data-parallel/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-decode-worker-data-parallel",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-decode-worker-data-parallel-multi-port/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-decode-worker-data-parallel-multi-port",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-omni-template/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-omni-template",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-prefill-template/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-prefill-template",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-prefill-worker-data-parallel/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-prefill-worker-data-parallel",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-prefill-worker-data-parallel-multi-port/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-prefill-worker-data-parallel-multi-port",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-router-route/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-router-route",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-scheduler",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default-pd/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default-pd",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-modality/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-modality",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-template/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-template",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-tokenizer/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-tokenizer",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-tracing/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-tracing",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-worker-data-parallel/manifest.yaml",
+      "source": "kserve-manifest-config_llmisvcconfig_config-llm-worker-data-parallel",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_overlays_test_clusterresources_kserve-vllmserver-test-patch/manifest.yaml",
+      "source": "kserve-manifest-config_overlays_test_clusterresources_kserve-vllmserver-test-patch",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_runtimes_kserve-huggingfaceserver/manifest.yaml",
+      "source": "kserve-manifest-config_runtimes_kserve-huggingfaceserver",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_runtimes_kserve-huggingfaceserver-multinode/manifest.yaml",
+      "source": "kserve-manifest-config_runtimes_kserve-huggingfaceserver-multinode",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_runtimes_kserve-llm-omni/manifest.yaml",
+      "source": "kserve-manifest-config_runtimes_kserve-llm-omni",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_runtimes_kserve-llm-sglang/manifest.yaml",
+      "source": "kserve-manifest-config_runtimes_kserve-llm-sglang",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-config_runtimes_kserve-vllmserver/manifest.yaml",
+      "source": "kserve-manifest-config_runtimes_kserve-vllmserver",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_fluid_kserve-huggingfaceserver/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_fluid_kserve-huggingfaceserver",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_kernelcache_vllm-servingruntime/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_kernelcache_vllm-servingruntime",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_agentic-tool-calling_llmisvc-single-gpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_agentic-tool-calling_llmisvc-single-gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-deepep-ht/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-deepep-ht",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-naive/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-naive",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-deepep-ht/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-deepep-ht",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-pplx/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-pplx",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_default/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_default",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_pd_disagg/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_pd_disagg",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_prefix_cache/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_prefix_cache",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_kv-cache-offloading_llm-inference-service-kv-cache-offloading/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_kv-cache-offloading_llm-inference-service-kv-cache-offloading",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_lora-adapters_llm-inference-service-lora-localmodelcache/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_lora-adapters_llm-inference-service-lora-localmodelcache",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_managed-dra_llm-inference-service-managed-dra-minimal/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_managed-dra_llm-inference-service-managed-dra-minimal",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_managed-dra_llm-inference-service-managed-dra-multi-device/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_managed-dra_llm-inference-service-managed-dra-multi-device",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-layered/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-layered",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-hf/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-hf",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-s3/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-s3",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-amd-scheduler-ref/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-amd-scheduler-ref",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-nvidia-with-scheduler/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-nvidia-with-scheduler",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_omni-modality_llm-inference-service-omni-tts-gpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_omni-modality_llm-inference-service-omni-tts-gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu-no-scheduler/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu-no-scheduler",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-pd-facebook-opt-125m-cpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-pd-facebook-opt-125m-cpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-sglang-opt-125m-cpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-sglang-opt-125m-cpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-opt-125m-cpu-kv-cache-routing-simulator/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-opt-125m-cpu-kv-cache-routing-simulator",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-qwen2-7b-gpu-kv-cache-routing/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-qwen2-7b-gpu-kv-cache-routing",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-pd-qwen2-7b-gpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-pd-qwen2-7b-gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu-no-scheduler/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu-no-scheduler",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-sglang-opt-125m-gpu/manifest.yaml",
+      "source": "kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-sglang-opt-125m-gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-gpu/manifest.yaml",
+      "source": "kserve-manifest-gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-grpc/manifest.yaml",
+      "source": "kserve-manifest-grpc",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-hack_release_smoke-test-data_llmisvc-opt-125m-cpu/manifest.yaml",
+      "source": "kserve-manifest-hack_release_smoke-test-data_llmisvc-opt-125m-cpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-ingress_gateway-patch/manifest.yaml",
+      "source": "kserve-manifest-ingress_gateway-patch",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-kcn-daemonset-patch/manifest.yaml",
+      "source": "kserve-manifest-kcn-daemonset-patch",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-metrics/manifest.yaml",
+      "source": "kserve-manifest-metrics",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-mnist/manifest.yaml",
+      "source": "kserve-manifest-mnist",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-mnist_gpu/manifest.yaml",
+      "source": "kserve-manifest-mnist_gpu",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-model-archiver/manifest.yaml",
+      "source": "kserve-manifest-model-archiver",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-pv/manifest.yaml",
+      "source": "kserve-manifest-pv",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-pvc/manifest.yaml",
+      "source": "kserve-manifest-pvc",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-pvc-pod/manifest.yaml",
+      "source": "kserve-manifest-pvc-pod",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-pvpod/manifest.yaml",
+      "source": "kserve-manifest-pvpod",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-resources/manifest.yaml",
+      "source": "kserve-manifest-resources",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-service-patch/manifest.yaml",
+      "source": "kserve-manifest-service-patch",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-serviceaccount-patch/manifest.yaml",
+      "source": "kserve-manifest-serviceaccount-patch",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-storageclass/manifest.yaml",
+      "source": "kserve-manifest-storageclass",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-storagecontainer/manifest.yaml",
+      "source": "kserve-manifest-storagecontainer",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-storagecontainer-patch/manifest.yaml",
+      "source": "kserve-manifest-storagecontainer-patch",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-torchserve/manifest.yaml",
+      "source": "kserve-manifest-torchserve",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-manifest-values/manifest.yaml",
+      "source": "kserve-manifest-values",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kserve-v0.15.0/default.yaml",
+      "source": "kserve-v0.15.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/kuberay-operator-1.7.1/default.yaml",
+      "source": "kuberay-operator-1.7.1",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/kuberay-sample-ray-cluster.historyserver/manifest.yaml",
+      "source": "kuberay-sample-ray-cluster.historyserver",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kuberay-sample-ray-service.custom-serve-service/manifest.yaml",
+      "source": "kuberay-sample-ray-service.custom-serve-service",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kuberay-sample-ray-service.deepseek/manifest.yaml",
+      "source": "kuberay-sample-ray-service.deepseek",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kuberay-sample-ray-service.high-throughput-llm/manifest.yaml",
+      "source": "kuberay-sample-ray-service.high-throughput-llm",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kuberay-sample-ray-service.llm-serve/manifest.yaml",
+      "source": "kuberay-sample-ray-service.llm-serve",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kuberay-sample-ray-service.no-ray-serve-replica/manifest.yaml",
+      "source": "kuberay-sample-ray-service.no-ray-serve-replica",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/kuberay-sample-ray-service.vllm-tpu-v6e-singlehost/manifest.yaml",
+      "source": "kuberay-sample-ray-service.vllm-tpu-v6e-singlehost",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/litellm-git/default.yaml",
+      "source": "litellm-git",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/litellm-helm-1.107.0-rc.2/default.yaml",
+      "source": "litellm-helm-1.107.0-rc.2",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/louis030195-tgi-helm-raw/templates-concat.yaml",
+      "source": "louis030195-tgi-helm-raw",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/opea-tgi-1.2.0/default.yaml",
+      "source": "opea-tgi-1.2.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/otwld-ollama-1.11.0/default.yaml",
+      "source": "otwld-ollama-1.11.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/otwld-ollama-1.18.0/default.yaml",
+      "source": "otwld-ollama-1.18.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/otwld-ollama-1.8.0/default.yaml",
+      "source": "otwld-ollama-1.8.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/otwld-ollama-1.93.0/default.yaml",
+      "source": "otwld-ollama-1.93.0",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/otwld-ollama-git-examples/test-values.yaml",
+      "source": "otwld-ollama-git-examples",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/otwld-ollama-git-examples/test-knative-values.yaml",
+      "source": "otwld-ollama-git-examples",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/ray-cluster-1.7.1/default.yaml",
+      "source": "ray-cluster-1.7.1",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/sglang-k8s-sglang-distributed-sts/manifest.yaml",
+      "source": "sglang-k8s-sglang-distributed-sts",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/sglang-k8s-sglang-service/manifest.yaml",
+      "source": "sglang-k8s-sglang-service",
+      "kind": "manifest"
+    },
+    {
+      "path": "rendered/shalb-huggingface-model-git/default.yaml",
+      "source": "shalb-huggingface-model-git",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.10/default.yaml",
+      "source": "vllm-stack-0.1.10",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.11/default.yaml",
+      "source": "vllm-stack-0.1.11",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.12/default.yaml",
+      "source": "vllm-stack-0.1.12",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13/default.yaml",
+      "source": "vllm-stack-0.1.13",
+      "kind": "helm-default"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-26-priority-routing.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-15-b-minimal-pipeline-parallel-example-multiple-modelspec.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-13-tool-enabled.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-15-a-minimal-pipeline-parallel-example-raycluster.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-03-match-pv.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-12-otel-vllm.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-01-2pods-minimal-example.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-18-prefix-aware.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-01-minimal-example.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-11-secure-vllm.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-04-multiple-models.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-02-basic-config.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-19-sleep-mode-aware.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-22-gateway-api.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-16-disagg-prefill.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-14-vllm-v1.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-09-lora-helm.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-single-gpu.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-01-minimal-amd-example.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp2.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-06-shared-storage.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-05-cpu-offloading.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-23-SR.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    },
+    {
+      "path": "rendered/vllm-stack-0.1.13-tutorials/values-09-lora-operator.yaml",
+      "source": "vllm-stack-0.1.13-tutorials",
+      "kind": "helm-values"
+    }
+  ]
+}

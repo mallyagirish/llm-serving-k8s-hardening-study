@@ -1,0 +1,626 @@
+---
+# Source: vllm-stack/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "scan-values-16-disagg-prefill-router-service-account"
+  namespace: llm-scan
+---
+# Source: vllm-stack/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "scan-values-16-disagg-prefill-secrets"
+  namespace: llm-scan
+type: Opaque
+data:
+  hf_token_llama-prefill: "PGhmLXRva2VuPg=="
+  hf_token_llama-decode: "PGhmLXRva2VuPg=="
+---
+# Source: vllm-stack/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "scan-values-16-disagg-prefill-llama-prefill-storage-claim"
+  namespace: llm-scan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+# Source: vllm-stack/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "scan-values-16-disagg-prefill-llama-decode-storage-claim"
+  namespace: llm-scan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+# Source: vllm-stack/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "scan-values-16-disagg-prefill-reader"
+  namespace: llm-scan
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "patch"]
+---
+# Source: vllm-stack/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: scan-values-16-disagg-prefill-deployment-access-binding
+  namespace: llm-scan
+subjects:
+  - kind: ServiceAccount
+    name: scan-values-16-disagg-prefill-router-service-account
+    namespace: llm-scan
+roleRef:
+  kind: Role
+  name: scan-values-16-disagg-prefill-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vllm-stack/templates/service-router.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-16-disagg-prefill-router-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  type: ClusterIP
+  ports:
+    - name: "router-sport"
+      port: 80
+      targetPort: 8000
+      protocol: TCP
+    - name: "lmcache-port"
+      port: 9000
+      targetPort: lmcache-port
+      protocol: TCP
+    
+  selector:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+---
+# Source: vllm-stack/templates/service-vllm.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-16-disagg-prefill-llama-prefill-engine-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: llama-prefill
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  type: ClusterIP
+  ports:
+    - name: "service-port"
+      port: 80
+      targetPort: "container-port"
+      protocol: TCP
+    - name: zmq-port
+      port: 55555
+      targetPort: zmq-port
+      protocol: TCP
+    - name: ucx-port
+      port: 9999
+      targetPort: ucx-port
+      protocol: TCP
+    
+  selector:
+    model: "llama-prefill"
+    helm-release-name: "scan-values-16-disagg-prefill"
+    app.kubernetes.io/name: llama-prefill
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+---
+# Source: vllm-stack/templates/service-vllm.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-16-disagg-prefill-llama-decode-engine-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: llama-decode
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  type: ClusterIP
+  ports:
+    - name: "service-port"
+      port: 80
+      targetPort: "container-port"
+      protocol: TCP
+    - name: zmq-port
+      port: 55555
+      targetPort: zmq-port
+      protocol: TCP
+    - name: ucx-port
+      port: 9999
+      targetPort: ucx-port
+      protocol: TCP
+    
+  selector:
+    model: "llama-decode"
+    helm-release-name: "scan-values-16-disagg-prefill"
+    app.kubernetes.io/name: llama-decode
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+---
+# Source: vllm-stack/templates/deployment-router.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-16-disagg-prefill-deployment-router"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: scan-values-16-disagg-prefill
+      app.kubernetes.io/component: router
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: router
+      release: router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/instance: scan-values-16-disagg-prefill
+        app.kubernetes.io/component: router
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: router
+        release: router
+    spec:
+      serviceAccountName: scan-values-16-disagg-prefill-router-service-account
+      containers:
+      - name: router-container
+        image: "lmcache/lmstack-router:pd"
+        imagePullPolicy: "Always"
+        env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: LMCACHE_LOG_LEVEL
+            value: "INFO"
+        args:
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--service-discovery"
+          - "k8s"
+          - "--k8s-namespace"
+          - "llm-scan"
+          - "--k8s-service-discovery-type"
+          - "pod-ip"
+          - "--k8s-label-selector"
+          - environment=test,release=test
+          - "--routing-logic"
+          - "disaggregated_prefill"
+          - "--engine-stats-interval"
+          - "15"
+          - "--request-stats-window"
+          - "60"
+          - --prefill-model-labels
+          - llama-prefill
+          - --decode-model-labels
+          - llama-decode
+        resources:
+          limits:
+            cpu: "4"
+            memory: 32G
+          requests:
+            cpu: "4"
+            memory: 16G
+        ports:
+          - name: "router-port"
+            containerPort: 8000
+          - name: "lmcache-port"
+            containerPort: 9000
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+---
+# Source: vllm-stack/templates/deployment-vllm-multi.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-16-disagg-prefill-llama-prefill-deployment-vllm"
+  namespace: llm-scan
+  labels:
+    model: llama-prefill
+    helm-release-name: scan-values-16-disagg-prefill
+    app.kubernetes.io/name: llama-prefill
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+    model: llama-prefill
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      model: llama-prefill
+      helm-release-name: scan-values-16-disagg-prefill
+      app.kubernetes.io/name: llama-prefill
+      app.kubernetes.io/instance: scan-values-16-disagg-prefill
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: test
+      release: test
+  progressDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        model: llama-prefill
+        helm-release-name: scan-values-16-disagg-prefill
+        app.kubernetes.io/name: llama-prefill
+        app.kubernetes.io/instance: scan-values-16-disagg-prefill
+        app.kubernetes.io/component: serving-engine
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: test
+        release: test
+    spec:
+      hostIPC: true
+      hostPID: true
+      hostname: "scan-values-16-disagg-prefill-llama-prefill-vllm-stack"
+      subdomain: "scan-values-16-disagg-prefill-llama-prefill-engine-service"
+      containers:
+        - name: "vllm"
+          image: "lmcache/vllm-openai:2025-05-27-v1"
+          securityContext:
+            capabilities:
+              add:
+              - SYS_PTRACE
+            runAsNonRoot: false
+          command:
+          - "/opt/venv/bin/vllm"
+          - "serve"
+          - "meta-llama/Llama-3.1-8B-Instruct"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--enable-prefix-caching"
+          - "--max-model-len"
+          - "32000"
+          - "--kv-transfer-config"
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_producer","kv_connector_extra_config":{"discard_partial_chunks": false, "lmcache_rpc_port": "sender"}}'
+          imagePullPolicy: "Always"
+          env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: HF_HOME
+            value: /data
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PROMETHEUS_MULTIPROC_DIR
+            value: "/tmp"
+          - name: HF_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: scan-values-16-disagg-prefill-secrets
+                key: hf_token_llama-prefill
+          - name: LMCACHE_USE_EXPERIMENTAL
+            value: "True"
+          - name: VLLM_RPC_TIMEOUT
+            value: "1000000"
+          - name: LMCACHE_LOG_LEVEL
+            value: "INFO"
+          - name: CUDA_VISIBLE_DEVICES
+            value: "0"
+          - name: LMCACHE_LOCAL_CPU
+            value: "False"
+          - name: LMCACHE_MAX_LOCAL_CPU_SIZE
+            value: "0"
+          - name: LMCACHE_REMOTE_SERDE
+            value: "NULL"
+          - name: UCX_TLS
+            value: "cuda_ipc,cuda_copy,tcp"
+          - name: LMCACHE_ENABLE_NIXL
+            value: "True"
+          - name: LMCACHE_NIXL_ROLE
+            value: "sender"
+          - name: LMCACHE_NIXL_RECEIVER_HOST
+            # value:  "0.0.0.0"
+            value: "pd-llama-decode-engine-service"
+          - name: LMCACHE_NIXL_RECEIVER_PORT
+            value: "55555"
+          - name: LMCACHE_NIXL_BUFFER_SIZE
+            value: "1073741824"
+          - name: LMCACHE_NIXL_BUFFER_DEVICE
+            value: "cuda"
+          - name: LMCACHE_NIXL_ENABLE_GC
+            value: "True"
+          - name: LMCACHE_LMCACHE_INSTANCE_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          ports:
+            - name: "container-port"
+              containerPort: 8000
+            - name: zmq-port
+              containerPort: 55555
+            - name: ucx-port
+              containerPort: 9999          
+          startupProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+            httpGet:
+              path:  /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          resources:
+            requests:
+              memory: "30Gi"
+              cpu: "8"
+            limits:
+          volumeMounts:
+          - name: scan-values-16-disagg-prefill-storage
+            mountPath: /data
+      volumes:
+        - name: scan-values-16-disagg-prefill-storage
+          persistentVolumeClaim:
+            claimName: "scan-values-16-disagg-prefill-llama-prefill-storage-claim"
+---
+# Source: vllm-stack/templates/deployment-vllm-multi.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-16-disagg-prefill-llama-decode-deployment-vllm"
+  namespace: llm-scan
+  labels:
+    model: llama-decode
+    helm-release-name: scan-values-16-disagg-prefill
+    app.kubernetes.io/name: llama-decode
+    app.kubernetes.io/instance: scan-values-16-disagg-prefill
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+    model: llama-decode
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      model: llama-decode
+      helm-release-name: scan-values-16-disagg-prefill
+      app.kubernetes.io/name: llama-decode
+      app.kubernetes.io/instance: scan-values-16-disagg-prefill
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: test
+      release: test
+  progressDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        model: llama-decode
+        helm-release-name: scan-values-16-disagg-prefill
+        app.kubernetes.io/name: llama-decode
+        app.kubernetes.io/instance: scan-values-16-disagg-prefill
+        app.kubernetes.io/component: serving-engine
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: test
+        release: test
+    spec:
+      hostIPC: true
+      hostPID: true
+      hostname: "scan-values-16-disagg-prefill-llama-decode-vllm-stack"
+      subdomain: "scan-values-16-disagg-prefill-llama-decode-engine-service"
+      containers:
+        - name: "vllm"
+          image: "lmcache/vllm-openai:2025-05-27-v1"
+          securityContext:
+            capabilities:
+              add:
+              - SYS_PTRACE
+            runAsNonRoot: false
+          command:
+          - "/opt/venv/bin/vllm"
+          - "serve"
+          - "meta-llama/Llama-3.1-8B-Instruct"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--enable-prefix-caching"
+          - "--max-model-len"
+          - "32000"
+          - "--kv-transfer-config"
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_consumer","kv_connector_extra_config":{"discard_partial_chunks": false, "lmcache_rpc_port": "receiver"}}'
+          imagePullPolicy: "Always"
+          env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: HF_HOME
+            value: /data
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PROMETHEUS_MULTIPROC_DIR
+            value: "/tmp"
+          - name: HF_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: scan-values-16-disagg-prefill-secrets
+                key: hf_token_llama-decode
+          - name: LMCACHE_USE_EXPERIMENTAL
+            value: "True"
+          - name: VLLM_RPC_TIMEOUT
+            value: "1000000"
+          - name: LMCACHE_LOG_LEVEL
+            value: "INFO"
+          - name: CUDA_VISIBLE_DEVICES
+            value: "1"
+          - name: LMCACHE_LOCAL_CPU
+            value: "False"
+          - name: LMCACHE_MAX_LOCAL_CPU_SIZE
+            value: "0"
+          - name: LMCACHE_REMOTE_SERDE
+            value: "NULL"
+          - name: UCX_TLS
+            value: "cuda_ipc,cuda_copy,tcp"
+          - name: LMCACHE_ENABLE_NIXL
+            value: "True"
+          - name: LMCACHE_NIXL_ROLE
+            value: "receiver"
+          - name: LMCACHE_NIXL_RECEIVER_HOST
+            # value:  "0.0.0.0"
+            value: "0.0.0.0"
+          - name: LMCACHE_NIXL_RECEIVER_PORT
+            value: "55555"
+          - name: LMCACHE_NIXL_BUFFER_SIZE
+            value: "1073741824"
+          - name: LMCACHE_NIXL_BUFFER_DEVICE
+            value: "cuda"
+          - name: LMCACHE_NIXL_ENABLE_GC
+            value: "True"
+          - name: LMCACHE_LMCACHE_INSTANCE_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          ports:
+            - name: "container-port"
+              containerPort: 8000
+            - name: zmq-port
+              containerPort: 55555
+            - name: ucx-port
+              containerPort: 9999          
+          startupProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+            httpGet:
+              path:  /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          resources:
+            requests:
+              memory: "30Gi"
+              cpu: "8"
+            limits:
+          volumeMounts:
+          - name: scan-values-16-disagg-prefill-storage
+            mountPath: /data
+      volumes:
+        - name: scan-values-16-disagg-prefill-storage
+          persistentVolumeClaim:
+            claimName: "scan-values-16-disagg-prefill-llama-decode-storage-claim"

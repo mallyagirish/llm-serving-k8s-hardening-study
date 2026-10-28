@@ -1,0 +1,547 @@
+---
+# Source: vllm-stack/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "scan-values-09-lora-helm-router-service-account"
+  namespace: llm-scan
+---
+# Source: vllm-stack/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scan-values-09-lora-helm-lora-controller
+  labels:
+    app.kubernetes.io/component: lora-controller
+    helm-release-name: scan-values-09-lora-helm
+---
+# Source: vllm-stack/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "scan-values-09-lora-helm-secrets"
+  namespace: llm-scan
+type: Opaque
+data:
+  hf_token_llama3: "PHlvdXItaGYtdG9rZW4+"
+  lora_adapter_credentials_llama-3.1-nemoguard-8b-topic-control: "PHlvdXItaGYtdG9rZW4+"
+---
+# Source: vllm-stack/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "scan-values-09-lora-helm-llama3-storage-claim"
+  namespace: llm-scan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Source: vllm-stack/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "scan-values-09-lora-helm-lora-controller"
+  labels:
+    app.kubernetes.io/component: lora-controller
+    helm-release-name: scan-values-09-lora-helm
+rules:
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+- apiGroups: ["production-stack.vllm.ai"]
+  resources: ["loraadapters"]
+  verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+- apiGroups: ["production-stack.vllm.ai"]
+  resources: ["loraadapters/status"]
+  verbs: ["get", "update", "patch"]
+- apiGroups: [""]
+  resources: ["pods", "events", "secrets"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+---
+# Source: vllm-stack/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "scan-values-09-lora-helm-leader-election-role"
+  labels:
+    app.kubernetes.io/component: leader-election
+    helm-release-name: scan-values-09-lora-helm
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+---
+# Source: vllm-stack/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: scan-values-09-lora-helm-lora-controller
+  labels:
+    app.kubernetes.io/component: lora-controller
+    helm-release-name: scan-values-09-lora-helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: scan-values-09-lora-helm-lora-controller
+subjects:
+- kind: ServiceAccount
+  name: scan-values-09-lora-helm-lora-controller
+  namespace: llm-scan
+---
+# Source: vllm-stack/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: scan-values-09-lora-helm-leader-election-rolebinding
+  labels:
+    app.kubernetes.io/component: leader-election
+    helm-release-name: scan-values-09-lora-helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: scan-values-09-lora-helm-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: scan-values-09-lora-helm-lora-controller
+  namespace: llm-scan
+---
+# Source: vllm-stack/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "scan-values-09-lora-helm-reader"
+  namespace: llm-scan
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "patch"]
+---
+# Source: vllm-stack/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: scan-values-09-lora-helm-deployment-access-binding
+  namespace: llm-scan
+subjects:
+  - kind: ServiceAccount
+    name: scan-values-09-lora-helm-router-service-account
+    namespace: llm-scan
+roleRef:
+  kind: Role
+  name: scan-values-09-lora-helm-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vllm-stack/templates/service-router.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-09-lora-helm-router-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-09-lora-helm
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  type: ClusterIP
+  ports:
+    - name: "router-sport"
+      port: 80
+      targetPort: 8000
+      protocol: TCP
+    - name: "lmcache-port"
+      port: 9000
+      targetPort: lmcache-port
+      protocol: TCP
+    
+  selector:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-09-lora-helm
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+---
+# Source: vllm-stack/templates/service-vllm.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-09-lora-helm-llama3-engine-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: llama3
+    app.kubernetes.io/instance: scan-values-09-lora-helm
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  type: ClusterIP
+  ports:
+    - name: "service-port"
+      port: 80
+      targetPort: "container-port"
+      protocol: TCP
+    - name: zmq-port
+      port: 55555
+      targetPort: zmq-port
+      protocol: TCP
+    - name: ucx-port
+      port: 9999
+      targetPort: ucx-port
+      protocol: TCP
+    
+  selector:
+    model: "llama3"
+    helm-release-name: "scan-values-09-lora-helm"
+    app.kubernetes.io/name: llama3
+    app.kubernetes.io/instance: scan-values-09-lora-helm
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+---
+# Source: vllm-stack/templates/deployment-lora-controller.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-values-09-lora-helm-lora-controller
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/component: lora-controller
+    helm-release-name: scan-values-09-lora-helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: lora-controller
+      helm-release-name: scan-values-09-lora-helm
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: lora-controller
+        helm-release-name: scan-values-09-lora-helm
+    spec:
+      serviceAccountName: scan-values-09-lora-helm-lora-controller
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: manager
+          image: "lmcache/lmstack-lora-controller:latest"
+          imagePullPolicy: Always
+          args:
+            - --leader-elect
+            - --health-probe-bind-address=:8081
+            - --metrics-bind-address=:8443
+            - --metrics-secure
+          env:
+            - name: WATCH_NAMESPACE
+              value: llm-scan
+            - name: KUBERNETES_CLUSTER_DOMAIN
+              value: "cluster.local"
+          ports:
+            - name: metrics
+              containerPort: 8443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+      volumes:
+      terminationGracePeriodSeconds: 10
+---
+# Source: vllm-stack/templates/deployment-router.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-09-lora-helm-deployment-router"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-09-lora-helm
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: scan-values-09-lora-helm
+      app.kubernetes.io/component: router
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: router
+      release: router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/instance: scan-values-09-lora-helm
+        app.kubernetes.io/component: router
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: router
+        release: router
+    spec:
+      serviceAccountName: scan-values-09-lora-helm-router-service-account
+      containers:
+      - name: router-container
+        image: "lmcache/lmstack-router:latest"
+        imagePullPolicy: "Always"
+        env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: LMCACHE_LOG_LEVEL
+            value: "INFO"
+        args:
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--service-discovery"
+          - "k8s"
+          - "--k8s-namespace"
+          - "llm-scan"
+          - "--k8s-service-discovery-type"
+          - "pod-ip"
+          - "--k8s-label-selector"
+          - environment=test,release=test
+          - "--routing-logic"
+          - "roundrobin"
+          - "--engine-stats-interval"
+          - "15"
+          - "--request-stats-window"
+          - "60"
+        resources:
+          limits:
+            memory: 1000Mi
+          requests:
+            cpu: 400m
+            memory: 1000Mi
+        ports:
+          - name: "router-port"
+            containerPort: 8000
+          - name: "lmcache-port"
+            containerPort: 9000
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+---
+# Source: vllm-stack/templates/deployment-vllm-multi.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-09-lora-helm-llama3-deployment-vllm"
+  namespace: llm-scan
+  labels:
+    model: llama3
+    helm-release-name: scan-values-09-lora-helm
+    app.kubernetes.io/name: llama3
+    app.kubernetes.io/instance: scan-values-09-lora-helm
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  replicas: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      model: llama3
+      helm-release-name: scan-values-09-lora-helm
+      app.kubernetes.io/name: llama3
+      app.kubernetes.io/instance: scan-values-09-lora-helm
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: test
+      release: test
+  progressDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        model: llama3
+        helm-release-name: scan-values-09-lora-helm
+        app.kubernetes.io/name: llama3
+        app.kubernetes.io/instance: scan-values-09-lora-helm
+        app.kubernetes.io/component: serving-engine
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: test
+        release: test
+    spec:
+      hostname: "scan-values-09-lora-helm-llama3-vllm-stack"
+      subdomain: "scan-values-09-lora-helm-llama3-engine-service"
+      containers:
+        - name: "vllm"
+          image: "vllm/vllm-openai:latest"
+          securityContext:
+            runAsNonRoot: false
+          command:
+          - "vllm"
+          - "serve"
+          - "meta-llama/Llama-3.1-8B-Instruct"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--enable-lora"
+          - "--enable-prefix-caching"
+          - "--max-model-len"
+          - "4096"
+          - "--dtype"
+          - "bfloat16"
+          - "--gpu-memory-utilization"
+          - "0.8"
+          imagePullPolicy: "Always"
+          env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: HF_HOME
+            value: /data
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PROMETHEUS_MULTIPROC_DIR
+            value: "/tmp"
+          - name: HF_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: scan-values-09-lora-helm-secrets
+                key: hf_token_llama3
+          - name: VLLM_ALLOW_RUNTIME_LORA_UPDATING
+            value: "True"
+          ports:
+            - name: "container-port"
+              containerPort: 8000
+            - name: zmq-port
+              containerPort: 55555
+            - name: ucx-port
+              containerPort: 9999          
+          startupProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+            httpGet:
+              path:  /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          resources:
+            requests:
+              memory: "32Gi"
+              cpu: "8"
+              nvidia.com/gpu: "1"
+            limits:
+              nvidia.com/gpu: "1"
+          volumeMounts:
+          - name: scan-values-09-lora-helm-storage
+            mountPath: /data
+        - name: sidecar
+          image: lmcache/lmstack-sidecar:latest
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "30090"
+            - name: LORA_DOWNLOAD_BASE_DIR
+              value: /data/lora-adapters
+          volumeMounts:
+            - name: scan-values-09-lora-helm-storage
+              mountPath: /data
+      volumes:
+        - name: scan-values-09-lora-helm-storage
+          persistentVolumeClaim:
+            claimName: "scan-values-09-lora-helm-llama3-storage-claim"
+---
+# Source: vllm-stack/templates/deployment-lora-adapter.yaml
+apiVersion: production-stack.vllm.ai/v1alpha1
+kind: LoraAdapter
+metadata:
+  name: llama3-nemoguard-adapter
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/component: lora-adapter
+    helm-release-name: scan-values-09-lora-helm
+spec:
+  baseModel: "llama3"
+  adapterSource:
+    type: "huggingface"
+    adapterName: "llama-3.1-nemoguard-8b-topic-control"
+    repository: "nvidia/llama-3.1-nemoguard-8b-topic-control"
+    credentialsSecretRef:
+      name: scan-values-09-lora-helm-secrets
+      key: lora_adapter_credentials_llama-3.1-nemoguard-8b-topic-control
+  loraAdapterDeploymentConfig:
+    algorithm: "default"
+    replicas: 1

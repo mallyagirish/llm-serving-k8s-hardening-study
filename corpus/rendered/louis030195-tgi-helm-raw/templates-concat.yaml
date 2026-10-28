@@ -1,0 +1,75 @@
+{{- range .Values.models }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .shortName }} 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .shortName }}
+      tier: {{ .shortName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .shortName }}
+        tier: {{ .shortName }}
+    spec:
+      nodeSelector:
+        cloud.google.com/gke-accelerator: {{ .gpu }}
+      containers:
+      - name: text-generation-inference
+        image: {{ $.Values.image.repository }}:{{ $.Values.image.tag }}
+        args: ["--model-id", "{{ .name }}", "--num-shard", "1"]
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: shm
+          mountPath: /dev/shm
+        - name: data
+          mountPath: /data
+        resources: 
+{{ toYaml .resources | indent 10 }}
+---
+{{- end }}apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.model.shortName }}
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: text-generation-inference-ip
+    kubernetes.io/ingress.allow-http: "false"
+    networking.gke.io/managed-certificates: managed-cert
+spec:
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: {{ .Values.model.shortName }}-service
+            port:
+              number: 80apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: {{ .Values.ingress.tls.secretName }} 
+spec:
+  domains:
+    - {{ .Values.ingress.host }} {{- range .Values.models }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .shortName }}-service
+  labels:
+    app: {{ .shortName }}
+spec:
+  type: NodePort
+  selector:
+    app: {{ .shortName }}
+    tier: {{ .shortName }}
+  ports:
+  - port: 80
+    targetPort: 80
+---
+{{- end }}

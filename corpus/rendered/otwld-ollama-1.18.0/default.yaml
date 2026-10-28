@@ -1,0 +1,134 @@
+---
+# Source: ollama/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scan-ollama-1.18.0
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.18.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-1.18.0
+    app.kubernetes.io/version: "0.7.1"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: ollama/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: scan-ollama-1.18.0
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.18.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-1.18.0
+    app.kubernetes.io/version: "0.7.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 11434
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-1.18.0
+---
+# Source: ollama/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-ollama-1.18.0
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.18.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-1.18.0
+    app.kubernetes.io/version: "0.7.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy: 
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ollama
+      app.kubernetes.io/instance: scan-ollama-1.18.0
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: ollama-1.18.0
+        app.kubernetes.io/name: ollama
+        app.kubernetes.io/instance: scan-ollama-1.18.0
+        app.kubernetes.io/version: "0.7.1"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: scan-ollama-1.18.0
+      securityContext:
+        {}
+      containers:
+        - name: ollama
+          securityContext:
+            {}
+          image: "ollama/ollama:0.7.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 11434
+              protocol: TCP
+          env:
+            - name: OLLAMA_HOST
+              value: "0.0.0.0:11434"
+          envFrom:
+          args:
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 6
+      volumes:
+        - name: ollama-data
+          emptyDir: { }
+---
+# Source: ollama/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "scan-ollama-1.18.0-test-connection"
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.18.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-1.18.0
+    app.kubernetes.io/version: "0.7.1"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['scan-ollama-1.18.0:11434']
+  restartPolicy: Never

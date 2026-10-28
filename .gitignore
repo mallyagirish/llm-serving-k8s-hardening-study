@@ -1,0 +1,13 @@
+# Large fetched chart clones / helm deps — recreate via scripts + SOURCES.lock.json
+corpus/charts/
+corpus/overlays/
+corpus/*.log
+corpus/fetch_render*.log
+**/.git/
+*.tgz
+*.tar.gz
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+.github/workflows/

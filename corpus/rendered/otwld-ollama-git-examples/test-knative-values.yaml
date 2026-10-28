@@ -1,0 +1,196 @@
+---
+# Source: ollama/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scan-ollama-test-knative-values
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.93.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-test-knative-values
+    app.kubernetes.io/version: "0.40.12"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: ollama/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    helm.sh/chart: ollama-1.93.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-test-knative-values
+    app.kubernetes.io/version: "0.40.12"
+    app.kubernetes.io/managed-by: Helm
+  name: scan-ollama-test-knative-values
+  namespace: llm-scan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "10Gi"
+---
+# Source: ollama/templates/knative/service.yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: scan-ollama-test-knative-values
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.93.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-test-knative-values
+    app.kubernetes.io/version: "0.40.12"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  template:
+    spec:
+      containerConcurrency: 0
+      timeoutSeconds: 300
+      responseStartTimeoutSeconds: 300
+      idleTimeoutSeconds: 300
+      serviceAccountName: scan-ollama-test-knative-values
+      containers:
+        - name: ollama
+          image: "ollama/ollama:0.40.12"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            runAsNonRoot: false
+            seccompProfile:
+              type: RuntimeDefault
+          ports:
+            - name: http1
+              containerPort: 11434
+          env:
+            - name: OLLAMA_HOST
+              value: "0.0.0.0:11434"
+          envFrom:
+          args:
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http1
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http1
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 6
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: scan-ollama-test-knative-values
+---
+# Source: ollama/templates/knative/model-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: scan-ollama-test-knative-values-model-bootstrap-4c233247
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.93.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-test-knative-values
+    app.kubernetes.io/version: "0.40.12"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: ollama-1.93.0
+        app.kubernetes.io/name: ollama
+        app.kubernetes.io/instance: scan-ollama-test-knative-values
+        app.kubernetes.io/version: "0.40.12"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      restartPolicy: Never
+      serviceAccountName: scan-ollama-test-knative-values
+      securityContext:
+        {}
+      containers:
+        - name: ollama-model-bootstrap
+          image: "ollama/ollama:0.40.12"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            runAsNonRoot: false
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: OLLAMA_HOST
+              value: "127.0.0.1:11434"
+          envFrom:
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+          command:
+            - /bin/sh
+            - -c
+            - |
+                /bin/ollama serve >/tmp/ollama-bootstrap.log 2>&1 &
+                ollama_pid=$!
+                trap 'kill $ollama_pid' EXIT
+
+                while ! /bin/ollama ps > /dev/null 2>&1; do
+                  sleep 5
+                done
+
+                /bin/ollama pull  moondream
+
+                /bin/ollama run moondream
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: scan-ollama-test-knative-values
+---
+# Source: ollama/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "scan-ollama-test-knative-values-test-connection"
+  namespace: llm-scan
+  labels:
+    helm.sh/chart: ollama-1.93.0
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/instance: scan-ollama-test-knative-values
+    app.kubernetes.io/version: "0.40.12"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['sh', '-ec']
+      args:
+        - >
+          wget -qO- "http://scan-ollama-test-knative-values.llm-scan.svc.cluster.local" >/dev/null
+  restartPolicy: Never

@@ -1,0 +1,398 @@
+---
+# Source: vllm-stack/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "scan-values-17-kv-aware-router-service-account"
+  namespace: llm-scan
+---
+# Source: vllm-stack/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "scan-values-17-kv-aware-secrets"
+  namespace: llm-scan
+type: Opaque
+data:
+---
+# Source: vllm-stack/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "scan-values-17-kv-aware-gpt-oss-20b-storage-claim"
+  namespace: llm-scan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Gi
+---
+# Source: vllm-stack/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "scan-values-17-kv-aware-reader"
+  namespace: llm-scan
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "patch"]
+---
+# Source: vllm-stack/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: scan-values-17-kv-aware-deployment-access-binding
+  namespace: llm-scan
+subjects:
+  - kind: ServiceAccount
+    name: scan-values-17-kv-aware-router-service-account
+    namespace: llm-scan
+roleRef:
+  kind: Role
+  name: scan-values-17-kv-aware-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vllm-stack/templates/service-router.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-17-kv-aware-router-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-17-kv-aware
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  type: ClusterIP
+  ports:
+    - name: "router-sport"
+      port: 80
+      targetPort: 8000
+      protocol: TCP
+    - name: "lmcache-port"
+      port: 9000
+      targetPort: lmcache-port
+      protocol: TCP
+    
+  selector:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-17-kv-aware
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+---
+# Source: vllm-stack/templates/service-vllm.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-17-kv-aware-gpt-oss-20b-engine-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: gpt-oss-20b
+    app.kubernetes.io/instance: scan-values-17-kv-aware
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  type: ClusterIP
+  ports:
+    - name: "service-port"
+      port: 80
+      targetPort: "container-port"
+      protocol: TCP
+    - name: zmq-port
+      port: 55555
+      targetPort: zmq-port
+      protocol: TCP
+    - name: ucx-port
+      port: 9999
+      targetPort: ucx-port
+      protocol: TCP
+    
+  selector:
+    model: "gpt-oss-20b"
+    helm-release-name: "scan-values-17-kv-aware"
+    app.kubernetes.io/name: gpt-oss-20b
+    app.kubernetes.io/instance: scan-values-17-kv-aware
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+---
+# Source: vllm-stack/templates/deployment-router.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-17-kv-aware-deployment-router"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-17-kv-aware
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: scan-values-17-kv-aware
+      app.kubernetes.io/component: router
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: router
+      release: router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/instance: scan-values-17-kv-aware
+        app.kubernetes.io/component: router
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: router
+        release: router
+    spec:
+      serviceAccountName: scan-values-17-kv-aware-router-service-account
+      containers:
+      - name: router-container
+        image: "lmcache/lmstack-router:latest"
+        imagePullPolicy: "Always"
+        env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: LMCACHE_LOG_LEVEL
+            value: "INFO"
+        args:
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--service-discovery"
+          - "k8s"
+          - "--k8s-namespace"
+          - "llm-scan"
+          - "--k8s-service-discovery-type"
+          - "pod-ip"
+          - "--k8s-label-selector"
+          - environment=test,release=test
+          - "--routing-logic"
+          - "kvaware"
+          - "--session-key"
+          - "x-user-id"
+          - "--engine-stats-interval"
+          - "15"
+          - "--request-stats-window"
+          - "60"
+          - "--lmcache-controller-port"
+          - "9000"
+          - "--lmcache-controller-reply-port"
+          - "9001"
+          - "--lmcache-controller-heartbeat-port"
+          - "9002"
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2G
+          requests:
+            cpu: "1"
+            memory: 2G
+        ports:
+          - name: "router-port"
+            containerPort: 8000
+          - name: "lmcache-port"
+            containerPort: 9000
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+---
+# Source: vllm-stack/templates/deployment-vllm-multi.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-17-kv-aware-gpt-oss-20b-deployment-vllm"
+  namespace: llm-scan
+  labels:
+    model: gpt-oss-20b
+    helm-release-name: scan-values-17-kv-aware
+    app.kubernetes.io/name: gpt-oss-20b
+    app.kubernetes.io/instance: scan-values-17-kv-aware
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      model: gpt-oss-20b
+      helm-release-name: scan-values-17-kv-aware
+      app.kubernetes.io/name: gpt-oss-20b
+      app.kubernetes.io/instance: scan-values-17-kv-aware
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: test
+      release: test
+  progressDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        model: gpt-oss-20b
+        helm-release-name: scan-values-17-kv-aware
+        app.kubernetes.io/name: gpt-oss-20b
+        app.kubernetes.io/instance: scan-values-17-kv-aware
+        app.kubernetes.io/component: serving-engine
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: test
+        release: test
+    spec:
+      hostname: "scan-values-17-kv-aware-gpt-oss-20b-vllm-stack"
+      subdomain: "scan-values-17-kv-aware-gpt-oss-20b-engine-service"
+      containers:
+        - name: "vllm"
+          image: "lmcache/vllm-openai:v0.3.9post2"
+          securityContext:
+            runAsNonRoot: false
+          command:
+          - "/opt/venv/bin/vllm"
+          - "serve"
+          - "openai/gpt-oss-20b"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--enable-prefix-caching"
+          - "--max-model-len"
+          - "8000"
+          - "--gpu_memory_utilization"
+          - "0.9"
+          - "--kv-transfer-config"
+          - '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both"}'
+          imagePullPolicy: "Always"
+          env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: HF_HOME
+            value: /data
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PROMETHEUS_MULTIPROC_DIR
+            value: "/tmp"
+          - name: VLLM_LOGGING_LEVEL
+            value: DEBUG
+          - name: HF_HOME
+            value: /data
+          - name: LMCACHE_USE_EXPERIMENTAL
+            value: "True"
+          - name: VLLM_RPC_TIMEOUT
+            value: "1000000"
+          - name: LMCACHE_LOG_LEVEL
+            value: "DEBUG"
+          - name: LMCACHE_LOCAL_CPU
+            value: "True"
+          - name: LMCACHE_MAX_LOCAL_CPU_SIZE
+            value: "60"
+          - name: LMCACHE_ENABLE_CONTROLLER
+            value: "True"
+          - name: LMCACHE_LMCACHE_INSTANCE_ID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: LMCACHE_CONTROLLER_PULL_URL
+            value: "scan-values-17-kv-aware-router-service:9000"
+          - name: LMCACHE_CONTROLLER_REPLY_URL
+            value: "scan-values-17-kv-aware-router-service:9001"
+          - name: LMCACHE_LMCACHE_WORKER_PORTS
+            value: "8001"
+          - name: LMCACHE_P2P_HOST
+            value: "localhost"
+          - name: LMCACHE_P2P_INIT_PORTS
+            value: "30081"
+          - name: LMCACHE_LMCACHE_WORKER_HEARTBEAT_TIME
+            value: "30"
+          ports:
+            - name: "container-port"
+              containerPort: 8000
+            - name: zmq-port
+              containerPort: 55555
+            - name: ucx-port
+              containerPort: 9999          
+          startupProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+            httpGet:
+              path:  /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          resources:
+            requests:
+              memory: "128Gi"
+              cpu: "8"
+              nvidia.com/gpu: "1"
+            limits:
+              nvidia.com/gpu: "1"
+          volumeMounts:
+          - name: scan-values-17-kv-aware-storage
+            mountPath: /data
+      volumes:
+        - name: scan-values-17-kv-aware-storage
+          persistentVolumeClaim:
+            claimName: "scan-values-17-kv-aware-gpt-oss-20b-storage-claim"

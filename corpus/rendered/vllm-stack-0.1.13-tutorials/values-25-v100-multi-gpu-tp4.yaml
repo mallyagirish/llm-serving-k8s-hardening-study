@@ -1,0 +1,376 @@
+---
+# Source: vllm-stack/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-router-service-account"
+  namespace: llm-scan
+---
+# Source: vllm-stack/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-secrets"
+  namespace: llm-scan
+type: Opaque
+data:
+---
+# Source: vllm-stack/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-qwen14b-storage-claim"
+  namespace: llm-scan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 80Gi
+---
+# Source: vllm-stack/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-reader"
+  namespace: llm-scan
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "patch"]
+---
+# Source: vllm-stack/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: scan-values-25-v100-multi-gpu-tp4-deployment-access-binding
+  namespace: llm-scan
+subjects:
+  - kind: ServiceAccount
+    name: scan-values-25-v100-multi-gpu-tp4-router-service-account
+    namespace: llm-scan
+roleRef:
+  kind: Role
+  name: scan-values-25-v100-multi-gpu-tp4-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vllm-stack/templates/service-router.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-router-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  type: ClusterIP
+  ports:
+    - name: "router-sport"
+      port: 80
+      targetPort: 8000
+      protocol: TCP
+    - name: "lmcache-port"
+      port: 9000
+      targetPort: lmcache-port
+      protocol: TCP
+    
+  selector:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+---
+# Source: vllm-stack/templates/service-vllm.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-qwen14b-engine-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: qwen14b
+    app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  type: ClusterIP
+  ports:
+    - name: "service-port"
+      port: 80
+      targetPort: "container-port"
+      protocol: TCP
+    - name: zmq-port
+      port: 55555
+      targetPort: zmq-port
+      protocol: TCP
+    - name: ucx-port
+      port: 9999
+      targetPort: ucx-port
+      protocol: TCP
+    
+  selector:
+    model: "qwen14b"
+    helm-release-name: "scan-values-25-v100-multi-gpu-tp4"
+    app.kubernetes.io/name: qwen14b
+    app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+---
+# Source: vllm-stack/templates/deployment-router.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-deployment-router"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+      app.kubernetes.io/component: router
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: router
+      release: router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+        app.kubernetes.io/component: router
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: router
+        release: router
+    spec:
+      serviceAccountName: scan-values-25-v100-multi-gpu-tp4-router-service-account
+      containers:
+      - name: router-container
+        image: "lmcache/lmstack-router:latest"
+        imagePullPolicy: "Always"
+        env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: LMCACHE_LOG_LEVEL
+            value: "INFO"
+        args:
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--service-discovery"
+          - "k8s"
+          - "--k8s-namespace"
+          - "llm-scan"
+          - "--k8s-service-discovery-type"
+          - "pod-ip"
+          - "--k8s-label-selector"
+          - environment=test,release=test
+          - "--routing-logic"
+          - "roundrobin"
+          - "--engine-stats-interval"
+          - "15"
+          - "--request-stats-window"
+          - "60"
+        resources:
+          limits:
+            memory: 1000Mi
+          requests:
+            cpu: 400m
+            memory: 1000Mi
+        ports:
+          - name: "router-port"
+            containerPort: 8000
+          - name: "lmcache-port"
+            containerPort: 9000
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+---
+# Source: vllm-stack/templates/deployment-vllm-multi.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-25-v100-multi-gpu-tp4-qwen14b-deployment-vllm"
+  namespace: llm-scan
+  labels:
+    model: qwen14b
+    helm-release-name: scan-values-25-v100-multi-gpu-tp4
+    app.kubernetes.io/name: qwen14b
+    app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      model: qwen14b
+      helm-release-name: scan-values-25-v100-multi-gpu-tp4
+      app.kubernetes.io/name: qwen14b
+      app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: test
+      release: test
+  progressDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        model: qwen14b
+        helm-release-name: scan-values-25-v100-multi-gpu-tp4
+        app.kubernetes.io/name: qwen14b
+        app.kubernetes.io/instance: scan-values-25-v100-multi-gpu-tp4
+        app.kubernetes.io/component: serving-engine
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: test
+        release: test
+    spec:
+      hostname: "scan-values-25-v100-multi-gpu-tp4-qwen14b-vllm-stack"
+      subdomain: "scan-values-25-v100-multi-gpu-tp4-qwen14b-engine-service"
+      containers:
+        - name: "vllm"
+          image: "vllm/vllm-openai:v0.8.5"
+          securityContext:
+            runAsNonRoot: false
+          command:
+          - "vllm"
+          - "serve"
+          - "Qwen/Qwen2.5-14B-Instruct"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--no-enable-prefix-caching"
+          - "--max-model-len"
+          - "8192"
+          - "--dtype"
+          - "half"
+          - "--tensor-parallel-size"
+          - "4"
+          - "--gpu_memory_utilization"
+          - "0.9"
+          - "--enforce-eager"
+          imagePullPolicy: "Always"
+          env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: HF_HOME
+            value: /data
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: VLLM_USE_V1
+            value: "0"
+          - name: VLLM_ENABLE_CUDA_COMPATIBILITY
+            value: "1"
+          ports:
+            - name: "container-port"
+              containerPort: 8000
+            - name: zmq-port
+              containerPort: 55555
+            - name: ucx-port
+              containerPort: 9999          
+          startupProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+            httpGet:
+              path:  /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          resources:
+            requests:
+              memory: "64Gi"
+              cpu: "16"
+              nvidia.com/gpu: "4"
+            limits:
+              nvidia.com/gpu: "4"
+          volumeMounts:
+          - name: scan-values-25-v100-multi-gpu-tp4-storage
+            mountPath: /data
+          - name: shm
+            mountPath: /dev/shm
+      volumes:
+        - name: scan-values-25-v100-multi-gpu-tp4-storage
+          persistentVolumeClaim:
+            claimName: "scan-values-25-v100-multi-gpu-tp4-qwen14b-storage-claim"
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 4Gi
+      runtimeClassName: nvidia
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - gpu-node-02

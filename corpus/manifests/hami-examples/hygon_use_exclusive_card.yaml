@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hcu-pytorch-demo
+spec:
+  containers:
+    - name: hcu-pytorch-demo
+      image: image.sourcefind.cn:5000/hcu/admin/base/pytorch:2.1.0-ubuntu22.04-dtk24.04.2-py3.10
+      command: [ "/bin/bash", "-c", "--" ]
+      args: [ "sleep infinity & wait" ]
+      resources:
+        limits:
+          hygon.com/hcunum: 2 # declare how many physical HCUs the pod needs

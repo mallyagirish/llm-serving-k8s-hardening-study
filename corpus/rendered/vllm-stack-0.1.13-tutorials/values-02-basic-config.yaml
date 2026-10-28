@@ -1,0 +1,364 @@
+---
+# Source: vllm-stack/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: "scan-values-02-basic-config-router-service-account"
+  namespace: llm-scan
+---
+# Source: vllm-stack/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "scan-values-02-basic-config-secrets"
+  namespace: llm-scan
+type: Opaque
+data:
+  hf_token_llama3: "PFlPVVIgSEYgVE9LRU4+"
+---
+# Source: vllm-stack/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "scan-values-02-basic-config-llama3-storage-claim"
+  namespace: llm-scan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+# Source: vllm-stack/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "scan-values-02-basic-config-reader"
+  namespace: llm-scan
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "patch"]
+---
+# Source: vllm-stack/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: scan-values-02-basic-config-deployment-access-binding
+  namespace: llm-scan
+subjects:
+  - kind: ServiceAccount
+    name: scan-values-02-basic-config-router-service-account
+    namespace: llm-scan
+roleRef:
+  kind: Role
+  name: scan-values-02-basic-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: vllm-stack/templates/service-router.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-02-basic-config-router-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-02-basic-config
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  type: ClusterIP
+  ports:
+    - name: "router-sport"
+      port: 80
+      targetPort: 8000
+      protocol: TCP
+    - name: "lmcache-port"
+      port: 9000
+      targetPort: lmcache-port
+      protocol: TCP
+    
+  selector:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-02-basic-config
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+---
+# Source: vllm-stack/templates/service-vllm.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: "scan-values-02-basic-config-llama3-engine-service"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: llama3
+    app.kubernetes.io/instance: scan-values-02-basic-config
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  type: ClusterIP
+  ports:
+    - name: "service-port"
+      port: 80
+      targetPort: "container-port"
+      protocol: TCP
+    - name: zmq-port
+      port: 55555
+      targetPort: zmq-port
+      protocol: TCP
+    - name: ucx-port
+      port: 9999
+      targetPort: ucx-port
+      protocol: TCP
+    
+  selector:
+    model: "llama3"
+    helm-release-name: "scan-values-02-basic-config"
+    app.kubernetes.io/name: llama3
+    app.kubernetes.io/instance: scan-values-02-basic-config
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+---
+# Source: vllm-stack/templates/deployment-router.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-02-basic-config-deployment-router"
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: scan-values-02-basic-config
+    app.kubernetes.io/component: router
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: router
+    release: router
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: scan-values-02-basic-config
+      app.kubernetes.io/component: router
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: router
+      release: router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/instance: scan-values-02-basic-config
+        app.kubernetes.io/component: router
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: router
+        release: router
+    spec:
+      serviceAccountName: scan-values-02-basic-config-router-service-account
+      containers:
+      - name: router-container
+        image: "lmcache/lmstack-router:latest"
+        imagePullPolicy: "Always"
+        env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: LMCACHE_LOG_LEVEL
+            value: "INFO"
+        args:
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--service-discovery"
+          - "k8s"
+          - "--k8s-namespace"
+          - "llm-scan"
+          - "--k8s-service-discovery-type"
+          - "pod-ip"
+          - "--k8s-label-selector"
+          - environment=test,release=test
+          - "--routing-logic"
+          - "roundrobin"
+          - "--engine-stats-interval"
+          - "15"
+          - "--request-stats-window"
+          - "60"
+        resources:
+          limits:
+            memory: 1000Mi
+          requests:
+            cpu: 400m
+            memory: 1000Mi
+        ports:
+          - name: "router-port"
+            containerPort: 8000
+          - name: "lmcache-port"
+            containerPort: 9000
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: router-port
+          initialDelaySeconds: 30
+          periodSeconds: 5
+---
+# Source: vllm-stack/templates/deployment-vllm-multi.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "scan-values-02-basic-config-llama3-deployment-vllm"
+  namespace: llm-scan
+  labels:
+    model: llama3
+    helm-release-name: scan-values-02-basic-config
+    app.kubernetes.io/name: llama3
+    app.kubernetes.io/instance: scan-values-02-basic-config
+    app.kubernetes.io/component: serving-engine
+    app.kubernetes.io/part-of: vllm-stack
+    app.kubernetes.io/managed-by: helm
+    environment: test
+    release: test
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      model: llama3
+      helm-release-name: scan-values-02-basic-config
+      app.kubernetes.io/name: llama3
+      app.kubernetes.io/instance: scan-values-02-basic-config
+      app.kubernetes.io/component: serving-engine
+      app.kubernetes.io/part-of: vllm-stack
+      app.kubernetes.io/managed-by: helm
+      environment: test
+      release: test
+  progressDeadlineSeconds: 1200
+  template:
+    metadata:
+      labels:
+        model: llama3
+        helm-release-name: scan-values-02-basic-config
+        app.kubernetes.io/name: llama3
+        app.kubernetes.io/instance: scan-values-02-basic-config
+        app.kubernetes.io/component: serving-engine
+        app.kubernetes.io/part-of: vllm-stack
+        app.kubernetes.io/managed-by: helm
+        environment: test
+        release: test
+    spec:
+      hostname: "scan-values-02-basic-config-llama3-vllm-stack"
+      subdomain: "scan-values-02-basic-config-llama3-engine-service"
+      containers:
+        - name: "vllm"
+          image: "vllm/vllm-openai:latest"
+          securityContext:
+            runAsNonRoot: false
+          command:
+          - "vllm"
+          - "serve"
+          - "meta-llama/Llama-3.1-8B-Instruct"
+          - "--host"
+          - "0.0.0.0"
+          - "--port"
+          - "8000"
+          - "--no-enable-chunked-prefill"
+          - "--no-enable-prefix-caching"
+          - "--max-model-len"
+          - "4096"
+          - "--dtype"
+          - "bfloat16"
+          - "--gpu-memory-utilization"
+          - "0.8"
+          imagePullPolicy: "Always"
+          env:
+          - name: PYTHONHASHSEED
+            value: "123"
+          - name: HF_HOME
+            value: /data
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PROMETHEUS_MULTIPROC_DIR
+            value: "/tmp"
+          - name: HF_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: scan-values-02-basic-config-secrets
+                key: hf_token_llama3
+          ports:
+            - name: "container-port"
+              containerPort: 8000
+            - name: zmq-port
+              containerPort: 55555
+            - name: ucx-port
+              containerPort: 9999          
+          startupProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+            httpGet:
+              path:  /health
+              port: 8000
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 3
+            httpGet:
+              path:  /health
+              port: 8000
+          resources:
+            requests:
+              memory: "16Gi"
+              cpu: "10"
+              nvidia.com/gpu: "1"
+            limits:
+              nvidia.com/gpu: "1"
+          volumeMounts:
+          - name: scan-values-02-basic-config-storage
+            mountPath: /data
+      volumes:
+        - name: scan-values-02-basic-config-storage
+          persistentVolumeClaim:
+            claimName: "scan-values-02-basic-config-llama3-storage-claim"
