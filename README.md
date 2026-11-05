@@ -117,6 +117,9 @@ python -m unittest discover -s tests -v
 python scripts/validate_corpus.py
 python scripts/scan_candidates.py corpus/rendered --output results/raw_candidate_findings.jsonl
 python scripts/build_workload_inventory.py
+
+# After human eligibility decisions are recorded in the generated CSV:
+python scripts/create_blinded_labeling_sample.py --eligibility-csv results/bundle_eligibility_review.csv --sample-size 30 --seed 20261105
 ```
 
 The GitHub Actions workflow runs the same pipeline and uploads a 30-day artifact containing the corpus inventory, parseability summary, raw candidate observations, and resource-level eligibility review queue.
