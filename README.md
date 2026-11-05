@@ -106,6 +106,20 @@ The Phase 3 pipeline is under active validation on branch `research/phase3-empir
 
 See [the empirical protocol](docs/PHASE3_EMPIRICAL_PROTOCOL.md), [corpus screening guide](docs/CORPUS_SCREENING_GUIDE.md), and [human labeling guide](docs/LABELING_GUIDE.md).
 
+### Run the Phase 3 validation locally
+
+After fetching/rendering the corpus, install the scanner dependency and run:
+
+```bash
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+python scripts/validate_corpus.py
+python scripts/scan_candidates.py corpus/rendered --output results/raw_candidate_findings.jsonl
+python scripts/build_workload_inventory.py
+```
+
+The GitHub Actions workflow runs the same pipeline and uploads a 30-day artifact containing the corpus inventory, parseability summary, raw candidate observations, and resource-level eligibility review queue.
+
 ## Status
 
 | Phase | Content | Status |
