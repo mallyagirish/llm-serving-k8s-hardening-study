@@ -31,6 +31,18 @@ class WorkloadInventoryTests(unittest.TestCase):
         )
         self.assertEqual(stratum, "supporting_platform_candidate")
 
+    def test_generic_controller_in_llm_chart_is_not_primary(self):
+        stratum, _ = inventory.propose_stratum(
+            "Deployment", "hami scheduler kube-scheduler image", "vllm-stack", "vllm-stack.yaml"
+        )
+        self.assertEqual(stratum, "supporting_platform_candidate")
+
+    def test_llm_inference_service_config_is_primary_candidate(self):
+        stratum, _ = inventory.propose_stratum(
+            "LLMInferenceServiceConfig", "decode-config", "kserve", "llmisvc.yaml"
+        )
+        self.assertEqual(stratum, "primary_candidate")
+
     def test_generic_kserve_control_plane_is_supporting(self):
         stratum, _ = inventory.propose_stratum(
             "Deployment", "kserve-controller-manager controller image", "kserve", "kserve.yaml"
