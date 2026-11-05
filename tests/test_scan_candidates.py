@@ -17,7 +17,7 @@ class CandidateScannerTests(unittest.TestCase):
             return scanner.scan_file(p)
 
     def test_llm_deployment_emits_static_candidates(self):
-        text = """
+        rows = self.scan_text("""
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -35,16 +35,16 @@ spec:
         image: vllm/vllm-openai:latest
         securityContext:
           privileged: true
-"""
-        rows = self.scan_text(text)
+""")
         ids = {r["rule_id"] for r in rows}
         self.assertIn("LLM-NET-05", ids)
         self.assertIn("LLM-GPU-03", ids)
         self.assertIn("LLM-WL-05", ids)
+        self.assertIn("LLM-WL-03", ids)
         self.assertTrue(all(r["status"] == "candidate_for_human_review" for r in rows))
 
     def test_non_llm_deployment_is_not_scanned(self):
-        text = """
+        self.assertEqual(self.scan_text("""
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -59,8 +59,43 @@ spec:
       containers:
       - name: web
         image: nginx:1.27
-"""
-        self.assertEqual(self.scan_text(text), [])
+"""), [])
+
+    def test_container_false_overrides_pod_true_for_run_as_non_root(self):
+        rows = self.scan_text("""
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: vllm-api}
+spec:
+  selector: {matchLabels: {app: vllm}}
+  template:
+    metadata: {labels: {app: vllm}}
+    spec:
+      securityContext: {runAsNonRoot: true}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        securityContext: {runAsNonRoot: false, allowPrivilegeEscalation: false, readOnlyRootFilesystem: true}
+""")
+        self.assertIn("LLM-WL-01", {r["rule_id"] for r in rows})
+        self.assertNotIn("LLM-WL-03", {r["rule_id"] for r in rows})
+        self.assertNotIn("LLM-WL-05", {r["rule_id"] for r in rows})
+
+    def test_cronjob_nested_pod_template_is_scanned(self):
+        rows = self.scan_text("""
+apiVersion: batch/v1
+kind: CronJob
+metadata: {name: llm-cache-maintenance}
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: llm-maintenance
+            image: example/llm-maintenance:1.0
+""")
+        self.assertIn("LLM-WL-01", {r["rule_id"] for r in rows})
 
 
 if __name__ == "__main__":
