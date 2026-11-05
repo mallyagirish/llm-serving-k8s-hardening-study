@@ -108,6 +108,18 @@ spec:
 """)
         self.assertEqual(rows, [])
 
+    def test_generic_inference_container_is_not_assumed_to_be_llm(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: npod}
+spec:
+  containers:
+  - name: npod
+    image: public.ecr.aws/neuron/pytorch-inference-neuron:1.13.1
+""")
+        self.assertEqual(rows, [])
+
     def test_sidecar_is_not_mislabeled_as_inference_container(self):
         rows = self.scan_text("""
 apiVersion: apps/v1
