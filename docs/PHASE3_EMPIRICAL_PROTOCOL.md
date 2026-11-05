@@ -71,7 +71,7 @@ If a rule's intended claim cannot be tested from available artifacts, downgrade 
 
 ## 5A. Current scanner coverage (implementation status)
 
-The current conservative candidate scanner emits candidates for nine rule IDs only: LLM-NET-01, LLM-NET-05, LLM-GPU-03, LLM-WL-01, LLM-WL-02, LLM-WL-03, LLM-WL-05, LLM-RES-01, and LLM-RES-03. The remaining rules are not yet automatically assessed by this script and require rule-specific manual evidence review or future tested extractors.
+The current conservative candidate scanner emits candidates for 13 rule IDs: LLM-NET-01, LLM-NET-03, LLM-NET-05, LLM-SEC-02, LLM-GPU-01, LLM-GPU-03, LLM-WL-01, LLM-WL-02, LLM-WL-03, LLM-WL-04, LLM-WL-05, LLM-RES-01, and LLM-RES-03. The remaining 15 rules are not yet automatically assessed by this script and require rule-specific manual evidence review or future tested extractors.
 
 The scanner intentionally emits candidates rather than TP/FP labels. It uses container/resource identity heuristics and can still miss or misclassify workloads. Candidate counts must not be presented as rule prevalence, scanner precision, or recall. The rule catalog's automation field is the authoritative coverage declaration for each rule version.
 
