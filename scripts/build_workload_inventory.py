@@ -72,6 +72,8 @@ def collect_containers(pod_spec: dict[str, Any]) -> list[dict[str, Any]]:
 def propose_stratum(kind: str, identity: str, source: str, path: str) -> tuple[str, str]:
     # Decide primary eligibility from the resource itself, not the bundle path.
     # A vLLM chart can also contain generic controllers, sidecars, and jobs.
+    if re.search(r"(test[-_ ]?connection|helm[-_ ]?test)", identity, re.I):
+        return "supporting_platform_candidate", "Helm test/connection-check resource; not a serving workload."
     if NON_SERVING_HINT.search(identity) and not EXPLICIT_SERVING_ENGINE.search(identity):
         return "supporting_platform_candidate", "Training/fine-tuning identity; not an inference workload candidate."
     if kind in {"LLMInferenceService", "LLMInferenceServiceConfig"}:
