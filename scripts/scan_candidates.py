@@ -23,6 +23,11 @@ LLM_HINT = re.compile(
     re.I,
 )
 IMAGE_DIGEST = re.compile(r"@sha256:[0-9a-f]{64}$", re.I)
+GPU_KEYS = ("nvidia.com/gpu", "amd.com/gpu", "habana.ai/gaudi", "gpu.intel.com/i915",
+            "iluvatar.ai/vgpu", "enflame.com/vgcu", "huawei.com/Ascend910")
+GPU_ENGINE_HINT = re.compile(r"(vllm|text-generation|tgi|sglang)", re.I)
+SECRET_ENV_HINT = re.compile(r"(API[_-]?KEY|TOKEN|PASSWORD|SECRET|HF[_-]?TOKEN|HUGGING[_-]?FACE)", re.I)
+PLACEHOLDER_VALUE = re.compile(r"(YOUR[_ -]?|REPLACE[_ -]?ME|CHANGE[_ -]?ME|DUMMY|EXAMPLE|TEST[_ -]?TOKEN|^\$\{[^}]+\}$|^$)", re.I)
 NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
 EXPLICIT_SERVING_ENGINE = re.compile(r"(vllm|text-generation|text_generation|tgi|sglang|ollama|litellm)", re.I)
 
@@ -185,6 +190,23 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                          prefix + "effective runAsNonRoot is not explicitly true",
                          "Image USER, runtime identity, and admission policy are not evaluated.",
                          **common)
+                if effective_pod_or_container_value(sc, pod_sc, "seccompProfile") is None:
+                    emit(findings, "LLM-WL-04", path, digest, obj,
+                         prefix + "no explicit seccompProfile at container or pod level",
+                         "Admission policy or node defaults may enforce seccomp externally; this is a manifest evidence candidate.",
+                         **common)
+                for env in c.get("env") or []:
+                    if not isinstance(env, dict):
+                        continue
+                    env_name = str(env.get("name", ""))
+                    env_value = env.get("value")
+                    if SECRET_ENV_HINT.search(env_name) and isinstance(env_value, str) and env_value.strip():
+                        if not PLACEHOLDER_VALUE.search(env_value.strip()):
+                            if not env.get("valueFrom"):
+                                emit(findings, "LLM-SEC-02", path, digest, obj,
+                                     prefix + "token-like environment variable uses a literal value: " + env_name,
+                                     "The literal value is deliberately redacted; verify it is not a placeholder and is not protected by an external mechanism.",
+                                     **common)
                 if sc.get("readOnlyRootFilesystem") is not True:
                     emit(findings, "LLM-WL-02", path, digest, obj,
                          prefix + "readOnlyRootFilesystem is not explicitly true",
@@ -198,6 +220,11 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                 resources = c.get("resources") or {}
                 req = resources.get("requests") or {}
                 lim = resources.get("limits") or {}
+                if GPU_ENGINE_HINT.search(name + " " + image) and not any(key in req or key in lim for key in GPU_KEYS):
+                    emit(findings, "LLM-GPU-01", path, digest, obj,
+                         prefix + "known GPU-oriented serving engine has no vendor GPU resource request/limit",
+                         "CPU execution or nonstandard device-plugin resources may be intentional; confirm hardware mode before labeling.",
+                         **common)
                 missing = [key for key in ("cpu", "memory") if key not in req or key not in lim]
                 if missing:
                     emit(findings, "LLM-RES-01", path, digest, obj,
@@ -209,6 +236,23 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                          prefix + "no readinessProbe or startupProbe",
                          "A probe may be defined externally; startup/readiness semantics require workload review.",
                          **common)
+        elif kind == "Ingress":
+            spec = obj.get("spec") or {}
+            meta = obj.get("metadata") or {}
+            backends = []
+            for rule in spec.get("rules") or []:
+                http = rule.get("http") or {}
+                for item in http.get("paths") or []:
+                    backend = item.get("backend") or {}
+                    service = backend.get("service") or {}
+                    if service.get("name"):
+                        backends.append(str(service["name"]))
+            identity = " ".join([str(meta.get("name", "")), " ".join(backends)])
+            if identity_matches(identity) and not spec.get("tls"):
+                emit(findings, "LLM-NET-03", path, digest, obj,
+                     "Ingress for an LLM-serving identity has no spec.tls configuration",
+                     "TLS may terminate upstream or at an external gateway/load balancer; inspect the full deployment path.",
+                     document_index=document_index)
         elif kind == "Service":
             spec = obj.get("spec") or {}
             ports = spec.get("ports") or []
