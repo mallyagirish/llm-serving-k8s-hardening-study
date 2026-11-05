@@ -15,10 +15,7 @@ import sys
 from pathlib import Path
 from typing import Any, Iterable
 
-try:
-    import yaml
-except ImportError:
-    raise SystemExit("Missing dependency: install PyYAML with 'python -m pip install PyYAML'")
+import yaml
 
 LLM_HINT = re.compile(
     r"(vllm|text-generation|text_generation|tgi|sglang|ollama|llm|inference|"
@@ -57,32 +54,44 @@ def workload_parts(obj: dict[str, Any]) -> tuple[str, dict[str, Any], list[dict[
     return kind, pod, [c for c in containers if isinstance(c, dict)]
 
 
-def looks_like_llm(obj: dict[str, Any], pod: dict[str, Any],
-                   containers: list[dict[str, Any]]) -> bool:
+def workload_has_llm_identity(obj: dict[str, Any], pod: dict[str, Any]) -> bool:
     meta = obj.get("metadata") or {}
-    pod_meta = ((obj.get("spec") or {}).get("template") or {}).get("metadata") or {}
-    parts = [str(meta.get("name", "")), str(meta.get("labels", "")),
-             str(pod_meta.get("labels", "")), str(pod.get("labels", ""))]
-    for c in containers:
-        parts.extend([
-            str(c.get("name", "")), str(c.get("image", "")),
-            " ".join(str(x) for x in (c.get("command") or [])),
-            " ".join(str(x) for x in (c.get("args") or [])),
-        ])
-    return any(LLM_HINT.search(part) for part in parts)
+    spec = obj.get("spec") or {}
+    template = spec.get("template") or {}
+    pod_meta = template.get("metadata") or {}
+    # Deliberately exclude namespace and arbitrary args: e.g. namespace=llm-scan
+    # must not make an unrelated operator look like an inference workload.
+    identity = " ".join([
+        str(meta.get("name", "")),
+        str(meta.get("labels", "")),
+        str(pod_meta.get("labels", "")),
+        str(pod.get("labels", "")),
+    ])
+    return bool(LLM_HINT.search(identity))
+
+
+def container_has_llm_identity(container: dict[str, Any]) -> bool:
+    identity = " ".join([
+        str(container.get("name", "")),
+        str(container.get("image", "")),
+    ])
+    return bool(LLM_HINT.search(identity))
 
 
 def emit(out: list[dict[str, Any]], rule: str, path: Path, digest: str,
-         obj: dict[str, Any], evidence: str, caveat: str) -> None:
+         obj: dict[str, Any], evidence: str, caveat: str,
+         container_name: str | None = None, document_index: int | None = None) -> None:
     meta = obj.get("metadata") or {}
     out.append({
         "rule_id": rule,
         "status": "candidate_for_human_review",
         "source_file": str(path),
         "source_sha256": digest,
+        "document_index": document_index,
         "kind": obj.get("kind"),
         "namespace": meta.get("namespace", "default"),
         "resource_name": meta.get("name"),
+        "container_name": container_name,
         "evidence": evidence,
         "interpretation_limit": caveat,
     })
@@ -90,7 +99,6 @@ def emit(out: list[dict[str, Any]], rule: str, path: Path, digest: str,
 
 def effective_pod_or_container_value(container_sc: dict[str, Any],
                                      pod_sc: dict[str, Any], key: str) -> Any:
-    # Container-level securityContext overrides pod-level value when explicitly set.
     if key in container_sc:
         return container_sc[key]
     return pod_sc.get(key)
@@ -99,43 +107,69 @@ def effective_pod_or_container_value(container_sc: dict[str, Any],
 def scan_file(path: Path) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     digest = sha256(path)
-    for obj in docs_in(path):
+    for document_index, obj in enumerate(docs_in(path)):
         kind, pod, containers = workload_parts(obj)
         if kind in {"Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"}:
-            if not containers or not looks_like_llm(obj, pod, containers):
+            if not containers:
                 continue
+            workload_hint = workload_has_llm_identity(obj, pod)
+            matched = [c for c in containers if container_has_llm_identity(c)]
+            if not workload_hint and not matched:
+                continue
+
+            # Container-level checks target only containers with their own
+            # serving-engine identity. If a workload is clearly LLM-serving
+            # but has a single generic container, that sole container is the
+            # target. Do not blindly flag sidecars in multi-container pods.
+            if matched:
+                target_containers = matched
+            elif workload_hint and len(containers) == 1:
+                target_containers = containers
+            else:
+                target_containers = []
+
             pod_sc = pod.get("securityContext") or {}
-            if pod.get("hostNetwork") is True:
-                emit(findings, "LLM-NET-05", path, digest, obj, "spec.hostNetwork=true",
-                     "Host networking is a risk indicator; node and network controls are not evaluated.")
-            if pod.get("hostPID") is True:
-                emit(findings, "LLM-NET-05", path, digest, obj, "spec.hostPID=true",
-                     "Host PID sharing is a risk indicator; runtime impact is not evaluated.")
-            for c in containers:
+            if workload_hint or matched:
+                if pod.get("hostNetwork") is True:
+                    emit(findings, "LLM-NET-05", path, digest, obj, "spec.hostNetwork=true",
+                         "Host networking is a risk indicator; node and network controls are not evaluated.",
+                         document_index=document_index)
+                if pod.get("hostPID") is True:
+                    emit(findings, "LLM-NET-05", path, digest, obj, "spec.hostPID=true",
+                         "Host PID sharing is a risk indicator; runtime impact is not evaluated.",
+                         document_index=document_index)
+
+            for c in target_containers:
                 name = str(c.get("name", "container"))
                 image = str(c.get("image", ""))
                 sc = c.get("securityContext") or {}
                 prefix = f"container={name}: "
+                common = {"container_name": name, "document_index": document_index}
                 if sc.get("privileged") is True:
                     emit(findings, "LLM-GPU-03", path, digest, obj,
                          prefix + "securityContext.privileged=true",
-                         "Privileged mode is a static risk indicator; device requirements and compensating controls need review.")
+                         "Privileged mode is a static risk indicator; device requirements and compensating controls need review.",
+                         **common)
                 if sc.get("allowPrivilegeEscalation") is not False:
                     emit(findings, "LLM-WL-03", path, digest, obj,
                          prefix + "allowPrivilegeEscalation is not explicitly false",
-                         "Kubernetes defaults and admission policies may affect effective behavior; this is an explicit-hardening candidate.")
+                         "Runtime defaults and admission policies are not evaluated; this is an explicit-hardening candidate.",
+                         **common)
                 if effective_pod_or_container_value(sc, pod_sc, "runAsNonRoot") is not True:
                     emit(findings, "LLM-WL-01", path, digest, obj,
                          prefix + "effective runAsNonRoot is not explicitly true",
-                         "Image USER, runtime identity, and admission policy are not evaluated.")
+                         "Image USER, runtime identity, and admission policy are not evaluated.",
+                         **common)
                 if sc.get("readOnlyRootFilesystem") is not True:
                     emit(findings, "LLM-WL-02", path, digest, obj,
                          prefix + "readOnlyRootFilesystem is not explicitly true",
-                         "Some serving engines require writable paths; this is a hardening candidate, not an unconditional defect.")
+                         "Some serving engines require writable paths; this is a hardening candidate, not an unconditional defect.",
+                         **common)
                 if image and not IMAGE_DIGEST.search(image):
                     emit(findings, "LLM-WL-05", path, digest, obj,
                          prefix + "image reference has no sha256 digest: " + image,
-                         "Tag mutability depends on registry policy; digest pinning is a reproducibility/supply-chain candidate.")
+                         "Tag mutability depends on registry policy; digest pinning is a reproducibility/supply-chain candidate.",
+                         **common)
                 resources = c.get("resources") or {}
                 req = resources.get("requests") or {}
                 lim = resources.get("limits") or {}
@@ -143,11 +177,13 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                 if missing:
                     emit(findings, "LLM-RES-01", path, digest, obj,
                          prefix + "CPU/memory requests or limits absent: " + ",".join(missing),
-                         "Namespace defaults, VPA, and workload sizing are not evaluated.")
+                         "Namespace defaults, VPA, and workload sizing are not evaluated.",
+                         **common)
                 if not c.get("readinessProbe") and not c.get("startupProbe"):
                     emit(findings, "LLM-RES-03", path, digest, obj,
                          prefix + "no readinessProbe or startupProbe",
-                         "A probe may be defined externally; startup/readiness semantics require workload review.")
+                         "A probe may be defined externally; startup/readiness semantics require workload review.",
+                         **common)
         elif kind == "Service":
             spec = obj.get("spec") or {}
             ports = spec.get("ports") or []
@@ -161,7 +197,8 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
             ):
                 emit(findings, "LLM-NET-01", path, digest, obj,
                      "Service type=" + str(spec.get("type")) + "; ports=" + port_text,
-                     "This does not prove internet reachability, missing authentication, or an exploitable endpoint.")
+                     "This does not prove internet reachability, missing authentication, or an exploitable endpoint.",
+                     document_index=document_index)
     return findings
 
 
