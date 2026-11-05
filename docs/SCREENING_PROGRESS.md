@@ -30,7 +30,7 @@ The current inventory extractor groups resource evidence within each locked bund
 | Documented parse exclusion | 7 |
 | **Total** | **202** |
 
-These are heuristic review queues, **not final inclusion decisions**. A reviewer must inspect the actual bundle and its resources before setting final_decision.
+These are heuristic review queues, **not final inclusion decisions**. A reviewer must inspect the actual bundle and its resources before setting final_decision. The latest conservative scan emitted 613 candidate observations across 49 bundles for human review; these are not adjudicated findings or prevalence estimates.
 
 ## Bundle counts by upstream project
 
