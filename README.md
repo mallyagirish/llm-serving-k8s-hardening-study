@@ -105,7 +105,7 @@ The Phase 3 pipeline is under active validation on branch `research/phase3-empir
 - See [Phase 3 screening progress](docs/SCREENING_PROGRESS.md) for project-level counts and next gates.
 - The conservative scanner emits review candidates for a subset of rules. Candidate counts are not prevalence estimates and must be independently adjudicated before publication.
 
-See [the empirical protocol](docs/PHASE3_EMPIRICAL_PROTOCOL.md), [corpus screening guide](docs/CORPUS_SCREENING_GUIDE.md), and [human labeling guide](docs/LABELING_GUIDE.md).
+See [the empirical protocol](docs/PHASE3_EMPIRICAL_PROTOCOL.md), [corpus screening guide](docs/CORPUS_SCREENING_GUIDE.md), [human labeling guide](docs/LABELING_GUIDE.md), [related-work review](docs/RELATED_WORK_AND_NOVELTY.md), and [exploratory literature search log](docs/LITERATURE_SEARCH_LOG.md).
 
 ### Run the Phase 3 validation locally
 
