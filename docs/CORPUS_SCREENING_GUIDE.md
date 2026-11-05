@@ -4,7 +4,7 @@
 
 The pinned corpus contains 202 bundle entries, but not every entry is necessarily an LLM inference workload. The primary research denominator must not include generic ML examples, operators, GPU schedulers, or unrelated KServe samples merely because they are in a serving-related repository.
 
-This guide and `corpus/eligibility_review.csv` establish a human-reviewed eligibility screen before prevalence analysis.
+This guide and `corpus/eligibility_review.csv` establish a human-reviewed bundle eligibility screen before prevalence analysis. The primary statistical unit is the locked configuration bundle, not each YAML document or resource. The resource-level review queue supports eligibility decisions and evidence tracing; its rows must not be counted as independent deployments.
 
 ## Screening strata
 
@@ -35,7 +35,7 @@ A bundle may contain multiple resources. Reviewers should identify the actual se
 - GPU schedulers/device plugins;
 - examples that merely allocate a GPU but do not serve an LLM.
 
-The same bundle can contain both in-scope and out-of-scope resources. Where practical, record resource-level eligibility in a separate annotation table rather than including or excluding an entire bundle indiscriminately.
+The same bundle can contain both in-scope and out-of-scope resources. The reviewer should decide whether the bundle contains a sufficiently complete LLM-serving configuration to be included, and record the in-scope resource names and evidence. Rule-level applicability is still assessed per bundle; individual resources are not independent prevalence observations.
 
 ## Denominators and reporting
 
