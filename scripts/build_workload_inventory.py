@@ -114,14 +114,26 @@ def build_inventory(root: Path, lock_path: Path) -> tuple[list[dict[str, Any]], 
             names = [str(c.get("name", "")) for c in containers]
             images = [str(c.get("image", "")) for c in containers]
             labels = meta.get("labels") or {}
-            spec_identity = json.dumps(obj.get("spec") or {}, sort_keys=True)[:6000]
-            identity = " ".join([
+            identity_parts = [
                 str(meta.get("name", "")),
                 json.dumps(labels, sort_keys=True),
                 " ".join(names),
                 " ".join(images),
-                spec_identity,
-            ])
+            ]
+            # Inspect only serving-specific fields for custom resources. Avoid
+            # arbitrary spec/args/namespace text (e.g. "llm-scan") as identity.
+            spec = obj.get("spec") or {}
+            if kind in {"RayService", "RayCluster"}:
+                identity_parts.append(str(spec.get("serveConfigV2", "")))
+            if kind == "InferenceService":
+                predictor = spec.get("predictor") or {}
+                model = predictor.get("model") or {}
+                identity_parts.extend([
+                    str((model.get("modelFormat") or {}).get("name", "")),
+                    str(model.get("runtime", "")),
+                    str(model.get("name", "")),
+                ])
+            identity = " ".join(identity_parts)
             stratum, reason = propose_stratum(
                 kind, identity, str(bundle.get("source", "")), rel
             )
