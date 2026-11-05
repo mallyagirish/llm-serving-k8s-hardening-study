@@ -146,13 +146,13 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                     emit(findings, "LLM-NET-05", path, digest, obj, "spec.hostPID=true",
                          "Host PID sharing is a risk indicator; runtime impact is not evaluated.",
                          document_index=document_index)
-            for volume in pod.get("volumes") or []:
-                host_path = ((volume.get("hostPath") or {}).get("path")) if isinstance(volume, dict) else None
-                if isinstance(host_path, str) and (host_path == "/dev" or host_path.startswith("/dev/")):
-                    emit(findings, "LLM-GPU-03", path, digest, obj,
-                         "Pod volume " + str(volume.get("name", "")) + " mounts hostPath " + host_path,
-                         "Host device mounts may be required for GPU access; assess device scope and least privilege.",
-                         document_index=document_index)
+                for volume in pod.get("volumes") or []:
+                    host_path = ((volume.get("hostPath") or {}).get("path")) if isinstance(volume, dict) else None
+                    if isinstance(host_path, str) and (host_path == "/dev" or host_path.startswith("/dev/")):
+                        emit(findings, "LLM-GPU-03", path, digest, obj,
+                             "Pod volume " + str(volume.get("name", "")) + " mounts hostPath " + host_path,
+                             "Host device mounts may be required for GPU access; assess device scope and least privilege.",
+                             document_index=document_index)
 
             for c in target_containers:
                 name = str(c.get("name", "container"))
