@@ -30,7 +30,7 @@ def proportional_quotas(groups: dict[str, list[dict[str, str]]], sample_size: in
 
 
 def create_sample(eligibility_rows: list[dict[str, str]], rules: list[dict[str, Any]],
-                  sample_size: int | None, seed: int, reviewer_id: str) -> list[dict[str, str]]:
+                  sample_size: int | None, seed: int, reviewer_id: str = "R1") -> list[dict[str, str]]:
     eligible = [r for r in eligibility_rows if r.get("final_decision", "").strip() == "include_primary"]
     if not eligible:
         raise ValueError("No bundles have final_decision=include_primary in the eligibility CSV.")
