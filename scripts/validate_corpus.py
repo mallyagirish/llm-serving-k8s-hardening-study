@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -136,6 +136,10 @@ def main() -> int:
 
     parseable_count = sum(row["parse_status"] == "parseable" for row in inventory)
     excluded_count = sum(row["parse_status"] == "documented_exclusion" for row in inventory)
+    hashes: dict[str, list[str]] = defaultdict(list)
+    for row in inventory:
+        hashes[row["sha256"]].append(row["path"])
+    exact_duplicate_groups = [paths for paths in hashes.values() if len(paths) > 1]
     summary = {
         "lockfile": str(Path(args.lockfile)),
         "lockfile_sha256": file_sha256(lock_path),
@@ -148,6 +152,9 @@ def main() -> int:
         "documented_non_yaml_exclusions": excluded_count,
         "yaml_documents_in_parseable_bundles": document_count,
         "bundle_kind_counts": dict(sorted(bundle_kind_counts.items())),
+        "exact_duplicate_hash_groups": len(exact_duplicate_groups),
+        "exact_duplicate_bundle_files": sum(len(paths) for paths in exact_duplicate_groups),
+        "exact_duplicate_paths": exact_duplicate_groups,
         "resource_kind_counts": dict(sorted(resource_kind_counts.items())),
         "llm_serving_eligibility": "not_assessed_by_this_validator",
         "errors": errors,
