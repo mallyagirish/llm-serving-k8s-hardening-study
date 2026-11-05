@@ -172,6 +172,46 @@ def build_inventory(root: Path, lock_path: Path) -> tuple[list[dict[str, Any]], 
     return rows, summary
 
 
+def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any]) -> list[dict[str, Any]]:
+    by_bundle: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        by_bundle.setdefault(row["bundle_path"], []).append(row)
+    output = []
+    for bundle in lock.get("bundles", []):
+        rel = str(bundle.get("path", ""))
+        resources = by_bundle.get(rel, [])
+        primary = [r for r in resources if r["proposed_stratum"] == "primary_candidate"]
+        supporting = [r for r in resources if r["proposed_stratum"] == "supporting_platform_candidate"]
+        unclear = [r for r in resources if r["proposed_stratum"] == "non_llm_or_unclear"]
+        if primary:
+            stratum = "primary_candidate"
+            rationale = "At least one resource-level identity suggests LLM inference; inspect bundle completeness and whether it is a workload or config."
+        elif supporting:
+            stratum = "supporting_platform_candidate"
+            rationale = "Only supporting platform/operator/GPU or generic serving resources were identified."
+        else:
+            stratum = "non_llm_or_unclear"
+            rationale = "No workload/custom serving resource was identified by the inventory extractor."
+        names = [f'{r["resource_kind"]}/{r["resource_name"]}' for r in primary[:12]]
+        output.append({
+            "bundle_path": rel,
+            "source": bundle.get("source", ""),
+            "bundle_kind": bundle.get("kind", ""),
+            "resource_records": len(resources),
+            "primary_resource_candidates": len(primary),
+            "supporting_resource_candidates": len(supporting),
+            "unclear_resource_records": len(unclear),
+            "primary_resource_examples": ";".join(names),
+            "preliminary_bundle_stratum": stratum,
+            "preliminary_reason": rationale,
+            "final_decision": "",
+            "reviewer": "",
+            "review_status": "pending",
+            "review_notes": "",
+        })
+    return output
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
@@ -180,6 +220,9 @@ def main() -> int:
     args = parser.parse_args()
     root = Path(args.root).resolve()
     rows, summary = build_inventory(root, root / args.lockfile)
+    lock = json.loads((root / args.lockfile).read_text(encoding="utf-8"))
+    bundle_rows = build_bundle_review(rows, lock)
+    summary["proposed_bundle_strata"] = dict(sorted(Counter(r["preliminary_bundle_stratum"] for r in bundle_rows).items()))
     out_dir = root / args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     fields = list(rows[0].keys()) if rows else []
@@ -190,6 +233,14 @@ def main() -> int:
         if fields:
             writer.writeheader()
             writer.writerows(rows)
+    bundle_fields = list(bundle_rows[0].keys()) if bundle_rows else []
+    with (out_dir / "bundle_eligibility_review.csv").open(
+        "w", newline="", encoding="utf-8"
+    ) as f:
+        writer = csv.DictWriter(f, fieldnames=bundle_fields)
+        if bundle_fields:
+            writer.writeheader()
+            writer.writerows(bundle_rows)
     (out_dir / "workload_inventory_summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
