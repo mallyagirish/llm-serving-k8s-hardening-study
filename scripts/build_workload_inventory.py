@@ -26,7 +26,7 @@ DIRECT_ENGINE_HINT = re.compile(
     re.I,
 )
 NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
-SUPPORT_HINT = re.compile(r"(kserve|kuberay|ray|hami|gpu|device-plugin|scheduler|operator)", re.I)
+SUPPORT_HINT = re.compile(r"(kserve|kuberay|ray|hami|gpu|device-plugin|scheduler|operator|vllm|tgi|sglang|ollama|litellm|text-generation)", re.I)
 
 
 def sha256(path: Path) -> str:
