@@ -146,6 +146,13 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                     emit(findings, "LLM-NET-05", path, digest, obj, "spec.hostPID=true",
                          "Host PID sharing is a risk indicator; runtime impact is not evaluated.",
                          document_index=document_index)
+            for volume in pod.get("volumes") or []:
+                host_path = ((volume.get("hostPath") or {}).get("path")) if isinstance(volume, dict) else None
+                if isinstance(host_path, str) and (host_path == "/dev" or host_path.startswith("/dev/")):
+                    emit(findings, "LLM-GPU-03", path, digest, obj,
+                         "Pod volume " + str(volume.get("name", "")) + " mounts hostPath " + host_path,
+                         "Host device mounts may be required for GPU access; assess device scope and least privilege.",
+                         document_index=document_index)
 
             for c in target_containers:
                 name = str(c.get("name", "container"))
@@ -157,6 +164,16 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                     emit(findings, "LLM-GPU-03", path, digest, obj,
                          prefix + "securityContext.privileged=true",
                          "Privileged mode is a static risk indicator; device requirements and compensating controls need review.",
+                         **common)
+                added_caps = ((sc.get("capabilities") or {}).get("add") or [])
+                dangerous_caps = sorted({
+                    str(cap).upper() for cap in added_caps
+                    if str(cap).upper() in {"ALL", "SYS_ADMIN", "SYS_PTRACE", "SYS_MODULE", "DAC_READ_SEARCH"}
+                })
+                if dangerous_caps:
+                    emit(findings, "LLM-GPU-03", path, digest, obj,
+                         prefix + "dangerous capabilities added: " + ",".join(dangerous_caps),
+                         "Capability risk depends on runtime needs; review whether each capability is essential.",
                          **common)
                 if sc.get("allowPrivilegeEscalation") is not False:
                     emit(findings, "LLM-WL-03", path, digest, obj,
