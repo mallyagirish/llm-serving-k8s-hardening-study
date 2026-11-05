@@ -39,6 +39,33 @@ SUPPORT_HINT = re.compile(
 )
 
 
+SOURCE_GROUP_RULES = [
+    ("hami-", "Project-HAMi/HAMi"),
+    ("kserve-manifest-", "kserve/kserve"),
+    ("kserve-0.15.0", "kserve/kserve"),
+    ("kuberay-sample-", "ray-project/kuberay"),
+    ("kuberay-operator-", "ray-project/kuberay"),
+    ("ray-cluster-", "ray-project/kuberay"),
+    ("vllm-stack-", "vllm-project/production-stack"),
+    ("otwld-ollama-", "otwld/ollama-helm"),
+    ("sglang-", "sgl-project/sglang"),
+    ("litellm-", "BerriAI/litellm"),
+    ("shalb-", "shalb/charts"),
+    ("louis030195-", "louis030195/text-generation-inference-helm"),
+    ("infracloud-", "infracloud/charts"),
+    ("opea-tgi-", "opea-project/charts/tgi"),
+]
+
+
+def upstream_project_for_bundle(path: str) -> str:
+    filename = Path(path).name.lower()
+    parent = Path(path).parts[1].lower() if len(Path(path).parts) > 1 else ""
+    for prefix, project in SOURCE_GROUP_RULES:
+        if parent.startswith(prefix):
+            return project
+    return "unmapped"
+
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -143,6 +170,7 @@ def build_inventory(root: Path, lock_path: Path) -> tuple[list[dict[str, Any]], 
                 "bundle_path": rel,
                 "source": bundle.get("source", ""),
                 "bundle_kind": bundle.get("kind", ""),
+                "upstream_project": upstream_project_for_bundle(rel),
                 "document_index": doc_index,
                 "api_version": obj.get("apiVersion", ""),
                 "resource_kind": kind,
@@ -163,6 +191,8 @@ def build_inventory(root: Path, lock_path: Path) -> tuple[list[dict[str, Any]], 
     summary = {
         "locked_bundles": len(lock.get("bundles", [])),
         "resource_records": len(rows),
+        "unique_upstream_projects": len({upstream_project_for_bundle(b.get("path", "")) for b in lock.get("bundles", [])}),
+        "bundle_counts_by_upstream_project": dict(sorted(Counter(upstream_project_for_bundle(b.get("path", "")) for b in lock.get("bundles", [])).items())),
         "resource_kind_counts": dict(sorted(Counter(r["resource_kind"] for r in rows).items())),
         "proposed_strata": dict(sorted(Counter(r["proposed_stratum"] for r in rows).items())),
         "errors": errors,
