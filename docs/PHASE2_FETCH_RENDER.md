@@ -6,9 +6,9 @@
 
 ## Counts
 
-See lockfile `counts` object. Headline: **203 rendered bundles** from **27 sources** (target ≥40 met).
+See lockfile `counts` object. Headline: **202 rendered bundles** from **27 sources** (target ≥40 met).
 
-Breakdown (approx): 21 helm-default, 28 helm-values overlays (incl. 26 vLLM tutorials), 154 manifests.
+Breakdown (approx): 20 helm-default, 28 helm-values overlays (incl. 26 vLLM tutorials), 154 manifests.
 
 ## Scripts
 
