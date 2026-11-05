@@ -29,7 +29,7 @@ This study builds a rule catalog aimed at those gaps and a pinned, reproducible 
 | --- | --- | --- |
 | Scope | LLM **inference serving** stacks on Kubernetes | Broad charts or CIS/PSS across arbitrary workloads |
 | Rules | **28 rules** spanning Auth, Network, Secrets, GPU/Isolation, Workload Security, Storage/Model, Resources, Observability—many LLM-specific | Generic container/RBAC/network checks |
-| Unit of analysis | `helm template` defaults + named values overlays + raw manifests | Often chart source only, or live cluster scans |
+| Unit of analysis | Locked configuration bundle (rendered chart/version/overlay or raw manifest bundle) | Often chart source only, or live cluster scans |
 | Corpus | Pinned public sources in `SOURCES.lock.json` (27 sources, 202 rendered bundles as of 2026-10-28) | Ad hoc or unpinned samples |
 | Goal | Prevalence measurement, case studies, and upstream hardening (Phase 3+) | One-off audits or tool benchmarks |
 
@@ -62,7 +62,7 @@ Pinned snapshot in [`corpus/SOURCES.lock.json`](corpus/SOURCES.lock.json):
 | Sources | **27** (git clones, Helm repos, OCI charts, raw manifests) |
 | Rendered bundles | **202** |
 | Breakdown | 20 Helm defaults, 28 values overlays (incl. vLLM tutorials), 154 manifests |
-| Stacks represented | vLLM production-stack, KServe, KubeRay / Ray Serve LLM, TGI charts, Ollama, HAMi examples, SGLang, LiteLLM, and related community charts |
+| Stacks represented | vLLM Production Stack, KServe, KubeRay / Ray Serve LLM, TGI charts, Ollama, HAMi/GPU-sharing examples, SGLang, LiteLLM, and related community charts |
 
 Large chart clones under `corpus/charts/` are **not** committed. Re-fetch and re-render from the lockfile with the scripts below. Phase 2 notes: [docs/PHASE2_FETCH_RENDER.md](docs/PHASE2_FETCH_RENDER.md).
 
@@ -93,6 +93,18 @@ cd llm-serving-k8s-hardening-study
 ```
 
 Rendered outputs land under `corpus/rendered/`. Phase 3 candidate scans are preliminary review queues, not adjudicated findings or prevalence estimates.
+
+## Phase 3 empirical evaluation (research branch)
+
+The Phase 3 pipeline is under active validation on branch `research/phase3-empirical-evaluation`.
+
+- The lockfile contains 202 bundle entries from 27 sources; all 202 paths are tracked.
+- 195 bundles parse as standalone YAML. Seven inputs are explicitly recorded in `corpus/parse_exceptions.json` (six unrendered Helm fragments and one invalid non-LLM sample) and excluded from static YAML scanning.
+- The 195 parseable bundles contain 617 YAML documents. These are inventory counts, not independent deployments.
+- Bundle-level eligibility and resource-level review queues are generated for human screening. Their heuristic strata are provisional and are not inclusion decisions.
+- The conservative scanner emits review candidates for a subset of rules. Candidate counts are not prevalence estimates and must be independently adjudicated before publication.
+
+See [the empirical protocol](docs/PHASE3_EMPIRICAL_PROTOCOL.md), [corpus screening guide](docs/CORPUS_SCREENING_GUIDE.md), and [human labeling guide](docs/LABELING_GUIDE.md).
 
 ## Status
 
