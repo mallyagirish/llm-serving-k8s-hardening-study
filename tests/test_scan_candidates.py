@@ -120,6 +120,18 @@ spec:
 """)
         self.assertEqual(rows, [])
 
+    def test_llm_finetuning_workload_is_not_inference(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: model-finetune}
+spec:
+  containers:
+  - name: trainer
+    image: registry.example/llm-finetune:latest
+""")
+        self.assertEqual(rows, [])
+
     def test_sidecar_is_not_mislabeled_as_inference_container(self):
         rows = self.scan_text("""
 apiVersion: apps/v1
