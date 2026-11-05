@@ -62,6 +62,20 @@ class WorkloadInventoryTests(unittest.TestCase):
         )
         self.assertEqual(stratum, "supporting_platform_candidate")
 
+    def test_bundle_review_aggregates_resource_candidates(self):
+        rows = [
+            {"bundle_path": "rendered/a.yaml", "proposed_stratum": "primary_candidate", "resource_kind": "Deployment", "resource_name": "vllm"},
+            {"bundle_path": "rendered/a.yaml", "proposed_stratum": "supporting_platform_candidate", "resource_kind": "Service", "resource_name": "gateway"},
+        ]
+        bundles = [
+            {"path": "rendered/a.yaml", "source": "vllm", "kind": "helm-default"},
+            {"path": "rendered/b.yaml", "source": "generic", "kind": "manifest"},
+        ]
+        reviewed = inventory.build_bundle_review(rows, {"bundles": bundles})
+        self.assertEqual(reviewed[0]["preliminary_bundle_stratum"], "primary_candidate")
+        self.assertEqual(reviewed[0]["primary_resource_candidates"], 1)
+        self.assertEqual(reviewed[1]["preliminary_bundle_stratum"], "non_llm_or_unclear")
+
     def test_build_inventory_writes_resource_records_from_locked_bundle(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
