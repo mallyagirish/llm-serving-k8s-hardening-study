@@ -8,7 +8,7 @@
 
 Measure how often the 28 proposed LLM-serving Kubernetes security rules are applicable and satisfied in the pinned public configuration corpus. Distinguish an evidenced weakness from a missing field, unsupported inference, or control that cannot be assessed from static YAML.
 
-The unit of analysis is not automatically every rendered YAML document. A chart default, tutorial overlay, and multiple resources emitted by one release are related observations. Report results at clearly defined levels and avoid treating correlated renders as independent deployments.
+The primary unit of analysis is the **configuration bundle** recorded in the corpus lockfile (one rendered chart/version/values overlay or one raw manifest bundle). A bundle may contain multiple Kubernetes resources and workloads; those resources are evidence within the bundle, not automatically independent observations. The resource-level inventory is a review aid for identifying the actual LLM-serving workload and its related Services, Ingresses, policies, and RBAC objects. Do not count its 222 (or later updated) resource rows as independent deployments. Chart versions and tutorial overlays from one upstream project are correlated and must be clustered or summarized separately.
 
 ## 2. Research questions
 
@@ -34,7 +34,7 @@ Do not mix researcher-created overlays into primary upstream-default prevalence.
 
 ## 4. Rule applicability and outcome labels
 
-Each rule × eligible unit receives one of four labels:
+Each rule × eligible configuration bundle receives one of four labels. A bundle is eligible for a rule only when it contains at least one workload/resource to which that rule applies:
 
 - **TP (finding present):** all predeclared evidence conditions for the rule are met.
 - **FP (no finding):** the rule is applicable and the configuration provides sufficient evidence that the weakness is absent.
@@ -95,7 +95,7 @@ Report:
 - per-stack and per-source-type estimates;
 - confidence intervals accounting for clustering by upstream source/project.
 
-Do not use total YAML documents as denominator for claims about workloads/deployments. Avoid counting multiple manifests from one workload as independent samples. Explain how multiple workloads in one rendered bundle are identified.
+Do not use total YAML documents or the resource-level review inventory as denominators for bundle-level prevalence. Within a bundle, aggregate a rule as present if at least one in-scope workload/resource has the predeclared positive evidence; label U when the bundle does not provide enough context to assess the rule across its relevant workload surface. Record resource-level evidence paths and workload identities so readers can inspect the aggregation. Avoid counting multiple resources from one bundle as independent samples. Explain how multiple workloads in one rendered bundle are identified.
 
 For scanner benchmarking, report precision, recall, specificity, F1, and coverage only where reference labels and denominator support them. Include confidence intervals and per-rule results; pooled scores must not conceal poor performance on individual rules.
 
