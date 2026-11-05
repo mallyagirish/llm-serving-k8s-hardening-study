@@ -1,6 +1,6 @@
 # Phase 1 — Rules + Corpus Plan
-## Hardening LLM Inference on Kubernetes: An Empirical Study of Production Serving Stacks
-**Author intent:** Girish Mallya NIW independent research artifact  
+## Security-Relevant Configurations in Public Kubernetes-Based LLM Inference Stacks: A Reproducible Empirical Study
+**Author:** Girish Mallya  
 **Status:** Phase 1 complete — 2026-10-28 (America/Los_Angeles)  
 **Scope:** Public Helm charts + K8s manifests for LLM inference serving only (no employer-private configs)
 
