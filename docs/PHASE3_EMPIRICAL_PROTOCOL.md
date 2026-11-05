@@ -8,7 +8,7 @@
 
 Measure how often the 28 proposed LLM-serving Kubernetes security rules are applicable and satisfied in the pinned public configuration corpus. Distinguish an evidenced weakness from a missing field, unsupported inference, or control that cannot be assessed from static YAML.
 
-The primary unit of analysis is the **configuration bundle** recorded in the corpus lockfile (one rendered chart/version/values overlay or one raw manifest bundle). A bundle may contain multiple Kubernetes resources and workloads; those resources are evidence within the bundle, not automatically independent observations. The resource-level inventory is a review aid for identifying the actual LLM-serving workload and its related Services, Ingresses, policies, and RBAC objects. Do not count its 222 (or later updated) resource rows as independent deployments. Chart versions and tutorial overlays from one upstream project are correlated and must be clustered or summarized separately.
+The primary unit of analysis is the **configuration bundle** recorded in the corpus lockfile (one rendered chart/version/values overlay or one raw manifest bundle). A bundle may contain multiple Kubernetes resources and workloads; those resources are evidence within the bundle, not automatically independent observations. The resource-level inventory is a review aid for identifying the actual LLM-serving workload and its related Services, Ingresses, policies, and RBAC objects. Do not count its 263 resource rows as independent deployments. Chart versions and tutorial overlays from one upstream project are correlated and must be clustered or summarized separately.
 
 ## 2. Research questions
 
