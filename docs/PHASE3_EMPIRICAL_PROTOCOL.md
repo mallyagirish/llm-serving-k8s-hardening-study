@@ -1,0 +1,145 @@
+# Phase 3 — Empirical Evaluation Protocol
+
+**Version:** 0.1 draft  
+**Status:** Protocol design; no prevalence results have been generated.  
+**Parent artifact:** Phase 1 rule catalog and Phase 2 pinned public corpus.
+
+## 1. Objective
+
+Measure how often the 28 proposed LLM-serving Kubernetes security rules are applicable and satisfied in the pinned public configuration corpus. Distinguish an evidenced weakness from a missing field, unsupported inference, or control that cannot be assessed from static YAML.
+
+The unit of analysis is not automatically every rendered YAML document. A chart default, tutorial overlay, and multiple resources emitted by one release are related observations. Report results at clearly defined levels and avoid treating correlated renders as independent deployments.
+
+## 2. Research questions
+
+- **RQ1 — Exposure:** What proportion of eligible LLM-serving configuration bundles expose each in-scope security weakness?
+- **RQ2 — Category profile:** How does posture vary across authentication, network, secrets/RBAC, GPU/isolation, workload security, storage/model, resources, and observability?
+- **RQ3 — Stack differences:** How do results differ by serving stack and source type (official chart, community chart, tutorial/example, raw manifest)?
+- **RQ4 — Evidence quality:** Which rules can be assessed reliably from static configuration, and which require runtime, deployment, or application context?
+- **RQ5 — Remediation opportunities:** Which high-confidence findings have actionable, narrowly scoped upstream fixes?
+
+## 3. Corpus accounting and inclusion
+
+Use the committed corpus/SOURCES.lock.json as the immutable Phase 2 snapshot. The lockfile records 27 sources and 202 rendered bundles. The Phase 2 narrative document currently says 203 in one place; resolve this discrepancy from the lockfile before analysis and use the verified count consistently.
+
+Before scanning:
+1. Validate every lockfile bundle path exists in the reproduced corpus.
+2. Compute SHA-256 for every input file.
+3. Parse each YAML stream and record document count, API kind, namespace, workload identity, and source metadata.
+4. Classify provenance as chart default, named upstream values overlay, raw upstream manifest, or synthetic researcher-created overlay.
+5. Identify exact and near-duplicates. Preserve raw data, but define a primary analysis set that prevents repeated chart versions/overlays from silently inflating prevalence.
+6. Publish inclusion/exclusion decisions and a corpus flow diagram.
+
+Do not mix researcher-created overlays into primary upstream-default prevalence. Analyze them separately as controlled scenarios.
+
+## 4. Rule applicability and outcome labels
+
+Each rule × eligible unit receives one of four labels:
+
+- **TP (finding present):** all predeclared evidence conditions for the rule are met.
+- **FP (no finding):** the rule is applicable and the configuration provides sufficient evidence that the weakness is absent.
+- **U (uncertain):** static artifacts do not provide enough context to decide reliably.
+- **NA (not applicable):** the rule does not apply to this resource/workload/source type.
+
+These labels describe a rule's assessment of a configuration, not scanner performance against independent ground truth. Do not call a scanner finding a true positive unless an independently adjudicated reference label supports it.
+
+For scanner evaluation, compare automated output to independent reference labels and report TP/FP/FN/TN using conventional classifier definitions. Keep U and NA out of the binary confusion matrix, report their counts, and run sensitivity bounds where appropriate.
+
+## 5. Rule-specific evidence requirements
+
+Every rule needs a machine-readable specification containing:
+- rule ID, title, category, severity, and rationale;
+- eligible resource kinds and source types;
+- positive and negative evidence predicates;
+- explicit uncertainty and NA conditions;
+- known limitations and required context;
+- at least one positive and one negative fixture;
+- rule owner/reviewer and version.
+
+Important guardrails:
+- Missing NetworkPolicy in a chart does not prove cluster-wide reachability or exposure; describe absence of a policy in the sampled artifact, not proof of exploitability.
+- LoadBalancer or NodePort is an exposure indicator, not proof that the endpoint is internet-accessible or unauthenticated.
+- Static YAML cannot establish that an API key is valid or enforced on every route unless relevant gateway/application configuration is present and verifiable.
+- Missing GPU resource declarations do not prove CPU fallback, GPU theft, or scheduler overcommit.
+- Lack of MIG/HAMi declarations does not prove multi-tenant co-location or absence of hardware isolation.
+- Missing PDB/probes/securityContext fields are configuration observations; operational impact requires runtime or workload-specific evidence.
+- Do not infer a plaintext secret from placeholder strings. Never publish actual secret-like values.
+- A latest tag and a tag without digest are separate policy decisions; document the exact predicate.
+- Account for pod-level and container-level securityContext inheritance and precedence.
+
+If a rule's intended claim cannot be tested from available artifacts, downgrade it to an explicitly static proxy or move it to runtime/future work. Do not overstate what the scanner establishes.
+
+## 6. Human reference labeling
+
+Create a written labeling guide with rule-specific examples. Sample independently at workload/bundle level using a reproducible random seed and stratification across rule categories and source types.
+
+- Two human reviewers independently label the same blinded sample before discussion.
+- Reviewers must not see scanner output or AI-generated pre-labels during the independent pass.
+- Record evidence paths and concise rationale for each label.
+- Adjudicate disagreements only after independent labels are locked.
+- Report raw agreement, class-wise agreement, and an appropriate chance-corrected statistic with confidence intervals.
+- Do not treat author adjudication of AI pre-labels as independent second-rater validation.
+- Keep an audit trail of label changes and reasons.
+
+If feasible, independently label all high-severity candidate findings and a representative sample of non-findings. Publish sampling weights and use them in population estimates.
+
+## 7. Outcomes and denominators
+
+Report:
+- eligible units per rule;
+- TP, FP, U, and NA counts;
+- finding prevalence among assessable applicable units: TP / (TP + FP);
+- uncertainty rate: U / (TP + FP + U);
+- applicability rate: (TP + FP + U) / all sampled units;
+- source-weighted and unweighted estimates, clearly distinguished;
+- per-stack and per-source-type estimates;
+- confidence intervals accounting for clustering by upstream source/project.
+
+Do not use total YAML documents as denominator for claims about workloads/deployments. Avoid counting multiple manifests from one workload as independent samples. Explain how multiple workloads in one rendered bundle are identified.
+
+For scanner benchmarking, report precision, recall, specificity, F1, and coverage only where reference labels and denominator support them. Include confidence intervals and per-rule results; pooled scores must not conceal poor performance on individual rules.
+
+## 8. Statistical plan
+
+This is a descriptive empirical study. Predefine primary unit, eligibility rules, deduplication strategy, sampling design, and primary outcomes before final prevalence inspection.
+
+Use cluster-aware bootstrap resampling at upstream project/source level when estimating uncertainty. If independent clusters are few, report that limitation and avoid overconfident intervals. For stratified human-label samples, apply sampling weights when estimating population metrics.
+
+Separate exploratory comparisons from confirmatory claims. Report effect sizes and intervals, not only p-values. Do not claim causality from cross-sectional public configuration samples.
+
+## 9. Validity threats
+
+- **Selection bias:** public charts and tutorials do not represent all private production deployments.
+- **Tutorial bias:** intentionally permissive examples must not be described as production defaults.
+- **Version bias:** pinned snapshots age; report collection date and avoid current-default claims without refresh.
+- **Static-analysis limits:** YAML does not reveal all gateway, cloud firewall, runtime, admission, or application controls.
+- **Dependence:** versions, overlays, and resources from one project are correlated.
+- **Construct validity:** several rules are risk proxies rather than proof of exploitability.
+- **Label validity:** ambiguous rules require uncertainty labels and independent review.
+- **Researcher bias:** authors designed the rule catalog; independent review and preregistered decision rules reduce but do not eliminate it.
+
+## 10. Release gates
+
+Do not publish prevalence claims until:
+- [ ] lockfile and bundle count reconcile;
+- [ ] all included bundles are reproducibly parsed;
+- [ ] rule predicates and fixtures are versioned;
+- [ ] static proxies are distinguished from security guarantees;
+- [ ] a blinded independent reference-label sample is completed;
+- [ ] agreement and adjudication are reported transparently;
+- [ ] denominators, weights, and clustering are documented;
+- [ ] primary results regenerate from scripts;
+- [ ] limitations and deviations are included in the manuscript.
+
+## 11. Planned outputs
+
+- rules/catalog.yaml: machine-readable rule definitions.
+- rules/fixtures/: positive, negative, and uncertainty fixtures.
+- scripts/scan.py: deterministic scanner with structured evidence.
+- results/raw_findings.jsonl: one record per rule × unit assessment.
+- results/summary.csv: aggregated counts and denominators.
+- results/figures/: reproducible plots.
+- docs/labeling-guide.md: human reference-label protocol.
+- docs/deviations.md: timestamped protocol changes.
+
+No numerical findings should be added until generated from the frozen pipeline.
