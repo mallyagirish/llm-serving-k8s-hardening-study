@@ -60,6 +60,21 @@ spec:
         gpu_rows = [r for r in rows if r["rule_id"] == "LLM-GPU-03"]
         self.assertEqual(len(gpu_rows), 2)
 
+    def test_non_llm_host_device_mount_is_not_flagged(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: ordinary-worker}
+spec:
+  volumes:
+  - name: host-dev
+    hostPath: {path: /dev}
+  containers:
+  - name: worker
+    image: nginx:1.27
+""")
+        self.assertEqual(rows, [])
+
     def test_non_llm_deployment_is_not_scanned(self):
         self.assertEqual(self.scan_text("""
 apiVersion: apps/v1
