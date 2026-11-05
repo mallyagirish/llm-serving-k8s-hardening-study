@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm-api
+  template:
+    metadata:
+      labels:
+        app: vllm-api
+    spec:
+      hostNetwork: true
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:latest
+          ports:
+            - containerPort: 8000
+          securityContext:
+            privileged: true
+          resources: {}
