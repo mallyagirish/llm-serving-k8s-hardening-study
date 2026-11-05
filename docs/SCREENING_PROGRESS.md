@@ -2,7 +2,7 @@
 
 **Snapshot:** 2026-10-28 lockfile; latest verified Phase 3 CI run #74 (2026-11-05 UTC).  
 **Branch:** research/phase3-empirical-evaluation  
-**Status:** Automated triage only; human eligibility decisions are pending.
+**Status:** Eligibility decisions FROZEN 2026-11-05 (see below). The freeze is an AI-assisted review pass recorded in the CSV with reviewer `claude-ai-assist`; per `docs/LABELING_GUIDE.md` §5, AI-assisted review is not a human second review, so author confirmation of the borderline calls listed below remains the outstanding protocol gate before the dataset is described as human-reviewed.
 
 ## Verified corpus accounting
 
@@ -18,26 +18,33 @@
 
 The latest run validated all 202 locked bundle paths, found no parser errors beyond the seven documented exclusions, and found no exact duplicate bundle-file hashes. Near-duplicate chart versions and overlays still require source-aware review. The seven parse exceptions are enumerated in corpus/parse_exceptions.json.
 
-## Provisional bundle triage
+## Frozen eligibility decisions (2026-11-05)
 
-| Provisional stratum | Bundles |
+Every one of the 202 bundles was screened against its actual manifests (resource kinds, container images, model/engine signals) and assigned a `final_decision` in `corpus/eligibility_review.csv`, with a frozen copy at `results/bundle_eligibility_review.csv`. No bundle remains `uncertain`.
+
+| Final decision | Bundles |
 |---|---:|
-| Primary LLM-serving candidate | 102 |
-| Supporting platform/GPU infrastructure candidate | 86 |
-| Non-LLM or unclear | 7 |
-| Documented parse exclusion | 7 |
+| `include_primary` | 105 |
+| `include_supporting` | 71 |
+| `exclude_non_llm` | 19 |
+| `exclude_unparseable` | 7 |
 | **Total** | **202** |
 
-These are heuristic review queues, **not final inclusion decisions**. A reviewer must inspect the actual bundle and its resources before setting final_decision. The latest conservative scan emitted 613 candidate observations across 49 bundles for human review; these are not adjudicated findings or prevalence estimates.
+Movement from the committed preliminary strata in the CSV (primary 100 / supporting 69 / unclear 26 / parse-pending 7 — note these CSV strata never matched the 102/86/7 figures in earlier revisions of this document, which grouped the queues differently):
 
-## Bundle counts by upstream project
+- Of 100 primary candidates: 99 confirmed primary; 1 excluded (a standalone JSON Patch test fragment that configures no workload by itself).
+- Of 69 supporting candidates: 68 confirmed supporting; 1 excluded (a comment-only instruction document containing no resources).
+- Of 26 unclear: 6 promoted to primary (four KServe HuggingFace/vLLM-Omni serving-runtime definitions and two Ray-LLM services), 3 to supporting (KServe controller install, KServe storage-container platform resource, Ray Serve custom-service example), and 17 excluded — the KServe generic-ML sample set (TorchServe image-classifier InferenceServices ×8, MNIST variants, and the two BERT sequence-classification samples), five bare storage tutorial resources, one empty (0-byte) bundle, and one toy Ray Serve DAG sample.
+- All 7 parse-pending bundles confirmed `exclude_unparseable`, matching `corpus/parse_exceptions.json` (six Helm template fragments / raw template concat and one invalid-YAML non-LLM example).
 
-| Upstream project cluster | Bundles | Primary candidates | Supporting | Unclear | Parse exclusions |
+Frozen counts by upstream project cluster:
+
+| Upstream project cluster | Bundles | Primary | Supporting | Exclude (non-LLM) | Exclude (unparseable) |
 |---|---:|---:|---:|---:|---:|
-| KServe | 79 | 49 | 18 | 6 | 6 |
-| Project HAMi | 67 | 3 | 63 | 1 | 0 |
+| KServe | 79 | 53 | 3 | 17 | 6 |
+| Project HAMi | 67 | 2 | 64 | 1 | 0 |
 | vLLM Production Stack | 30 | 30 | 0 | 0 | 0 |
-| KubeRay | 9 | 4 | 5 | 0 | 0 |
+| KubeRay | 9 | 4 | 4 | 1 | 0 |
 | Ollama Helm | 6 | 6 | 0 | 0 | 0 |
 | Infracloud charts | 4 | 4 | 0 | 0 | 0 |
 | LiteLLM | 2 | 2 | 0 | 0 | 0 |
@@ -45,7 +52,16 @@ These are heuristic review queues, **not final inclusion decisions**. A reviewer
 | OPEA TGI | 1 | 1 | 0 | 0 | 0 |
 | Shalb charts | 1 | 1 | 0 | 0 | 0 |
 | Louis030195 TGI Helm | 1 | 0 | 0 | 0 | 1 |
-| **Total** | **202** | **102** | **86** | **7** | **7** |
+| **Total** | **202** | **105** | **71** | **19** | **7** |
+
+Borderline calls recorded for author confirmation (deciding evidence is in each row's `review_notes`):
+
+- The two BERT samples (`kserve-manifest-bert`, `kserve-manifest-bert_gpu`) were excluded as generic-ML sequence-classification demos. An encoder-LM reading could argue primary; the exclusion follows the screening guide's rule that unclear cases need positive LLM-serving evidence.
+- The LiteLLM gateway charts are primary with no model server in the bundle, per the screening guide's inclusion of gateways in the primary stratum.
+- `LLMInferenceServiceConfig`-only bundles (llm-d templates, scheduler/EPP configs) are primary: they are direct LLM inference serving configurations, though they are config fragments correlated with their sample families and must be clustered accordingly in analysis.
+- HAMi GPU-allocation pods stay supporting even when the image is a serving image (e.g. the VastAI vLLM image runs `sleep infinity`); they allocate shared GPUs and serve nothing.
+
+The latest conservative scan emitted 613 candidate observations across 49 bundles for human review; these are not adjudicated findings or prevalence estimates.
 
 ## Interpretation and known dependence
 
@@ -56,8 +72,8 @@ These are heuristic review queues, **not final inclusion decisions**. A reviewer
 
 ## Next gates
 
-1. Human-review all primary candidates, supporting candidates, and unclear bundles; do not use the preliminary stratum as a final decision.
-2. Record final bundle decisions, in-scope resource identity, rationale, reviewer, and source evidence in the review CSV.
+1. ~~Human-review all primary candidates, supporting candidates, and unclear bundles~~ — done 2026-11-05 as an AI-assisted pass (frozen table above); the remaining human gate is author confirmation of the borderline calls listed above.
+2. ~~Record final bundle decisions, in-scope resource identity, rationale, reviewer, and source evidence in the review CSV~~ — done: `final_decision`, rationale, and reviewer are recorded for all 202 rows in `corpus/eligibility_review.csv` (frozen copy: `results/bundle_eligibility_review.csv`).
 3. Define exact/near-duplicate and chart-version/overlay handling before computing prevalence.
 4. Freeze the primary bundle set and rule predicates.
 5. Generate identical scanner-blind labeling sheets for two independent human reviewers using the same seed and sample size, but separate output files and reviewer IDs. The sheets expose source paths because reviewers need to inspect the artifacts; they are not source-blinded.
