@@ -61,7 +61,7 @@ Pinned snapshot in [`corpus/SOURCES.lock.json`](corpus/SOURCES.lock.json):
 | Collection time | 2026-10-28, America/Los_Angeles |
 | Sources | **27** (git clones, Helm repos, OCI charts, raw manifests) |
 | Rendered bundles | **202** |
-| Breakdown | ~20 Helm defaults, ~28 values overlays (incl. vLLM tutorials), ~154 manifests |
+| Breakdown | 20 Helm defaults, 28 values overlays (incl. vLLM tutorials), 154 manifests |
 | Stacks represented | vLLM production-stack, KServe, KubeRay / Ray Serve LLM, TGI charts, Ollama, HAMi examples, SGLang, LiteLLM, and related community charts |
 
 Large chart clones under `corpus/charts/` are **not** committed. Re-fetch and re-render from the lockfile with the scripts below. Phase 2 notes: [docs/PHASE2_FETCH_RENDER.md](docs/PHASE2_FETCH_RENDER.md).
@@ -92,7 +92,7 @@ cd llm-serving-k8s-hardening-study
 ./scripts/render_all.sh
 ```
 
-Rendered outputs land under `corpus/rendered/`. Scanning probes and prevalence tables are **not** published yet (Phase 3).
+Rendered outputs land under `corpus/rendered/`. Phase 3 candidate scans are preliminary review queues, not adjudicated findings or prevalence estimates.
 
 ## Status
 
@@ -100,7 +100,7 @@ Rendered outputs land under `corpus/rendered/`. Scanning probes and prevalence t
 | --- | --- | --- |
 | 1 | Rule catalog (28) + corpus design | Done — [docs/PHASE1_RULES_AND_CORPUS.md](docs/PHASE1_RULES_AND_CORPUS.md) |
 | 2 | Fetch + render pinned public corpus | Done — 27 sources, 202 rendered bundles (2026-10-28, America/Los_Angeles) |
-| 3 | Scan probes + prevalence measurement | Next |
+| 3 | Corpus validation + candidate scan + reference labeling | In progress — protocol, conservative scanner, and CI pipeline on research branch |
 | 4+ | Case studies, upstream issues/PRs, preprint draft | Planned |
 
 No prevalence results, CVE claims, or paper citations are asserted in this README beyond the Phase 1–2 artifacts in-tree.
