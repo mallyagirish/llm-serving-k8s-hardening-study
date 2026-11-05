@@ -42,7 +42,7 @@ SUPPORT_HINT = re.compile(
 SOURCE_GROUP_RULES = [
     ("hami-", "Project-HAMi/HAMi"),
     ("kserve-manifest-", "kserve/kserve"),
-    ("kserve-0.15.0", "kserve/kserve"),
+    ("kserve-v0.15.0", "kserve/kserve"),
     ("kuberay-sample-", "ray-project/kuberay"),
     ("kuberay-operator-", "ray-project/kuberay"),
     ("ray-cluster-", "ray-project/kuberay"),
