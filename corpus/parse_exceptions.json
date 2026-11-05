@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Explicit allowlist of bundle files retained for provenance but excluded from standalone static YAML parsing.",
+  "exceptions": [
+    {
+      "path": "rendered/kserve-manifest-ingress_gateway-patch/manifest.yaml",
+      "classification": "helm_template_fragment",
+      "reason": "Contains unrendered Helm control-flow and template expressions; not a standalone Kubernetes YAML document.",
+      "decision": "exclude_from_primary_static_yaml_scan"
+    },
+    {
+      "path": "rendered/kserve-manifest-kcn-daemonset-patch/manifest.yaml",
+      "classification": "helm_template_fragment",
+      "reason": "Contains unrendered Helm template expressions in the resource fields; not standalone YAML.",
+      "decision": "exclude_from_primary_static_yaml_scan"
+    },
+    {
+      "path": "rendered/kserve-manifest-model-archiver/manifest.yaml",
+      "classification": "invalid_yaml_non_llm_example",
+      "reason": "The image placeholder {username}/margen:v1.2 is unquoted and makes the sample invalid YAML; the sample is not clearly an LLM inference workload.",
+      "decision": "exclude_from_primary_static_yaml_scan"
+    },
+    {
+      "path": "rendered/kserve-manifest-service-patch/manifest.yaml",
+      "classification": "helm_template_fragment",
+      "reason": "Contains unrendered Helm with-blocks and template expressions; not standalone YAML.",
+      "decision": "exclude_from_primary_static_yaml_scan"
+    },
+    {
+      "path": "rendered/kserve-manifest-serviceaccount-patch/manifest.yaml",
+      "classification": "helm_template_fragment",
+      "reason": "Contains unrendered Helm with-blocks and template expressions; not standalone YAML.",
+      "decision": "exclude_from_primary_static_yaml_scan"
+    },
+    {
+      "path": "rendered/kserve-manifest-storagecontainer-patch/manifest.yaml",
+      "classification": "helm_template_fragment",
+      "reason": "Contains unrendered Helm with-blocks and template expressions; not standalone YAML.",
+      "decision": "exclude_from_primary_static_yaml_scan"
+    },
+    {
+      "path": "rendered/louis030195-tgi-helm-raw/templates-concat.yaml",
+      "classification": "raw_helm_template_concat",
+      "reason": "Concatenated raw Helm templates contain unresolved template syntax and are not a rendered manifest bundle.",
+      "decision": "exclude_from_primary_static_yaml_scan"
+    }
+  ]
+}
