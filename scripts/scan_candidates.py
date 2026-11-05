@@ -23,6 +23,8 @@ LLM_HINT = re.compile(
     re.I,
 )
 IMAGE_DIGEST = re.compile(r"@sha256:[0-9a-f]{64}$", re.I)
+NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
+EXPLICIT_SERVING_ENGINE = re.compile(r"(vllm|text-generation|text_generation|tgi|sglang|ollama|litellm)", re.I)
 
 
 def sha256(path: Path) -> str:
@@ -54,6 +56,12 @@ def workload_parts(obj: dict[str, Any]) -> tuple[str, dict[str, Any], list[dict[
     return kind, pod, [c for c in containers if isinstance(c, dict)]
 
 
+def identity_matches(text: str) -> bool:
+    if NON_SERVING_HINT.search(text) and not EXPLICIT_SERVING_ENGINE.search(text):
+        return False
+    return bool(LLM_HINT.search(text))
+
+
 def workload_has_llm_identity(obj: dict[str, Any], pod: dict[str, Any]) -> bool:
     meta = obj.get("metadata") or {}
     spec = obj.get("spec") or {}
@@ -67,7 +75,7 @@ def workload_has_llm_identity(obj: dict[str, Any], pod: dict[str, Any]) -> bool:
         str(pod_meta.get("labels", "")),
         str(pod.get("labels", "")),
     ])
-    return bool(LLM_HINT.search(identity))
+    return identity_matches(identity)
 
 
 def container_has_llm_identity(container: dict[str, Any]) -> bool:
@@ -75,7 +83,7 @@ def container_has_llm_identity(container: dict[str, Any]) -> bool:
         str(container.get("name", "")),
         str(container.get("image", "")),
     ])
-    return bool(LLM_HINT.search(identity))
+    return identity_matches(identity)
 
 
 def emit(out: list[dict[str, Any]], rule: str, path: Path, digest: str,
