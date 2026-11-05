@@ -50,6 +50,12 @@ class WorkloadInventoryTests(unittest.TestCase):
         )
         self.assertEqual(stratum, "supporting_platform_candidate")
 
+    def test_helm_test_connection_pod_is_not_primary(self):
+        stratum, _ = inventory.propose_stratum(
+            "Pod", "scan-vllm-test-connection wget busybox", "vllm-chart", "vllm.yaml"
+        )
+        self.assertEqual(stratum, "supporting_platform_candidate")
+
     def test_generic_kserve_control_plane_is_supporting(self):
         stratum, _ = inventory.propose_stratum(
             "Deployment", "kserve-controller-manager controller image", "kserve", "kserve.yaml"
