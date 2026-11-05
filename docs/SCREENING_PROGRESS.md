@@ -13,6 +13,7 @@
 | Parseable standalone YAML bundles | 195 | Passed PyYAML parsing |
 | Documented non-standalone/invalid inputs | 7 | Six Helm template fragments and one invalid non-LLM example |
 | YAML documents in parseable bundles | 617 | Documents, not independent observations |
+| Exact duplicate file hashes | 0 | Near-duplicate versions/overlays still require source-aware review |
 | Resource-level review records | 263 | Workloads and serving-related custom resources; review aid only |
 
 All 202 bundle paths are tracked and the lockfile accounting reconciles. The seven parse exceptions are enumerated in corpus/parse_exceptions.json.
