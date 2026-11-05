@@ -50,6 +50,7 @@ jobs:
             results/corpus_validation.json
             results/raw_candidate_findings.jsonl
             results/resource_eligibility_review.csv
+            results/bundle_eligibility_review.csv
             results/workload_inventory_summary.json
           if-no-files-found: error
           retention-days: 30
