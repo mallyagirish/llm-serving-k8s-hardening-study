@@ -70,11 +70,13 @@ class WorkloadInventoryTests(unittest.TestCase):
         bundles = [
             {"path": "rendered/a.yaml", "source": "vllm", "kind": "helm-default"},
             {"path": "rendered/b.yaml", "source": "generic", "kind": "manifest"},
+            {"path": "rendered/bad.yaml", "source": "kserve", "kind": "manifest"},
         ]
-        reviewed = inventory.build_bundle_review(rows, {"bundles": bundles})
+        reviewed = inventory.build_bundle_review(rows, {"bundles": bundles}, {"rendered/bad.yaml"})
         self.assertEqual(reviewed[0]["preliminary_bundle_stratum"], "primary_candidate")
         self.assertEqual(reviewed[0]["primary_resource_candidates"], 1)
         self.assertEqual(reviewed[1]["preliminary_bundle_stratum"], "non_llm_or_unclear")
+        self.assertEqual(reviewed[2]["preliminary_bundle_stratum"], "exclude_pending")
 
     def test_build_inventory_writes_resource_records_from_locked_bundle(self):
         with tempfile.TemporaryDirectory() as tmp:
