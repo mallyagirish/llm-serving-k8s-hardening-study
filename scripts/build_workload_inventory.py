@@ -19,7 +19,7 @@ from typing import Any
 import yaml
 
 POD_WORKLOAD_KINDS = {"Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"}
-SERVING_CR_KINDS = {"LLMInferenceService", "InferenceService", "RayService", "RayCluster"}
+SERVING_CR_KINDS = {"LLMInferenceService", "LLMInferenceServiceConfig", "InferenceService", "RayService", "RayCluster", "ServingRuntime", "ClusterServingRuntime", "LocalModelCache", "LocalModelNodeGroup", "LoraAdapter"}
 DIRECT_ENGINE_HINT = re.compile(
     r"(vllm|text-generation|text_generation|tgi|sglang|ollama|litellm|"
     r"deepseek|llama|qwen|mistral|gemma|bloom|falcon|mixtral|phi|granite|llm)",
@@ -60,112 +60,18 @@ def collect_containers(pod_spec: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def propose_stratum(kind: str, identity: str, source: str, path: str) -> tuple[str, str]:
-    text = " ".join([kind, identity, source, path])
-    if NON_SERVING_HINT.search(text) and not re.search(
-        r"(vllm|text-generation|tgi|sglang|ollama|litellm)", text, re.I
+    # Decide primary eligibility from the resource itself, not the bundle path.
+    # A vLLM chart can also contain generic controllers, sidecars, and jobs.
+    if NON_SERVING_HINT.search(identity) and not re.search(
+        r"(vllm|text-generation|tgi|sglang|ollama|litellm)", identity, re.I
     ):
         return "supporting_platform_candidate", "Training/fine-tuning identity; not an inference workload candidate."
-    if kind == "LLMInferenceService":
-        return "primary_candidate", "Kubernetes LLMInferenceService custom resource; verify serving configuration and version."
+    if kind in {"LLMInferenceService", "LLMInferenceServiceConfig"}:
+        return "primary_candidate", "Kubernetes LLM inference custom resource/config; verify version and rule-specific applicability."
     if DIRECT_ENGINE_HINT.search(identity):
-        return "primary_candidate", "Resource name, labels, or container identity suggests an LLM inference engine/model; verify actual purpose."
-    if kind in SERVING_CR_KINDS or SUPPORT_HINT.search(text):
-        return "supporting_platform_candidate", "Serving platform/operator/GPU infrastructure or generic inference resource; determine rule-specific applicability."
+        return "primary_candidate", "Resource name, labels, or container identity directly suggests an LLM inference engine/model; verify actual purpose."
+    context = " ".join([kind, source, path])
+    if kind in SERVING_CR_KINDS or SUPPORT_HINT.search(context):
+        return "supporting_platform_candidate", "Serving platform/operator/GPU infrastructure or generic ML serving resource; determine rule-specific applicability."
     return "non_llm_or_unclear", "No direct LLM-serving identity detected from resource metadata/container images."
 
-
-def build_inventory(root: Path, lock_path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    lock = json.loads(lock_path.read_text(encoding="utf-8"))
-    rows: list[dict[str, Any]] = []
-    errors: list[str] = []
-    kind_counts = Counter()
-    for bundle in lock.get("bundles", []):
-        rel = bundle["path"]
-        path = (root / "corpus" / rel).resolve()
-        if not path.is_file():
-            errors.append(f"missing bundle: corpus/{rel}")
-            continue
-        try:
-            with path.open("r", encoding="utf-8") as f:
-                documents = list(yaml.safe_load_all(f))
-        except (yaml.YAMLError, UnicodeDecodeError):
-            # Non-standalone inputs are already recorded in parse_exceptions.json.
-            continue
-        for doc_index, obj in enumerate(documents):
-            if not isinstance(obj, dict) or not isinstance(obj.get("kind"), str):
-                continue
-            kind = obj["kind"]
-            kind_counts[kind] += 1
-            if kind not in POD_WORKLOAD_KINDS | SERVING_CR_KINDS:
-                continue
-
-            meta = obj.get("metadata") or {}
-            pod_spec = get_pod_spec(obj) if kind in POD_WORKLOAD_KINDS else {}
-            containers = collect_containers(pod_spec)
-            names = [str(c.get("name", "")) for c in containers]
-            images = [str(c.get("image", "")) for c in containers]
-            labels = meta.get("labels") or {}
-            identity = " ".join([
-                str(meta.get("name", "")),
-                json.dumps(labels, sort_keys=True),
-                " ".join(names),
-                " ".join(images),
-            ])
-            stratum, reason = propose_stratum(kind, identity, str(bundle.get("source", "")), rel)
-            rows.append({
-                "bundle_path": rel,
-                "source": bundle.get("source", ""),
-                "bundle_kind": bundle.get("kind", ""),
-                "document_index": doc_index,
-                "api_version": obj.get("apiVersion", ""),
-                "resource_kind": kind,
-                "resource_name": meta.get("name", ""),
-                "namespace": meta.get("namespace", "default"),
-                "container_count": len(containers),
-                "container_names": ";".join(names),
-                "container_images": ";".join(images),
-                "proposed_stratum": stratum,
-                "proposed_reason": reason,
-                "final_decision": "",
-                "reviewer": "",
-                "review_status": "pending",
-                "review_notes": "",
-                "source_sha256": sha256(path),
-            })
-
-    summary = {
-        "locked_bundles": len(lock.get("bundles", [])),
-        "resource_records": len(rows),
-        "resource_kind_counts": dict(sorted(Counter(r["resource_kind"] for r in rows).items())),
-        "proposed_strata": dict(sorted(Counter(r["proposed_stratum"] for r in rows).items())),
-        "errors": errors,
-        "final_eligibility_status": "not_reviewed",
-    }
-    return rows, summary
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--root", default=".")
-    parser.add_argument("--lockfile", default="corpus/SOURCES.lock.json")
-    parser.add_argument("--out-dir", default="results")
-    args = parser.parse_args()
-    root = Path(args.root).resolve()
-    rows, summary = build_inventory(root, root / args.lockfile)
-    out_dir = root / args.out_dir
-    out_dir.mkdir(parents=True, exist_ok=True)
-    fields = list(rows[0].keys()) if rows else []
-    with (out_dir / "resource_eligibility_review.csv").open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fields)
-        if fields:
-            writer.writeheader()
-            writer.writerows(rows)
-    (out_dir / "workload_inventory_summary.json").write_text(
-        json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    print(json.dumps(summary, indent=2, sort_keys=True))
-    return 1 if summary["errors"] else 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
