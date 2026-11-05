@@ -39,6 +39,27 @@ spec:
         self.assertIn("LLM-WL-03", ids)
         self.assertTrue(all(r["status"] == "candidate_for_human_review" for r in rows))
 
+    def test_dangerous_capabilities_and_host_device_mount_are_candidates(self):
+        rows = self.scan_text("""
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: vllm-api}
+spec:
+  template:
+    spec:
+      volumes:
+      - name: gpu-devices
+        hostPath: {path: /dev}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:latest
+        securityContext:
+          capabilities:
+            add: ["SYS_ADMIN"]
+""")
+        gpu_rows = [r for r in rows if r["rule_id"] == "LLM-GPU-03"]
+        self.assertEqual(len(gpu_rows), 2)
+
     def test_non_llm_deployment_is_not_scanned(self):
         self.assertEqual(self.scan_text("""
 apiVersion: apps/v1
