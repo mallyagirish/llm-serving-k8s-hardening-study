@@ -1,0 +1,230 @@
+{
+  "schema_version": "0.1",
+  "purpose": "Machine-readable inventory of the 28 proposed rules. Automated checks are conservative candidate generators, not adjudicated findings.",
+  "rules": [
+    {
+      "id": "LLM-AUTH-01",
+      "title": "Missing/disabled API key on OpenAI-compatible endpoint",
+      "category": "Auth",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-AUTH-02",
+      "title": "API key protects only /v1 routes; sibling routes may bypass auth",
+      "category": "Auth",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-AUTH-03",
+      "title": "Tokenizer, admin, or development endpoints enabled",
+      "category": "Auth",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-AUTH-04",
+      "title": "Unrestricted CORS or disabled auth middleware",
+      "category": "Auth",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-AUTH-05",
+      "title": "Ingress without authentication controls",
+      "category": "Auth",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-NET-01",
+      "title": "Inference Service exposed as LoadBalancer or NodePort",
+      "category": "Network",
+      "severity": "Critical",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-NET-02",
+      "title": "No NetworkPolicy in sampled inference configuration",
+      "category": "Network",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-NET-03",
+      "title": "Inference Ingress/Gateway has no evidenced TLS configuration",
+      "category": "Network",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-NET-04",
+      "title": "Distributed/Ray/KV-transfer control ports broadly exposed",
+      "category": "Network",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-NET-05",
+      "title": "Inference workload uses hostNetwork or hostPID",
+      "category": "Network",
+      "severity": "Critical",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-SEC-01",
+      "title": "Secret-like literal appears in values or ConfigMap",
+      "category": "Secrets",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-SEC-02",
+      "title": "Token-like environment variable uses literal value rather than secretKeyRef",
+      "category": "Secrets",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-SEC-03",
+      "title": "Inference ServiceAccount has broad or cluster-admin permissions",
+      "category": "Secrets",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-GPU-01",
+      "title": "GPU-serving container lacks vendor GPU resource request/limit",
+      "category": "GPU/Isolation",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-GPU-02",
+      "title": "GPU multi-tenant isolation controls are not evidenced",
+      "category": "GPU/Isolation",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-GPU-03",
+      "title": "GPU workload uses privileged mode or dangerous capabilities",
+      "category": "GPU/Isolation",
+      "severity": "Critical",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-WL-01",
+      "title": "Inference container does not explicitly require non-root execution",
+      "category": "Workload Security",
+      "severity": "High",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-WL-02",
+      "title": "Inference container does not explicitly use a read-only root filesystem",
+      "category": "Workload Security",
+      "severity": "Medium",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-WL-03",
+      "title": "Inference container does not explicitly disable privilege escalation",
+      "category": "Workload Security",
+      "severity": "High",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-WL-04",
+      "title": "Inference workload lacks an evidenced seccomp/AppArmor profile",
+      "category": "Workload Security",
+      "severity": "Medium",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-WL-05",
+      "title": "Inference image uses latest or lacks immutable digest",
+      "category": "Workload Security",
+      "severity": "High",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-STOR-01",
+      "title": "Model/cache storage has potentially unsafe sharing or permissions",
+      "category": "Storage/Model",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-STOR-02",
+      "title": "Model/cache path uses a potentially untrusted writable volume",
+      "category": "Storage/Model",
+      "severity": "Critical",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-STOR-03",
+      "title": "Model download initContainer has excess privilege or token exposure",
+      "category": "Storage/Model",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-RES-01",
+      "title": "Inference container lacks CPU/memory requests or limits",
+      "category": "Resources",
+      "severity": "High",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-RES-02",
+      "title": "Production-like replicated inference workload lacks a PDB",
+      "category": "Resources",
+      "severity": "Medium",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    },
+    {
+      "id": "LLM-RES-03",
+      "title": "Inference container lacks readiness/startup probes",
+      "category": "Resources",
+      "severity": "High",
+      "automation": "candidate_only",
+      "assessment_semantics": "Static candidate requiring human review"
+    },
+    {
+      "id": "LLM-OBS-01",
+      "title": "Metrics/dashboard endpoint appears exposed without evidenced auth",
+      "category": "Observability",
+      "severity": "High",
+      "automation": "manual_review",
+      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+    }
+  ]
+}
