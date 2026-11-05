@@ -75,6 +75,99 @@ spec:
 """)
         self.assertEqual(rows, [])
 
+    def test_literal_token_env_is_flagged_without_leaking_value(self):
+        secret = "hf_super_secret_value_123"
+        rows = self.scan_text(f"""
+apiVersion: v1
+kind: Pod
+metadata: {{name: vllm-api}}
+spec:
+  containers:
+  - name: vllm
+    image: vllm/vllm-openai:latest
+    env:
+    - name: HUGGING_FACE_HUB_TOKEN
+      value: {secret}
+""")
+        row = next(r for r in rows if r["rule_id"] == "LLM-SEC-02")
+        self.assertIn("HUGGING_FACE_HUB_TOKEN", row["evidence"])
+        self.assertNotIn(secret, str(row))
+
+    def test_placeholder_token_env_is_not_flagged(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: vllm-api}
+spec:
+  containers:
+  - name: vllm
+    image: vllm/vllm-openai:latest
+    env:
+    - name: HUGGING_FACE_HUB_TOKEN
+      value: YOUR_HF_TOKEN
+""")
+        self.assertNotIn("LLM-SEC-02", {r["rule_id"] for r in rows})
+
+    def test_missing_seccomp_profile_is_candidate(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: vllm-api}
+spec:
+  containers:
+  - name: vllm
+    image: vllm/vllm-openai:latest
+""")
+        self.assertIn("LLM-WL-04", {r["rule_id"] for r in rows})
+
+    def test_gpu_engine_without_gpu_resource_is_candidate(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: vllm-api}
+spec:
+  containers:
+  - name: vllm
+    image: vllm/vllm-openai:latest
+    resources:
+      requests: {cpu: "2", memory: "8Gi"}
+      limits: {cpu: "4", memory: "16Gi"}
+""")
+        self.assertIn("LLM-GPU-01", {r["rule_id"] for r in rows})
+
+    def test_gpu_engine_with_vendor_gpu_resource_is_not_candidate(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: vllm-api}
+spec:
+  containers:
+  - name: vllm
+    image: vllm/vllm-openai:latest
+    resources:
+      limits: {nvidia.com/gpu: 1}
+""")
+        self.assertNotIn("LLM-GPU-01", {r["rule_id"] for r in rows})
+
+    def test_llm_ingress_without_tls_is_candidate(self):
+        rows = self.scan_text("""
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: {name: vllm-api}
+spec:
+  rules:
+  - host: llm.example.test
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: vllm-api
+            port: {number: 8000}
+""")
+        self.assertIn("LLM-NET-03", {r["rule_id"] for r in rows})
+
     def test_non_llm_deployment_is_not_scanned(self):
         self.assertEqual(self.scan_text("""
 apiVersion: apps/v1
