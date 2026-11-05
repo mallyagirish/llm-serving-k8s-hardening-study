@@ -1,16 +1,16 @@
-# Hardening LLM Inference on Kubernetes
+# Security-Relevant Configurations in Public Kubernetes-Based LLM Inference Stacks
 
 Empirical study of security and reliability misconfigurations in public Helm charts and Kubernetes manifests used to serve large language models (vLLM, TGI, SGLang, Ollama, KServe GenAI, Ray Serve LLM, and related gateways).
 
 **Author:** [Girish Mallya](https://github.com/mallyagirish)  
-**Working title:** *Hardening LLM Inference on Kubernetes: An Empirical Study of Production Serving Stacks*  
+**Working title:** *Security-Relevant Configurations in Public Kubernetes-Based LLM Inference Stacks: A Reproducible Empirical Study*  
 **License:** [Apache-2.0](LICENSE)
 
 > Not legal advice. This repository is an independent research artifact; it does not constitute immigration, legal, or security advice.
 
 ## Problem
 
-Organizations increasingly run LLM inference on Kubernetes: OpenAI-compatible HTTP APIs, GPU-backed Deployments, Ingress/Gateway frontends, shared model caches, and multi-tenant GPU nodes. Default and tutorial configurations for these stacks often omit controls that matter specifically for inference—API authentication on `/v1` and sibling routes, NetworkPolicy around GPU pods, TLS on Ingress, secret handling for Hugging Face tokens, GPU isolation, and trusted model-cache mounts.
+Organizations increasingly run LLM inference on Kubernetes: OpenAI-compatible HTTP APIs, GPU-backed Deployments, Ingress/Gateway frontends, shared model caches, and multi-tenant GPU nodes. Default and tutorial configurations for these stacks may omit controls that matter specifically for inference—API authentication on `/v1` and sibling routes, NetworkPolicy around GPU pods, TLS on Ingress, secret handling for Hugging Face tokens, GPU isolation, and trusted model-cache mounts.
 
 Generic Kubernetes and Helm hardening surveys (CIS benchmarks, Pod Security Standards, broad chart audits) catch many workload-security gaps, but they do not systematically cover **LLM-serving-specific** surfaces such as:
 
@@ -116,7 +116,7 @@ No prevalence results, CVE claims, or paper citations are asserted in this READM
 
 Working paper title (preprint not yet posted):
 
-> Girish Mallya. *Hardening LLM Inference on Kubernetes: An Empirical Study of Production Serving Stacks*. Work in progress.
+> Girish Mallya. *Security-Relevant Configurations in Public Kubernetes-Based LLM Inference Stacks: A Reproducible Empirical Study*. Work in progress.
 
 When an arXiv ID or DOI exists, this section will be updated. Prefer citing a specific commit or release tag of this repository until then.
 
