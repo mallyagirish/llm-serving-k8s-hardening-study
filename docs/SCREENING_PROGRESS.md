@@ -1,8 +1,8 @@
 # Phase 3 Corpus Screening Progress
 
-**Snapshot:** 2026-10-28 lockfile; Phase 3 CI run #54 (2026-11-05).  
+**Snapshot:** 2026-10-28 lockfile; latest verified Phase 3 CI run #74 (2026-11-05 UTC).  
 **Branch:** research/phase3-empirical-evaluation  
-**Status:** Provisional automated triage only; human eligibility decisions are pending.
+**Status:** Automated triage only; human eligibility decisions are pending.
 
 ## Verified corpus accounting
 
@@ -16,11 +16,9 @@
 | Exact duplicate file hashes | 0 | Near-duplicate versions/overlays still require source-aware review |
 | Resource-level review records | 263 | Workloads and serving-related custom resources; review aid only |
 
-All 202 bundle paths are tracked and the lockfile accounting reconciles. The seven parse exceptions are enumerated in corpus/parse_exceptions.json.
+The latest run validated all 202 locked bundle paths, found no parser errors beyond the seven documented exclusions, and found no exact duplicate bundle-file hashes. Near-duplicate chart versions and overlays still require source-aware review. The seven parse exceptions are enumerated in corpus/parse_exceptions.json.
 
 ## Provisional bundle triage
-
-The current inventory extractor groups resource evidence within each locked bundle and proposes a bundle-level stratum:
 
 | Provisional stratum | Bundles |
 |---|---:|
@@ -49,20 +47,25 @@ These are heuristic review queues, **not final inclusion decisions**. A reviewer
 | Louis030195 TGI Helm | 1 | 0 | 0 | 0 | 1 |
 | **Total** | **202** | **102** | **86** | **7** | **7** |
 
-## Important interpretation
+## Interpretation and known dependence
 
 - HAMi contributes 67 bundles, but only three are currently classified as direct LLM-serving candidates; most are generic GPU-sharing examples. Keep those in a separate supporting analysis unless a reviewer finds an LLM-serving workload.
-- KServe contributes 79 bundles, including direct LLMInferenceService/LLMInferenceServiceConfig examples, generic ML samples, platform resources, and six non-standalone fragments. Review the exact resource purpose and avoid counting every KServe artifact as an LLM workload.
-- vLLM Production Stack contributes 30 bundles, including four chart versions and tutorial overlays. Treat versions/overlays as correlated observations and report the chart-version/tutorial strata separately.
+- KServe contributes 79 bundles, including direct LLMInferenceService/LLMInferenceServiceConfig examples, generic ML samples, platform resources, and six non-standalone fragments. Review exact resource purpose.
+- vLLM Production Stack contributes 30 bundles, including chart versions and tutorial overlays. Treat versions/overlays as correlated observations and report their strata separately.
 - The 11 project clusters, not the 27 lockfile source entries or 202 bundles, are the conservative top-level grouping for dependence-aware summaries.
 
 ## Next gates
 
-1. Human-review the 102 primary candidates and 86 supporting candidates; resolve the 7 unclear bundles.
-2. Record final bundle decisions and evidence in the screening CSV. Keep the parse exceptions excluded from static YAML analysis.
+1. Human-review all primary candidates, supporting candidates, and unclear bundles; do not use the preliminary stratum as a final decision.
+2. Record final bundle decisions, in-scope resource identity, rationale, reviewer, and source evidence in the review CSV.
 3. Define exact/near-duplicate and chart-version/overlay handling before computing prevalence.
 4. Freeze the primary bundle set and rule predicates.
-5. Create a reproducible blinded labeling sample and have two human reviewers label it independently.
-6. Run confirmatory analysis only after labels and the protocol are frozen.
+5. Generate identical scanner-blind labeling sheets for two independent human reviewers using the same seed and sample size, but separate output files and reviewer IDs. The sheets expose source paths because reviewers need to inspect the artifacts; they are not source-blinded.
+6. Lock both reviewers' labels before adjudication; report agreement, uncertainty, and adjudication changes.
+7. Run confirmatory analysis only after labels and the protocol are frozen.
 
-CI artifact: [Run #54](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/41955336887). The artifact contains the generated bundle/resource eligibility queues, raw scanner candidates, and validation inventory; it expires after 30 days.
+## Reproducibility artifacts
+
+- [Latest successful CI run #74](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/41955908875)
+- Artifact: `phase3-corpus-validation-and-candidates`, artifact ID `13383270891`, expires 2026-12-05.
+- The artifact contains corpus inventory, validation report, raw scanner candidates, and bundle/resource eligibility queues. Generated queue rows are not final human decisions.
