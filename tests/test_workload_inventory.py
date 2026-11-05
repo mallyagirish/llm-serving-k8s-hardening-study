@@ -38,6 +38,12 @@ class WorkloadInventoryTests(unittest.TestCase):
         )
         self.assertEqual(stratum, "supporting_platform_candidate")
 
+    def test_generic_neuron_inference_pod_is_not_primary_llm(self):
+        stratum, _ = inventory.propose_stratum(
+            "Pod", "npod public.ecr.aws/neuron/pytorch-inference-neuron:1.13.1", "hami", "hami-example.yaml"
+        )
+        self.assertEqual(stratum, "supporting_platform_candidate")
+
     def test_generic_controller_in_llm_chart_is_not_primary(self):
         stratum, _ = inventory.propose_stratum(
             "Deployment", "hami scheduler kube-scheduler image", "vllm-stack", "vllm-stack.yaml"
