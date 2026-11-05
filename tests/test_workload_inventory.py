@@ -11,6 +11,16 @@ spec.loader.exec_module(inventory)
 
 
 class WorkloadInventoryTests(unittest.TestCase):
+    def test_upstream_project_mapping_groups_versions_and_repositories(self):
+        self.assertEqual(
+            inventory.upstream_project_for_bundle("rendered/vllm-stack-0.1.13/default.yaml"),
+            "vllm-project/production-stack",
+        )
+        self.assertEqual(
+            inventory.upstream_project_for_bundle("rendered/kserve-v0.15.0/default.yaml"),
+            "kserve/kserve",
+        )
+
     def test_cronjob_pod_template_is_extracted(self):
         pod = inventory.get_pod_spec({
             "kind": "CronJob",
