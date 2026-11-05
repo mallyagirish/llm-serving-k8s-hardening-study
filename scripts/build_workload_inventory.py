@@ -202,7 +202,7 @@ def build_inventory(root: Path, lock_path: Path) -> tuple[list[dict[str, Any]], 
     return rows, summary
 
 
-def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any], exception_paths: set[str] | None = None) -> list[dict[str, Any]]:
+def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any], exception_paths: set[str] | None = None, corpus_root: Path | None = None) -> list[dict[str, Any]]:
     by_bundle: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         by_bundle.setdefault(row["bundle_path"], []).append(row)
@@ -228,6 +228,7 @@ def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any], except
         names = [f'{r["resource_kind"]}/{r["resource_name"]}' for r in primary[:12]]
         output.append({
             "bundle_path": rel,
+            "bundle_sha256": sha256(corpus_root / "corpus" / rel) if corpus_root and (corpus_root / "corpus" / rel).is_file() else "",
             "source": bundle.get("source", ""),
             "bundle_kind": bundle.get("kind", ""),
             "upstream_project": upstream_project_for_bundle(rel),
@@ -257,7 +258,7 @@ def main() -> int:
     lock = json.loads((root / args.lockfile).read_text(encoding="utf-8"))
     exceptions_doc = json.loads((root / "corpus" / "parse_exceptions.json").read_text(encoding="utf-8"))
     exception_paths = {item["path"] for item in exceptions_doc.get("exceptions", [])}
-    bundle_rows = build_bundle_review(rows, lock, exception_paths)
+    bundle_rows = build_bundle_review(rows, lock, exception_paths, root)
     summary["proposed_bundle_strata"] = dict(sorted(Counter(r["preliminary_bundle_stratum"] for r in bundle_rows).items()))
     out_dir = root / args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
