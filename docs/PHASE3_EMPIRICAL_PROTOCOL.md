@@ -69,6 +69,12 @@ Important guardrails:
 
 If a rule's intended claim cannot be tested from available artifacts, downgrade it to an explicitly static proxy or move it to runtime/future work. Do not overstate what the scanner establishes.
 
+## 5A. Current scanner coverage (implementation status)
+
+The current conservative candidate scanner emits candidates for nine rule IDs only: LLM-NET-01, LLM-NET-05, LLM-GPU-03, LLM-WL-01, LLM-WL-02, LLM-WL-03, LLM-WL-05, LLM-RES-01, and LLM-RES-03. The remaining rules are not yet automatically assessed by this script and require rule-specific manual evidence review or future tested extractors.
+
+The scanner intentionally emits candidates rather than TP/FP labels. It uses container/resource identity heuristics and can still miss or misclassify workloads. Candidate counts must not be presented as rule prevalence, scanner precision, or recall. The rule catalog's automation field is the authoritative coverage declaration for each rule version.
+
 ## 6. Human reference labeling
 
 Create a written labeling guide with rule-specific examples. Sample independently at workload/bundle level using a reproducible random seed and stratification across rule categories and source types.
