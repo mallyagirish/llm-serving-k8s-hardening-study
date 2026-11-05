@@ -63,8 +63,8 @@
       "title": "Inference Ingress/Gateway has no evidenced TLS configuration",
       "category": "Network",
       "severity": "High",
-      "automation": "manual_review",
-      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+      "automation": "candidate_only",
+      "assessment_semantics": "Conservative static candidate requiring human review; external controls and runtime context may change interpretation."
     },
     {
       "id": "LLM-NET-04",
@@ -95,8 +95,8 @@
       "title": "Token-like environment variable uses literal value rather than secretKeyRef",
       "category": "Secrets",
       "severity": "High",
-      "automation": "manual_review",
-      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+      "automation": "candidate_only",
+      "assessment_semantics": "Conservative static candidate requiring human review; external controls and runtime context may change interpretation."
     },
     {
       "id": "LLM-SEC-03",
@@ -111,8 +111,8 @@
       "title": "GPU-serving container lacks vendor GPU resource request/limit",
       "category": "GPU/Isolation",
       "severity": "High",
-      "automation": "manual_review",
-      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+      "automation": "candidate_only",
+      "assessment_semantics": "Conservative static candidate requiring human review; external controls and runtime context may change interpretation."
     },
     {
       "id": "LLM-GPU-02",
@@ -159,8 +159,8 @@
       "title": "Inference workload lacks an evidenced seccomp/AppArmor profile",
       "category": "Workload Security",
       "severity": "Medium",
-      "automation": "manual_review",
-      "assessment_semantics": "Manual review required; do not infer finding from absence alone"
+      "automation": "candidate_only",
+      "assessment_semantics": "Conservative static candidate requiring human review; external controls and runtime context may change interpretation."
     },
     {
       "id": "LLM-WL-05",
