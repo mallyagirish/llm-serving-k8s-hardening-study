@@ -2,7 +2,7 @@
 # Phase 2: fetch verified LLM-serving K8s sources and helm-template them.
 set -uo pipefail
 
-ROOT="/workspace/llm-serving-k8s-hardening-study"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CORPUS="$ROOT/corpus"
 CHARTS="$CORPUS/charts"
 MANIFESTS="$CORPUS/manifests"
