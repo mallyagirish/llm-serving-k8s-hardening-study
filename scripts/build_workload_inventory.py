@@ -172,7 +172,7 @@ def build_inventory(root: Path, lock_path: Path) -> tuple[list[dict[str, Any]], 
     return rows, summary
 
 
-def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any]) -> list[dict[str, Any]]:
+def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any], exception_paths: set[str] | None = None) -> list[dict[str, Any]]:
     by_bundle: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         by_bundle.setdefault(row["bundle_path"], []).append(row)
@@ -183,7 +183,10 @@ def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any]) -> lis
         primary = [r for r in resources if r["proposed_stratum"] == "primary_candidate"]
         supporting = [r for r in resources if r["proposed_stratum"] == "supporting_platform_candidate"]
         unclear = [r for r in resources if r["proposed_stratum"] == "non_llm_or_unclear"]
-        if primary:
+        if exception_paths and rel in exception_paths:
+            stratum = "exclude_pending"
+            rationale = "Non-standalone/invalid YAML; see corpus/parse_exceptions.json."
+        elif primary:
             stratum = "primary_candidate"
             rationale = "At least one resource-level identity suggests LLM inference; inspect bundle completeness and whether it is a workload or config."
         elif supporting:
@@ -221,7 +224,9 @@ def main() -> int:
     root = Path(args.root).resolve()
     rows, summary = build_inventory(root, root / args.lockfile)
     lock = json.loads((root / args.lockfile).read_text(encoding="utf-8"))
-    bundle_rows = build_bundle_review(rows, lock)
+    exceptions_doc = json.loads((root / "corpus" / "parse_exceptions.json").read_text(encoding="utf-8"))
+    exception_paths = {item["path"] for item in exceptions_doc.get("exceptions", [])}
+    bundle_rows = build_bundle_review(rows, lock, exception_paths)
     summary["proposed_bundle_strata"] = dict(sorted(Counter(r["preliminary_bundle_stratum"] for r in bundle_rows).items()))
     out_dir = root / args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
