@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Create a blinded bundle × rule labeling template from reviewed eligibility CSV.
+"""Create a scanner-blind bundle × rule labeling sheet from reviewed eligibility.
 
-The input eligibility CSV must contain final_decision=include_primary for each
-bundle in the primary sample. Scanner candidates are deliberately not read.
+The eligibility CSV must contain final_decision=include_primary. Scanner
+candidate output is deliberately not read. This is scanner-blinding, not
+source-blinding: reviewers need bundle paths to inspect the source artifacts.
 """
 from __future__ import annotations
 
@@ -29,7 +30,7 @@ def proportional_quotas(groups: dict[str, list[dict[str, str]]], sample_size: in
 
 
 def create_sample(eligibility_rows: list[dict[str, str]], rules: list[dict[str, Any]],
-                  sample_size: int | None, seed: int) -> list[dict[str, str]]:
+                  sample_size: int | None, seed: int, reviewer_id: str) -> list[dict[str, str]]:
     eligible = [r for r in eligibility_rows if r.get("final_decision", "").strip() == "include_primary"]
     if not eligible:
         raise ValueError("No bundles have final_decision=include_primary in the eligibility CSV.")
@@ -70,25 +71,28 @@ def create_sample(eligibility_rows: list[dict[str, str]], rules: list[dict[str, 
                 "label": "",
                 "evidence_path": "",
                 "rationale": "",
-                "reviewer_id": "",
+                "reviewer_id": reviewer_id,
                 "review_timestamp": "",
             })
     return output
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Create a reproducible scanner-blind labeling sheet; source metadata remains visible."
+    )
     parser.add_argument("--eligibility-csv", required=True)
     parser.add_argument("--rules", default="rules/catalog.json")
     parser.add_argument("--sample-size", type=int, default=None)
     parser.add_argument("--seed", type=int, default=20261105)
-    parser.add_argument("--output", default="results/blinded_labeling_template.csv")
+    parser.add_argument("--reviewer-id", required=True, help="Distinct identifier, e.g. R1 or R2.")
+    parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
     with Path(args.eligibility_csv).open(newline="", encoding="utf-8") as f:
         eligibility = list(csv.DictReader(f))
     catalog = json.loads(Path(args.rules).read_text(encoding="utf-8"))
-    rows = create_sample(eligibility, catalog["rules"], args.sample_size, args.seed)
+    rows = create_sample(eligibility, catalog["rules"], args.sample_size, args.seed, args.reviewer_id)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", newline="", encoding="utf-8") as f:
@@ -100,8 +104,11 @@ def main() -> int:
         "rules": len(catalog["rules"]),
         "label_rows": len(rows),
         "seed": args.seed,
+        "reviewer_id": args.reviewer_id,
         "output": str(output),
         "scanner_output_used": False,
+        "scanner_blind": True,
+        "source_blind": False,
     }, indent=2))
     return 0
 
