@@ -26,7 +26,7 @@ SERVING_CR_KINDS = {
 }
 DIRECT_ENGINE_HINT = re.compile(
     r"(vllm|text-generation|text_generation|tgi|sglang|ollama|litellm|"
-    r"deepseek|llama|qwen|mistral|gemma|bloom|falcon|mixtral|phi|granite|llm)",
+    r"deepseek|llama|qwen|mistral|gemma|bloom|falcon|mixtral|phi|granite|llm[-_ ]?(inference|serve|serving|server|api|gateway)|llmisvc)",
     re.I,
 )
 NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
