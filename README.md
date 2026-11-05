@@ -103,7 +103,7 @@ The Phase 3 pipeline is under active validation on branch `research/phase3-empir
 - The 195 parseable bundles contain 617 YAML documents. These are inventory counts, not independent deployments.
 - The 27 lockfile source entries group into 11 upstream project clusters. The current resource-aware triage proposes 102 primary candidates, 86 supporting candidates, 7 unclear bundles, and 7 parse exclusions; all decisions remain pending human review.
 - See [Phase 3 screening progress](docs/SCREENING_PROGRESS.md) for project-level counts and next gates.
-- The conservative scanner emits review candidates for a subset of rules. Candidate counts are not prevalence estimates and must be independently adjudicated before publication.
+- The conservative scanner currently emits candidates for 13 of the 28 rules. Candidate counts are not prevalence estimates and must be independently adjudicated before publication.
 
 See [the empirical protocol](docs/PHASE3_EMPIRICAL_PROTOCOL.md), [corpus screening guide](docs/CORPUS_SCREENING_GUIDE.md), [human labeling guide](docs/LABELING_GUIDE.md), [related-work review](docs/RELATED_WORK_AND_NOVELTY.md), and [exploratory literature search log](docs/LITERATURE_SEARCH_LOG.md).
 
