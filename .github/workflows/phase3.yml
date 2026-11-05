@@ -38,6 +38,9 @@ jobs:
       - name: Generate conservative review candidates
         run: python scripts/scan_candidates.py corpus/rendered --output results/raw_candidate_findings.jsonl
 
+      - name: Build resource-level eligibility review queue
+        run: python scripts/build_workload_inventory.py
+
       - name: Upload reproducible outputs
         uses: actions/upload-artifact@v4
         with:
@@ -46,5 +49,7 @@ jobs:
             results/corpus_inventory.jsonl
             results/corpus_validation.json
             results/raw_candidate_findings.jsonl
+            results/resource_eligibility_review.csv
+            results/workload_inventory_summary.json
           if-no-files-found: error
           retention-days: 30
