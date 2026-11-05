@@ -230,6 +230,7 @@ def build_bundle_review(rows: list[dict[str, Any]], lock: dict[str, Any], except
             "bundle_path": rel,
             "source": bundle.get("source", ""),
             "bundle_kind": bundle.get("kind", ""),
+            "upstream_project": upstream_project_for_bundle(rel),
             "resource_records": len(resources),
             "primary_resource_candidates": len(primary),
             "supporting_resource_candidates": len(supporting),
