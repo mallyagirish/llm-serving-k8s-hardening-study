@@ -124,11 +124,11 @@
     },
     {
       "id": "LLM-GPU-03",
-      "title": "GPU workload uses privileged mode or dangerous capabilities",
+      "title": "GPU workload uses privileged mode, dangerous capabilities, or broad host-device mounts",
       "category": "GPU/Isolation",
       "severity": "Critical",
       "automation": "candidate_only",
-      "assessment_semantics": "Static candidate requiring human review"
+      "assessment_semantics": "Static candidate requiring human review; GPU device access may be necessary and must be scoped."
     },
     {
       "id": "LLM-WL-01",
