@@ -50,6 +50,14 @@ The paper analyzes 2,662 Stack Overflow issues, derives a Kubernetes misconfigur
 
 **Relationship:** Generic Kubernetes misconfiguration taxonomy and LLM repair are already covered. Do not position the companion remediation study as the first generic Kubernetes repair benchmark.
 
+### KubeGuard: runtime-informed Kubernetes hardening
+
+Sgan Cohen et al. (2025), “KubeGuard: LLM-Assisted Kubernetes Hardening via Configuration Files and Runtime Logs Analysis.” arXiv:2509.04191. https://arxiv.org/abs/2509.04191
+
+KubeGuard combines Kubernetes manifests with audit, network-flow, and provenance logs to generate/refine Roles, NetworkPolicies, and Deployments. It evaluates generic microservice applications and focuses on runtime-informed least-privilege hardening.
+
+**Relationship:** KubeGuard is adjacent to the companion remediation benchmark and establishes that runtime-informed LLM hardening of Kubernetes resources is already explored. Our remediation study must focus on LLM-serving-specific acceptance oracles rather than claim generic runtime-aware hardening as novel.
+
 ## 3. LLM-assisted infrastructure repair
 
 ### LLMSecConfig
@@ -74,6 +82,14 @@ The vLLM security guide documents several serving-specific boundaries, including
 https://docs.vllm.ai/en/latest/usage/security/
 
 The guide explicitly states that vLLM does not provide tenant isolation between callers sharing one server process and recommends architectural controls such as per-tenant instances and an authenticating gateway. This supports our focus on the deployment architecture around an inference process, but documentation guidance is not empirical evidence of prevalence.
+
+### LIMA: cross-layer vulnerabilities in local inference frameworks
+
+Sen, Longoria, and Liu (WOOT 2026), “LIMA: Defining, Benchmarking and Detecting Cross-Layer Vulnerabilities in LLM Inference Frameworks.” USENIX WOOT '26, pp. 287–303. https://www.usenix.org/conference/woot26/presentation/sen
+
+LIMA curates 60 disclosed vulnerabilities across llama.cpp, vLLM, Ollama, and LocalAI, develops LIMABench/LIMAScan, and reports seven newly discovered vulnerabilities in model-artifact loading paths.
+
+**Relationship:** This is direct evidence that inference engines and model artifacts have serving-specific attack surfaces. It is not a Kubernetes deployment-manifest prevalence study, but it makes model/cache and model-loading rules important and cautions against treating container hardening as the whole security story.
 
 ## 5. Defensible contribution for this study
 
