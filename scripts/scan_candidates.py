@@ -18,8 +18,8 @@ from typing import Any, Iterable
 import yaml
 
 LLM_HINT = re.compile(
-    r"(vllm|text-generation|text_generation|tgi|sglang|ollama|llm|inference|"
-    r"rayserve|ray-serve|litellm|huggingface|deepseek|llama|qwen|mistral)",
+    r"(vllm|text-generation|text_generation|tgi|sglang|ollama|llm|"
+    r"rayserve|ray-serve|litellm|deepseek|llama|qwen|mistral|gemma|bloom|falcon|mixtral|phi|granite)",
     re.I,
 )
 IMAGE_DIGEST = re.compile(r"@sha256:[0-9a-f]{64}$", re.I)
