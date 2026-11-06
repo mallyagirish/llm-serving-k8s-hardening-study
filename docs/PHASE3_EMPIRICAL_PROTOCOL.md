@@ -36,14 +36,14 @@ Do not mix researcher-created overlays into primary upstream-default prevalence.
 
 Each rule × eligible configuration bundle receives one of four labels. A bundle is eligible for a rule only when it contains at least one workload/resource to which that rule applies:
 
-- **TP (finding present):** all predeclared evidence conditions for the rule are met.
-- **FP (no finding):** the rule is applicable and the configuration provides sufficient evidence that the weakness is absent.
+- **PRESENT (finding present):** all predeclared evidence conditions for the rule are met.
+- **ABSENT (no finding):** the rule is applicable and the configuration provides sufficient evidence that the weakness is absent.
 - **U (uncertain):** static artifacts do not provide enough context to decide reliably.
 - **NA (not applicable):** the rule does not apply to this resource/workload/source type.
 
 These labels describe a rule's assessment of a configuration, not scanner performance against independent ground truth. Do not call a scanner finding a true positive unless an independently adjudicated reference label supports it.
 
-For scanner evaluation, compare automated output to independent reference labels and report TP/FP/FN/TN using conventional classifier definitions. Keep U and NA out of the binary confusion matrix, report their counts, and run sensitivity bounds where appropriate.
+For scanner evaluation, compare automated output to independent reference labels and report TP/FP/FN/TN using conventional classifier definitions: a scanner candidate on a PRESENT unit is a TP, a candidate on an ABSENT unit is an FP, no candidate on a PRESENT unit is an FN, and no candidate on an ABSENT unit is a TN. Keep U and NA out of the binary confusion matrix, report their counts, and run sensitivity bounds where appropriate.
 
 ## 5. Rule-specific evidence requirements
 
@@ -93,10 +93,10 @@ If feasible, independently label all high-severity candidate findings and a repr
 
 Report:
 - eligible units per rule;
-- TP, FP, U, and NA counts;
-- finding prevalence among assessable applicable units: TP / (TP + FP);
-- uncertainty rate: U / (TP + FP + U);
-- applicability rate: (TP + FP + U) / all sampled units;
+- PRESENT, ABSENT, U, and NA counts;
+- finding prevalence among assessable applicable units: PRESENT / (PRESENT + ABSENT);
+- uncertainty rate: U / (PRESENT + ABSENT + U);
+- applicability rate: (PRESENT + ABSENT + U) / all sampled units;
 - source-weighted and unweighted estimates, clearly distinguished;
 - per-stack and per-source-type estimates;
 - confidence intervals accounting for clustering by upstream source/project.

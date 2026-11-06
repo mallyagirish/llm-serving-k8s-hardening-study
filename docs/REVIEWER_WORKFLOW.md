@@ -29,11 +29,13 @@ python scripts/create_blinded_labeling_sample.py \
 
 The sample size of 30 above is a **pilot only**, not a final statistically powered sample. Confirm the pilot size and sampling strata before running it. Do not generate a confirmatory sample until eligibility and protocol are frozen. If all eligible bundles are intended for review, omit `--sample-size` in both commands.
 
+The generator (v2) validates the frozen nine-column eligibility schema and fails loudly — it never silently defaults: upstream project is derived from the pinned corpus mapping (`upstream_project_for_bundle` in `scripts/build_workload_inventory.py`), each selected bundle's SHA-256 is computed from the file on disk, and missing files, duplicate bundle paths, pending/unrecognized `final_decision` values, or unmapped projects abort the run. Each run also writes a provenance sidecar next to the sheet (`<output>.meta.json`) recording the eligibility CSV and rule-catalog hashes, the seed, the reviewer ID, and the exact selected bundle list with projects and hashes. Before distributing the sheets, check that the R1 and R2 sidecars agree on input hashes, seed, sample size, and selected bundles, differing only in `reviewer_id`.
+
 ## Independent review
 
 1. Give each reviewer only their own CSV and read-only access to the pinned corpus and labeling guide.
 2. Do not share scanner output, the other reviewer's sheet, or interim labels.
-3. For each bundle × rule row, enter one of `TP`, `FP`, `U`, or `NA`, plus evidence path and concise rationale.
+3. For each bundle × rule row, enter one of `PRESENT`, `ABSENT`, `U`, or `NA`, plus evidence path and concise rationale. These are reference classifications of the rule condition — reviewers never see scanner predictions, so do not think of them as scanner true/false positives (see `docs/LABELING_GUIDE.md` §1).
 4. Use `U` when static artifacts do not establish the required context; do not force a binary decision.
 5. Do not record credential values. Record key names and locations only.
 6. Lock and timestamp both sheets before any discussion.

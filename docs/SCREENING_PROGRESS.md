@@ -61,6 +61,18 @@ Borderline calls recorded for author confirmation (deciding evidence is in each 
 - `LLMInferenceServiceConfig`-only bundles (llm-d templates, scheduler/EPP configs) are primary: they are direct LLM inference serving configurations, though they are config fragments correlated with their sample families and must be clustered accordingly in analysis.
 - HAMi GPU-allocation pods stay supporting even when the image is a serving image (e.g. the VastAI vLLM image runs `sleep infinity`); they allocate shared GPUs and serve nothing.
 
+### Scope decisions recorded (2026-11-05, author's call)
+
+The borderline calls above were put to the author and decided as follows; these are now recorded scope decisions, not open questions:
+
+- **BERT sensitivity question — exclusions retained.** The two BERT samples (`kserve-manifest-bert`, `kserve-manifest-bert_gpu`) stay `exclude_non_llm`. The case for primary (encoder language models are LLMs) is acknowledged as arguable, but flipping the decisions now, without a predeclared scope rationale, would introduce avoidable subjectivity into a frozen dataset. The sensitivity question is recorded here and will be revisited in a documented scope/sensitivity analysis (e.g. reporting headline results with and without generic-ML encoder samples) rather than by ad-hoc relabeling.
+- **LiteLLM gateway charts stay primary.** They remain in the primary stratum under the screening guide's stated gateway rule: a serving gateway is part of the LLM-serving configuration surface even when the bundle contains no model server.
+- **`LLMInferenceServiceConfig`-only bundles stay primary, treated as correlated.** They are direct llm-d serving configurations, but they are config fragments belonging to sample families — not independent deployments. Analysis must cluster them with their families (and cluster uncertainty at project/family level) rather than counting them as independent observations.
+
+### Eligibility-to-labeling pipeline hardened (2026-11-05)
+
+Before any reviewer sheets are generated, the sampling generator (`scripts/create_blinded_labeling_sample.py`, v2) was fixed to read the frozen nine-column eligibility schema: upstream project is derived from the pinned corpus mapping, bundle SHA-256 values are computed from disk at generation time, and missing files, duplicate paths, pending decisions, and unmapped projects are hard errors instead of silent `unmapped`/empty defaults. Each run emits a provenance sidecar (input hashes, seed, reviewer ID, selected bundles). Reviewer labels were renamed TP/FP → **PRESENT/ABSENT** (U/NA retained) across the guide, workflow, and protocol, since reviewers record reference classifications of rule conditions, not scanner outcomes. Tests now cover the actual frozen CSV schema, and the full suite passes against this commit.
+
 The latest conservative scan emitted 613 candidate observations across 49 bundles for human review; these are not adjudicated findings or prevalence estimates.
 
 ## Interpretation and known dependence

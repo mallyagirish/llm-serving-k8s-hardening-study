@@ -1,17 +1,19 @@
 # Human Reference-Labeling Guide
 
-**Version:** 0.1 draft — freeze and independently review before confirmatory labeling.
+**Version:** 0.2 draft — freeze and independently review before confirmatory labeling. (0.2, 2026-11-05: reviewer labels renamed TP/FP → PRESENT/ABSENT before any sheets were generated, because reviewers record reference classifications of rule conditions, not scanner outcomes; U/NA unchanged.)
 
 ## 1. What the labels mean
 
 For each rule × configuration bundle:
 
-- **TP — rule condition observed:** the predeclared positive evidence is present in the bundle.
-- **FP — rule condition not observed:** the rule applies and the bundle provides enough context to establish that the condition is absent.
+Reviewers assign **reference classifications of the rule condition** in each bundle. Reviewers never see scanner predictions, so these labels are not scanner true/false positives:
+
+- **PRESENT — rule condition observed:** the predeclared positive evidence for the rule's misconfiguration condition is present in the bundle.
+- **ABSENT — rule condition not observed:** the rule applies and the bundle provides enough context to establish that the condition is absent.
 - **U — uncertain:** required context is absent, incomplete, ambiguous, or outside static YAML.
 - **NA — not applicable:** the bundle has no resource/workload to which the rule applies.
 
-These are reference labels for the rule predicate. They are **not** scanner confusion-matrix true/false positives unless compared against scanner output on the same independently labeled unit.
+These are reference labels for the rule predicate. They become scanner confusion-matrix quantities (TP/FP/FN/TN) only later, when adjudicated reference labels are compared against scanner output on the same independently labeled unit — that comparison is an analysis step, not something a reviewer records.
 
 Record the exact file, YAML document index, resource name, field path, and a short rationale. Never copy actual credential values into labels, logs, CSVs, or the paper. Redact values and record only key names and location.
 
@@ -23,19 +25,19 @@ Record the exact file, YAML document index, resource name, field path, and a sho
 4. Treat placeholders such as YOUR_TOKEN, ${API_KEY}, changeme, and obvious examples as placeholders, not confirmed leaked secrets.
 5. Account for pod-level and container-level securityContext precedence. An explicitly set container value overrides the pod-level value for that container.
 6. If a control may be enforced outside the bundle (cloud firewall, external gateway, admission policy, service mesh, cluster-wide NetworkPolicy), use U unless the artifact contains sufficient evidence.
-7. A bundle can contain multiple resources. Aggregate a rule as TP if at least one in-scope resource satisfies its positive predicate; preserve resource-level evidence for that decision.
+7. A bundle can contain multiple resources. Aggregate a rule as PRESENT if at least one in-scope resource satisfies its positive predicate; preserve resource-level evidence for that decision.
 8. Keep tutorial/example bundles distinct from chart defaults in analysis and writing.
 
 ## 3. Rule-specific evidence
 
-| Rule | TP evidence | FP evidence | Use U / NA when |
+| Rule | PRESENT evidence | ABSENT evidence | Use U / NA when |
 |---|---|---|---|
 | LLM-AUTH-01 | An exposed inference API is configured without API-key/auth enforcement in the serving process or included gateway. | Explicit auth enforcement is configured for the relevant API routes. | Gateway/auth config is outside the bundle or the serving API is not identifiable. |
 | LLM-AUTH-02 | A key protects only selected routes while sibling inference/ops routes remain reachable without an allowlist/auth layer. | Included gateway/proxy blocks or authenticates all sensitive sibling routes. | Only a serving Deployment is present and route-level gateway behavior is unavailable. |
 | LLM-AUTH-03 | Tokenizer, admin, profiler, or development endpoints/flags are explicitly enabled. | Relevant flags are explicitly disabled and no such endpoint is configured. | Engine version or effective flags cannot be determined. |
 | LLM-AUTH-04 | Wildcard CORS is configured in a way that permits untrusted origins, especially with credentials, or auth middleware is explicitly disabled. | Origins are restricted and auth middleware is enabled. | CORS/auth behavior is application- or gateway-defined outside the bundle. |
 | LLM-AUTH-05 | Ingress/HTTPRoute exposes an inference backend and the complete included routing config has no auth filter/annotation. | An included auth filter, external-auth integration, or equivalent gate protects the route. | Controller-level or external auth configuration is missing from the bundle. |
-| LLM-NET-01 | Inference Service has type LoadBalancer or NodePort. | Service is ClusterIP/headless and no matching externally exposed Service exists in the bundle. | No Service is present or the Service-to-workload mapping is unclear. TP is an exposure indicator, not proof of public internet access. |
+| LLM-NET-01 | Inference Service has type LoadBalancer or NodePort. | Service is ClusterIP/headless and no matching externally exposed Service exists in the bundle. | No Service is present or the Service-to-workload mapping is unclear. PRESENT is an exposure indicator, not proof of public internet access. |
 | LLM-NET-02 | A complete chart/bundle for the workload contains no NetworkPolicy selecting it and no included default-deny policy. | A policy selects the workload and constrains ingress/egress as specified by the rule. | Bundle completeness or namespace-wide policy state is unknown. Do not infer cluster-wide absence. |
 | LLM-NET-03 | Ingress has no TLS section, or the relevant Gateway listener is HTTP-only without an included TLS termination path. | TLS is explicitly configured on the relevant listener/route. | TLS terminates upstream or in an external load balancer not represented in the bundle. |
 | LLM-NET-04 | Service/host networking exposes recognized Ray, distributed, or KV-transfer control ports beyond the intended trusted boundary. | Relevant control ports are absent or explicitly isolated by included policies. | Port purpose or network boundary cannot be determined. ClusterIP alone does not prove safe isolation. |
@@ -63,7 +65,7 @@ Record the exact file, YAML document index, resource name, field path, and a sho
 
 Each row in the human reference-label dataset should include:
 - bundle_path, bundle_sha256, rule_id;
-- label (TP/FP/U/NA);
+- label (PRESENT/ABSENT/U/NA);
 - resource_kind, resource_name, container_name where applicable;
 - yaml_document_index and evidence_path;
 - rationale (one to three sentences);

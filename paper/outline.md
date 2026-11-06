@@ -51,7 +51,7 @@
 ## 5. Study Design
 
 - RQ-specific outcomes and denominators.
-- TP/FP/U/NA reference-label semantics.
+- PRESENT/ABSENT/U/NA reference-label semantics.
 - Human blinded sampling and adjudication.
 - Scanner extraction and rule-specific coverage.
 - Statistical analysis and clustering by source/project.
