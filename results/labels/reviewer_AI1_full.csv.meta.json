@@ -1,0 +1,588 @@
+{
+ "artifact": "blinded_labeling_sample_metadata",
+ "eligibility_reviewers": [
+  "claude-ai-assist"
+ ],
+ "eligible_primary_bundles": 105,
+ "generated_at_utc": "2026-11-06T18:33:46.144341+00:00",
+ "generator": {
+  "commit": "bbb69faca02f55d37122c871b925cb5a524399e2",
+  "script": "scripts/create_blinded_labeling_sample.py",
+  "script_sha256": "ec313a39b173e6d46015cc3ea789074acda05babb35a3ab15f7701a027cd7eb0",
+  "version": "2.0.0"
+ },
+ "inputs": {
+  "corpus_lockfile": {
+   "path": "corpus/SOURCES.lock.json",
+   "sha256": "5d1d28942fbeba94c31b75e816a2023999e4253f372adc5811015016668e313e"
+  },
+  "corpus_root": ".",
+  "eligibility_csv": {
+   "path": "results/bundle_eligibility_review.csv",
+   "sha256": "3e2f486a1cfdae43c36ed0db3c13d71fe326bcebc8a91c12c47324dcd7c422ff"
+  },
+  "project_mapping": {
+   "script_sha256": "6d99acf1866126500d65e1e3fab96836281410395d0bf823be9e5c3c98ec75cd",
+   "source": "scripts/build_workload_inventory.py:upstream_project_for_bundle (pinned corpus/SOURCES.lock.json bundle mapping)"
+  },
+  "rules_catalog": {
+   "path": "rules/catalog.json",
+   "sha256": "0f3b23fd341afd6e954f9f9c193122655e1812eb30c7ee1b2a8d9106c068ff9e"
+  }
+ },
+ "label_rows": 2940,
+ "label_semantics": "Reference classifications of rule conditions assigned by scanner-blind reviewers. PRESENT = rule condition present in the bundle; ABSENT = rule applies and the condition is absent; U = cannot determine from the bundle; NA = rule not applicable. PRESENT/ABSENT are not scanner TP/FP.",
+ "label_values": [
+  "PRESENT",
+  "ABSENT",
+  "U",
+  "NA"
+ ],
+ "reviewer_id": "AI-1",
+ "rules": 28,
+ "sample_size": 105,
+ "scanner_blind": true,
+ "scanner_output_used": false,
+ "seed": 20261105,
+ "selected_bundle_count": 105,
+ "selected_bundles": [
+  {
+   "bundle_path": "rendered/litellm-git/default.yaml",
+   "bundle_sha256": "e63032454bb21ff94fa6e3fa1d55cccbf4075049c90cb2cebde5dc49f3dde9fc",
+   "upstream_project": "BerriAI/litellm"
+  },
+  {
+   "bundle_path": "rendered/litellm-helm-1.107.0-rc.2/default.yaml",
+   "bundle_sha256": "55ae51e6bc01f6320d84bbedaca312e83cd095657c81f07906114a89c798d06c",
+   "upstream_project": "BerriAI/litellm"
+  },
+  {
+   "bundle_path": "rendered/hami-example-nvidia_vllm_cross_vgpu/manifest.yaml",
+   "bundle_sha256": "ea402cee2d16ade10a5edea08d96d571087ea5ce456906109cb9f7810df685f3",
+   "upstream_project": "Project-HAMi/HAMi"
+  },
+  {
+   "bundle_path": "rendered/hami-example-remotegpu_vllm_deployment/manifest.yaml",
+   "bundle_sha256": "d4bd944e22e495f0c98f5f0c3c08862a792aec02140576bb758ce35978419691",
+   "upstream_project": "Project-HAMi/HAMi"
+  },
+  {
+   "bundle_path": "rendered/infracloud-charts-text-generation-inference-0.3.0/default.yaml",
+   "bundle_sha256": "c568a59a731be084d8090f62020031a89fcf8236348f04b98ad7955eea41a8f1",
+   "upstream_project": "infracloud/charts"
+  },
+  {
+   "bundle_path": "rendered/infracloud-charts-vllm-0.4.1/default.yaml",
+   "bundle_sha256": "663ef6d412ade19db81f194fe3b75a86c14531ee98ded8f6edbee8b775657280",
+   "upstream_project": "infracloud/charts"
+  },
+  {
+   "bundle_path": "rendered/infracloud-text-generation-inference-0.3.0/default.yaml",
+   "bundle_sha256": "00dd37ef11bd69811b6d64d0e31dcbb5508b66c144571e1305871c0b181f9c3a",
+   "upstream_project": "infracloud/charts"
+  },
+  {
+   "bundle_path": "rendered/infracloud-vllm-0.4.1/default.yaml",
+   "bundle_sha256": "3d252d62bfcdd479778b891feb2faced9df81ab4edaedd0bc8d2d047e887f4df",
+   "upstream_project": "infracloud/charts"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-bloom-560m/manifest.yaml",
+   "bundle_sha256": "583410f0bedc938563b47e3b4fadcbfd0b18170049660c740cc230d593aaf9bf",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-decode-template/manifest.yaml",
+   "bundle_sha256": "bd67b8e9e75df6d095bb891ff17e5cf641f2aa00a0166dd9e6e8585bc8670657",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-decode-worker-data-parallel-multi-port/manifest.yaml",
+   "bundle_sha256": "c965f8d873d608c3dd38087cf319b89674d043773e972e17954cf874de3f7b8f",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-decode-worker-data-parallel/manifest.yaml",
+   "bundle_sha256": "8f353d40fbfdf291e7f574d566018e68444a329577c80ab57d42558a86c1eaac",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-omni-template/manifest.yaml",
+   "bundle_sha256": "d799cccbd001eccc610b97473dfa2174e3212a390765704f224ad71c614e532c",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-prefill-template/manifest.yaml",
+   "bundle_sha256": "39aaaf778a8bd626ff2b2cfa3f7a21b14ca8c1892d48a66ff39dbf9f326c3bec",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-prefill-worker-data-parallel-multi-port/manifest.yaml",
+   "bundle_sha256": "5b107952aaff0e8c54a9334626976d5898c39ca973cbb51ca5ef2d33d9e13388",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-prefill-worker-data-parallel/manifest.yaml",
+   "bundle_sha256": "79e1488543fe8770ac512ebdcecdde6b86c406de4744eae0cfbeb0ee3d85134d",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-router-route/manifest.yaml",
+   "bundle_sha256": "c190e42270f5a577a283c03be87b8211fbbac3e5e792c84150db73a8f1a799c0",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default-pd/manifest.yaml",
+   "bundle_sha256": "9ac70fb42b525755b532690b116754e5b1b07f35d32245e370114f0fb347a529",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default/manifest.yaml",
+   "bundle_sha256": "f533a5c5f2f16038e245c2c83a6b14d2f756633064415c2d28a7be2952db558a",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-modality/manifest.yaml",
+   "bundle_sha256": "19e73c2e350259c65b11b4a3793d74d38140301244586684dc40a9893de55db5",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler/manifest.yaml",
+   "bundle_sha256": "86811811baa530cd5ad2aeee6e4a63ae7f823968dee4cb8d4b3adbcda7db19fd",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-template/manifest.yaml",
+   "bundle_sha256": "28a18a5056d86545e514c3c5c0f9d1de8170a96dee5a7ea470819b1b0dec9c2e",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-tokenizer/manifest.yaml",
+   "bundle_sha256": "3fa76470d5c493de78686dc895bbcf576a6fc029c593801df5276b1291f738cb",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-tracing/manifest.yaml",
+   "bundle_sha256": "20163e3fc4ecc22617b49e9dc77156d3dbc42ad62d38284fbc789e35f2e6f538",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-worker-data-parallel/manifest.yaml",
+   "bundle_sha256": "661dc17bf19e117a3d496fb88d232a0280ff472b00dffdbd00c72dff1aae1a43",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_runtimes_kserve-huggingfaceserver-multinode/manifest.yaml",
+   "bundle_sha256": "8fe9dbd6d2ce0c45aa50b66ff984bf58fc72c90d90908fea03f7c1e86d84f511",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_runtimes_kserve-huggingfaceserver/manifest.yaml",
+   "bundle_sha256": "c9d1fccb36590f336af9f83276775adc9343a01738b0c95e406ee68c989edff1",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_runtimes_kserve-llm-omni/manifest.yaml",
+   "bundle_sha256": "e4e069d43d9326212bef99edafab03136c00211945795b51f66bc1120a60248b",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_runtimes_kserve-llm-sglang/manifest.yaml",
+   "bundle_sha256": "44e0320f0dd45a2e1f5fbedd31e00b4767d4ebdb1e3974dd9d1ac3cdaafd065b",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-config_runtimes_kserve-vllmserver/manifest.yaml",
+   "bundle_sha256": "760d812dff5b9df30f3e50380b5c906567d1b6695d15dcfe43dd718cad3e31e4",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_fluid_kserve-huggingfaceserver/manifest.yaml",
+   "bundle_sha256": "7bf6b9d884a525a9a2a7f2e2d0345a0d48378eddf22a4e25ee9c24bd9453bd08",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_kernelcache_vllm-servingruntime/manifest.yaml",
+   "bundle_sha256": "af57a6ac0fa5c6838f17a394c24d50d155738e3339dcd8401386d0ebaa821ffd",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_agentic-tool-calling_llmisvc-single-gpu/manifest.yaml",
+   "bundle_sha256": "75c32a1ff708c01b651edeb39f19f44c180f509d1e9c40336fe665cc15d65d70",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-deepep-ht/manifest.yaml",
+   "bundle_sha256": "bea5bee3849eb222201b4fcf34cfe9efebb76338b5c0825c46bbdfa129c1b7c3",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-naive/manifest.yaml",
+   "bundle_sha256": "f19474ed7bc72c8c686d9a4fb1b7a0e47c8ae2776516bf4e717ef9ef4bcc6964",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-deepep-ht/manifest.yaml",
+   "bundle_sha256": "b606b007d99cb562a2fbbc10f7f1dec80ba614229dfb46324e3d9852c5746714",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-pplx/manifest.yaml",
+   "bundle_sha256": "9c5ed92d39eb8a0f287d5b525bb3f12fd994ecb7396f81815b0fc62988700ae7",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_default/manifest.yaml",
+   "bundle_sha256": "272398a0cba9f622938e459c2f66e5f054f268d6540b5416a8ff397bfe9ac365",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_pd_disagg/manifest.yaml",
+   "bundle_sha256": "8d22c17d8ac48b213d3e76a952171b4d4c16acc2f97fb96d630b69af3ae12e86",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_prefix_cache/manifest.yaml",
+   "bundle_sha256": "5a2fca8ddad4e276d294bfdf75ab68bebcc004c89f5b6ccbe7f07454f1e93375",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_kv-cache-offloading_llm-inference-service-kv-cache-offloading/manifest.yaml",
+   "bundle_sha256": "92661cacb04372508852c2c431384301411d915b24069fcd0878377dc28af67c",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_lora-adapters_llm-inference-service-lora-localmodelcache/manifest.yaml",
+   "bundle_sha256": "32c2178db3e0a4225faf5ce79af021ccdb7255cd2c178370601bfede686720a8",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_managed-dra_llm-inference-service-managed-dra-minimal/manifest.yaml",
+   "bundle_sha256": "3003c04420e0a54e89502306e940cce3377588a6d98dc2185ecba1c73bb0b21f",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_managed-dra_llm-inference-service-managed-dra-multi-device/manifest.yaml",
+   "bundle_sha256": "335f19a47a3f2d47e9217cdd2a44a9b889d13809a5bc6afc5e9f73d17c4c8710",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-layered/manifest.yaml",
+   "bundle_sha256": "f0281c1d38c8b2c21406d625ac1495c61089b4ec43c7834b9992667d6492604c",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-hf/manifest.yaml",
+   "bundle_sha256": "ee7c178604c0cf56736d9446e4115812b6041f3e216c6beb6632b4407c8cf714",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-s3/manifest.yaml",
+   "bundle_sha256": "6629baf752a1b3fa4e835fa81c024e251b2b4c65a3054c5c8aa636b89235198d",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-amd-scheduler-ref/manifest.yaml",
+   "bundle_sha256": "0ae41b891983b9717daeeb8acfa36dad04f0ba9fdb3f7c38cb5b1b6c0c8e61a5",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-nvidia-with-scheduler/manifest.yaml",
+   "bundle_sha256": "341edf5b921f7736508328bd63575e302990a2db404243114f7f5f856bef5318",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_omni-modality_llm-inference-service-omni-tts-gpu/manifest.yaml",
+   "bundle_sha256": "74bf7682dff043eb8bba314a23501be1b197427a6c5a7ccf7ffb1e7253b28b14",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu-no-scheduler/manifest.yaml",
+   "bundle_sha256": "53471a6ffebf998e3f3c0c32d31f75593d3fc3f4082dc8d2cc80a48193410c73",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu/manifest.yaml",
+   "bundle_sha256": "a17c28ab42f2ea2e1e3c08de010c4eb98f7fcc0f364e93913ff1c32b8abbdc79",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-pd-facebook-opt-125m-cpu/manifest.yaml",
+   "bundle_sha256": "c686e001c5677b3f69460ecf1b6c99e7774f38556e8f6c854e7702ad00600c19",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-sglang-opt-125m-cpu/manifest.yaml",
+   "bundle_sha256": "72cff29ea239b006dfa093ce6a88e36e95639da2559b512dd47f8b35132b27ea",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-opt-125m-cpu-kv-cache-routing-simulator/manifest.yaml",
+   "bundle_sha256": "4005f5221d41065bb6174a28f1474358dd4ea9461def5bea371f5c88a290b5b1",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-qwen2-7b-gpu-kv-cache-routing/manifest.yaml",
+   "bundle_sha256": "73a7bcdb6f888f7e1bf3cf0751511ef38770fe5f758853781c03384d092e9f25",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-pd-qwen2-7b-gpu/manifest.yaml",
+   "bundle_sha256": "ed3c321e76099515f3a73696ff182162179508fdccaad2b945b1a99d8e825d89",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu-no-scheduler/manifest.yaml",
+   "bundle_sha256": "eaf940031a30f719aca59bcb0b22d000570d74e2e442e50faae9cab8dedcf3b5",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu/manifest.yaml",
+   "bundle_sha256": "9121bcc44f2dc740978d382a25cede95deda258d824d3bd7a77a395d4771521b",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-sglang-opt-125m-gpu/manifest.yaml",
+   "bundle_sha256": "34baf18fdaeb9476448e22f496fd4ef0b7df0e01de625a7376583561664cda2e",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/kserve-manifest-hack_release_smoke-test-data_llmisvc-opt-125m-cpu/manifest.yaml",
+   "bundle_sha256": "a1cc50d587540f61591cf618857920e62857b834c12ca96e54eea127fc3559b2",
+   "upstream_project": "kserve/kserve"
+  },
+  {
+   "bundle_path": "rendered/opea-tgi-1.2.0/default.yaml",
+   "bundle_sha256": "6f2260cc8a4d97fba25a08e494a589b0af0e1b6bc68264a81559fb0a46fca4ad",
+   "upstream_project": "opea-project/charts/tgi"
+  },
+  {
+   "bundle_path": "rendered/otwld-ollama-1.11.0/default.yaml",
+   "bundle_sha256": "6c26a11091112a21b3f634224d5ad5a4f64e7f757fa0ec9f605d8e7285c8d1a7",
+   "upstream_project": "otwld/ollama-helm"
+  },
+  {
+   "bundle_path": "rendered/otwld-ollama-1.18.0/default.yaml",
+   "bundle_sha256": "4a1af1c89058050834294692cec51ce37bfd5c6b423d17d1b6139cec1d6e1d72",
+   "upstream_project": "otwld/ollama-helm"
+  },
+  {
+   "bundle_path": "rendered/otwld-ollama-1.8.0/default.yaml",
+   "bundle_sha256": "a805730589995dddd47eb79c0e66e84cd3cb3d8710823e48009aa6e7828203c9",
+   "upstream_project": "otwld/ollama-helm"
+  },
+  {
+   "bundle_path": "rendered/otwld-ollama-1.93.0/default.yaml",
+   "bundle_sha256": "5c2d65d87027b07ca4bde8a4256baca7efe4594e35cc047c405efab421ad9b21",
+   "upstream_project": "otwld/ollama-helm"
+  },
+  {
+   "bundle_path": "rendered/otwld-ollama-git-examples/test-knative-values.yaml",
+   "bundle_sha256": "ad675ff46117d64a761dc1b6ad4a15520a1bd335be950c9557fa67ab1a3be1ee",
+   "upstream_project": "otwld/ollama-helm"
+  },
+  {
+   "bundle_path": "rendered/otwld-ollama-git-examples/test-values.yaml",
+   "bundle_sha256": "8bb1f859f4cce8f4c10e30eff831637d95f2feb66cfadfaa553efe720b37e46c",
+   "upstream_project": "otwld/ollama-helm"
+  },
+  {
+   "bundle_path": "rendered/kuberay-sample-ray-service.deepseek/manifest.yaml",
+   "bundle_sha256": "1de80658a34764f1c73f0e569a3c8bdd281b4ab76ee7304dc3ca3054180b556a",
+   "upstream_project": "ray-project/kuberay"
+  },
+  {
+   "bundle_path": "rendered/kuberay-sample-ray-service.high-throughput-llm/manifest.yaml",
+   "bundle_sha256": "9d6b4de7a9719c2f1ca72a406f413ba01b9da3eeaf6d50d84fd2fd4fe4d29cea",
+   "upstream_project": "ray-project/kuberay"
+  },
+  {
+   "bundle_path": "rendered/kuberay-sample-ray-service.llm-serve/manifest.yaml",
+   "bundle_sha256": "eee690b418fb1ec552a452634cf63ae0308f3bd4f257bf3227adcd3dd7b110ea",
+   "upstream_project": "ray-project/kuberay"
+  },
+  {
+   "bundle_path": "rendered/kuberay-sample-ray-service.vllm-tpu-v6e-singlehost/manifest.yaml",
+   "bundle_sha256": "3146caa5a1c422ea575e28c3aa766736909103bb5b95757797501086affaa946",
+   "upstream_project": "ray-project/kuberay"
+  },
+  {
+   "bundle_path": "rendered/sglang-k8s-sglang-distributed-sts/manifest.yaml",
+   "bundle_sha256": "a966502b6469fa9aced9d343ec831ff5b057cd7f3092d11ae3b50bd6c06437ee",
+   "upstream_project": "sgl-project/sglang"
+  },
+  {
+   "bundle_path": "rendered/sglang-k8s-sglang-service/manifest.yaml",
+   "bundle_sha256": "1a4c8ec247ef982caaab1e73f3639d472b676025ba568efb90a1076669ea9cc0",
+   "upstream_project": "sgl-project/sglang"
+  },
+  {
+   "bundle_path": "rendered/shalb-huggingface-model-git/default.yaml",
+   "bundle_sha256": "5c26c4c1eb07209ce6ea28ab52ff6be4c49d677e1a3de1f27e4021d0ba8ec4c6",
+   "upstream_project": "shalb/charts"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.10/default.yaml",
+   "bundle_sha256": "bd106cf00f8611d18580667ef41ccee62673ff2806cff2549c881bd28d8f4123",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.11/default.yaml",
+   "bundle_sha256": "185e8b7a9a4ee77de4494f60e7f19e41391b115fb445a07ee2d235d0df9fc72b",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.12/default.yaml",
+   "bundle_sha256": "911d7ea4fb57d68c00667bff6a40eed70f0e25cb8cc2bff63d52f8e80fdc22fd",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-01-2pods-minimal-example.yaml",
+   "bundle_sha256": "d8a03bfe1838cefd1245114b0ae801178ab1ccb88d4e024a7504ee7e50e41a7c",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-01-minimal-amd-example.yaml",
+   "bundle_sha256": "f6fb98db66646586942877a09619692a278b590bcd412153db848d1bbcaa1706",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-01-minimal-example.yaml",
+   "bundle_sha256": "71f22e1b75351f3a8b6e83518f60984e4a2213662848ae38f5e7c4fa58812b70",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-02-basic-config.yaml",
+   "bundle_sha256": "e3a7a214a600ba2dc883636d638c1b78dfe6026356ff7f278fd65d7e47a8f7b1",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-03-match-pv.yaml",
+   "bundle_sha256": "769fa77bab0c24373d7abfb20cd64779a9ad4f1f52fc257cb5afd444c367edbb",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-04-multiple-models.yaml",
+   "bundle_sha256": "d822ad419575d339de12a2b6275a2d7efdf361af28f474ce7359fedb0960b8e5",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-05-cpu-offloading.yaml",
+   "bundle_sha256": "fc79b7216438bd0452c931fca6f69743e392037fda4b9332babf93aae372b933",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-06-shared-storage.yaml",
+   "bundle_sha256": "b4cac46e64e5de4481bcc97d6fbe7dd92c75e2170097bec0686d0cfd129682e0",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-09-lora-helm.yaml",
+   "bundle_sha256": "1160afff3703856b83f5f8cb4656ce4e119749587eb70a83571368a191e03796",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-09-lora-operator.yaml",
+   "bundle_sha256": "280cad3a87389a0f0f2895c69057074968eda91a2bc20f39d312fda9959c5fb9",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-11-secure-vllm.yaml",
+   "bundle_sha256": "129389f71d10c9ee0131a385cb63a1fc006d3cac0e91ffabd55012a9102b89fd",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-12-otel-vllm.yaml",
+   "bundle_sha256": "c5e0460613ec5b822cdbedafd5ab72499845ef10ed66d1409fb6ae23dc7eff42",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-13-tool-enabled.yaml",
+   "bundle_sha256": "43a0013027dcc5affe28db69890a0c961896708389ef4c25f82ab98dff0bcf36",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-14-vllm-v1.yaml",
+   "bundle_sha256": "eddc543ef3315e57d8d178afb6954912470e132c8ab353fe56f2d18eae536038",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-15-a-minimal-pipeline-parallel-example-raycluster.yaml",
+   "bundle_sha256": "99c2a4dc0bec497bf76d5411edd717624af46203cc5863755774cc1d5bf31aa9",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-15-b-minimal-pipeline-parallel-example-multiple-modelspec.yaml",
+   "bundle_sha256": "a288e06dba6fe90316d26933d440d407d50117d2c697a48320f116cbf5b857b4",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-16-disagg-prefill.yaml",
+   "bundle_sha256": "4121b2c1f91f97aaa9a3f7a4f5a71824ed7f41b7138c2017a114491900fe323d",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml",
+   "bundle_sha256": "d47962544ab07e89d7e169af0af0ad9586fe800ae270758f653c1b8abb928b9b",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-18-prefix-aware.yaml",
+   "bundle_sha256": "be6885b005301cb200fce0733849edcd04c1c615515bf8736b086a62fb0146c1",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-19-sleep-mode-aware.yaml",
+   "bundle_sha256": "aa09941d13e67ecf29bbb7085746406a4eb6ec318d5971b658149bed5657d5fa",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-22-gateway-api.yaml",
+   "bundle_sha256": "b9257a671cdd596c9dd638c4f545e063fb08d2156969ed442b528ae00af05431",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-23-SR.yaml",
+   "bundle_sha256": "6d7274da108804675cfecfb28878db744f0966162ed7dfa92e8d120154109c2a",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp2.yaml",
+   "bundle_sha256": "6c44b04c7c16d840fce1766321b7325e1e97ca908190216f34df0b9117ffe778",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml",
+   "bundle_sha256": "60754774dd4d553f1a6e14e2cf5734b399d4e956eb735031c6c20a0dbfe75d14",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-single-gpu.yaml",
+   "bundle_sha256": "7a686fe82390d6f8e305ba5dffc396c87b7048f2aa2b7b5a7374c69b6bf54a97",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-26-priority-routing.yaml",
+   "bundle_sha256": "2476466612443a5f2da936c2ac1cc56e35d07c7d8e73184148149190b663849a",
+   "upstream_project": "vllm-project/production-stack"
+  },
+  {
+   "bundle_path": "rendered/vllm-stack-0.1.13/default.yaml",
+   "bundle_sha256": "e953359d6996195526b229e100db448421983e43ed76b6c676c5d98b3b965581",
+   "upstream_project": "vllm-project/production-stack"
+  }
+ ],
+ "source_blind": false,
+ "labeling_provenance": {
+  "reviewer_id": "AI-1",
+  "reviewer_identity": "claude-ai-assist (AI system; not a human reviewer)",
+  "guide_version": "v0.4 (docs/LABELING_GUIDE.md)",
+  "labeled_at_utc": "2026-11-06T18:51:15Z",
+  "pilot_bundles_30": "Rows for the 30 pilot bundles carry the adjudicated proposed labels from results/labels/reviewer_AI1_adjudication.csv verbatim (label, evidence_path, rationale): the guide-v0.4 adjudication of the AI-1 pilot pass (791 confirmed / 19 changed under v0.3 amendments / 30 RES-02 rows resolved under the v0.4 observable predicate).",
+  "fresh_bundles_75": "Rows for the remaining 75 bundles were labeled directly under guide v0.4 by AI-1: programmatic evidence extraction from the corpus manifests only (scripts parse each manifest and surface the fields each rule's predicate reads), predicates applied per rule, every PRESENT/ABSENT row carrying an evidence location and rationale. Scanner outputs and pre-existing rule-level labels were never consulted (scanner-blind).",
+  "spot_verification": "5 fresh bundles (BerriAI/litellm helm chart, sgl-project/sglang distributed StatefulSet, ray-project/kuberay RayService LLM sample, shalb/charts huggingface-model, opea-project/charts tgi) were hand-checked against their raw manifests for all 28 rules: 135/140 initial agreement; the 5 disagreements traced to three extraction/scope issues (model-path discovery from serve flags, RES-03 serving-path scope, boolean-valued env vars in SEC-02), fixed and re-verified; the pilot calibration set still reproduces the adjudicated pilot labels 840/840 after the fixes.",
+  "consistency_repairs": "A pilot-vs-fresh consistency comparison caught one assessed-unit slip: WL-05 in two fresh KServe config fragments (scheduler, tokenizer) had initially been judged on sub-template images that WL-01..04 exclude from the assessed unit; both are NA in the final sheet, matching the pilot fragments' adjudicated treatment. After all repairs the pilot calibration set still reproduces the adjudicated pilot labels 840/840.",
+  "author_verification": "PENDING - Girish's end review is the human verification/adjudication of record for this dataset.",
+  "status": "AI-generated reference classifications. This is not human review and must not be reported as such; agreement between AI passes is not human inter-rater reliability."
+ }
+}
