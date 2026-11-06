@@ -15,3 +15,6 @@ Planned outputs:
 - run_metadata.json — commit, corpus lockfile hash, tool versions, run timestamp, and configuration.
 
 Every result must be regenerable from a documented command and pinned input snapshot. Preserve raw machine outputs separately from human reference labels and adjudication records.
+## CI-generated review queues
+
+The Phase 3 workflow writes freshly generated, preliminary inventory and eligibility queues under `results/ci-generated/` and uploads them in the `phase3-ci-generated-review-queues` artifact. These are disposable triage outputs, not the frozen, AI-assisted eligibility decisions. The canonical frozen bundle decisions remain `results/bundle_eligibility_review.csv`; do not replace them with an artifact copy. The CI queue artifact is not a canonical source for reviewer-sheet generation.
