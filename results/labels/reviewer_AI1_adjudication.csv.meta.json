@@ -1,0 +1,129 @@
+{
+  "artifact": "adjudication of the AI-1 pilot labeling pass",
+  "source_sheet": "results/labels/reviewer_AI1.csv",
+  "source_sheet_sha256": "808aa67727ff047b3dcf9391f6778cd9b40f3780aaec6240b9df540b5fe45deb",
+  "source_reviewer_id": "AI-1",
+  "provenance_warning": "r1_label values are AI-generated labels (reviewer AI-1, claude-ai-assist) used as the operational R1 set for workflow organization only. They are NOT a human reviewer's labels, and agreement with any other pass is not human inter-rater reliability.",
+  "guide_version": "0.3",
+  "adjudicator": "claude-ai-assist (Task 5, applying the author's adjudication positions)",
+  "author_verification": "pending \u2014 Girish reviews everything once at the end",
+  "rows": 840,
+  "changed_rows": 19,
+  "changes": [
+    {
+      "rule_id": "LLM-AUTH-03",
+      "from": "ABSENT",
+      "to": "U",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-opt-125m-cpu-kv-cache-routing-simulator/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-AUTH-03",
+      "from": "ABSENT",
+      "to": "U",
+      "bundle_path": "rendered/kuberay-sample-ray-service.deepseek/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.12/default.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-02-basic-config.yaml"
+    },
+    {
+      "rule_id": "LLM-SEC-03",
+      "from": "U",
+      "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-02-basic-config.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-05-cpu-offloading.yaml"
+    },
+    {
+      "rule_id": "LLM-SEC-03",
+      "from": "U",
+      "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-05-cpu-offloading.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-06-shared-storage.yaml"
+    },
+    {
+      "rule_id": "LLM-SEC-03",
+      "from": "U",
+      "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-06-shared-storage.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-15-b-minimal-pipeline-parallel-example-multiple-modelspec.yaml"
+    },
+    {
+      "rule_id": "LLM-SEC-03",
+      "from": "U",
+      "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-15-b-minimal-pipeline-parallel-example-multiple-modelspec.yaml"
+    },
+    {
+      "rule_id": "LLM-AUTH-03",
+      "from": "ABSENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml"
+    },
+    {
+      "rule_id": "LLM-SEC-03",
+      "from": "U",
+      "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-22-gateway-api.yaml"
+    },
+    {
+      "rule_id": "LLM-SEC-03",
+      "from": "U",
+      "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-22-gateway-api.yaml"
+    },
+    {
+      "rule_id": "LLM-AUTH-03",
+      "from": "ABSENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml"
+    },
+    {
+      "rule_id": "LLM-NET-04",
+      "from": "PRESENT",
+      "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml"
+    },
+    {
+      "rule_id": "LLM-SEC-03",
+      "from": "U",
+      "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml"
+    }
+  ],
+  "pending_decision": "LLM-RES-02: observable predicate vs retained production intent; rows carried unchanged"
+}

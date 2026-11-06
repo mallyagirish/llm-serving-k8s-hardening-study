@@ -60,6 +60,12 @@ Important guardrails:
 - Missing NetworkPolicy in a chart does not prove cluster-wide reachability or exposure; describe absence of a policy in the sampled artifact, not proof of exploitability.
 - LoadBalancer or NodePort is an exposure indicator, not proof that the endpoint is internet-accessible or unauthenticated.
 - Static YAML cannot establish that an API key is valid or enforced on every route unless relevant gateway/application configuration is present and verifiable.
+- Sibling-route auth coverage (AUTH-02) and CORS/middleware behavior (AUTH-04) require included route or application configuration for a determinate decision; do not infer either from missing manifest fields (guide v0.3).
+- Absence of an endpoint enable flag (AUTH-03) does not establish the endpoint is disabled; determinate decisions need an explicit flag, a documented version-specific default, or configuration that definitively establishes the endpoint surface.
+- SEC-03 claims are limited to **in-bundle RBAC evidence**: whether the bundle itself binds a workload ServiceAccount to broad permissions. A ServiceAccount's effective cluster permissions cannot be established from a bundle and are outside the study's claims.
+- A declared Service port (NET-04), including on a ClusterIP Service, does not by itself establish exposure of distributed/KV-transfer control ports beyond the serving system's own trust boundary (its router/engine/KV peers within the deployment); PRESENT requires included evidence of reachability beyond that boundary, ABSENT requires the ports to be demonstrably absent or explicitly isolated.
+- GPU co-tenancy and isolation (GPU-02) cannot be inferred from static YAML in either direction; determinate labels require runtime/node evidence.
+- **Pending decision — RES-02:** whether to replace the production-intent test with a predeclared observable predicate (multi-replica/autoscaling without a matching PDB) or retain production intent and accept a smaller decidable denominator. Unresolved as of 2026-11-05; no labeling under either redefinition until the decision is recorded.
 - Missing GPU resource declarations do not prove CPU fallback, GPU theft, or scheduler overcommit.
 - Lack of MIG/HAMi declarations does not prove multi-tenant co-location or absence of hardware isolation.
 - Missing PDB/probes/securityContext fields are configuration observations; operational impact requires runtime or workload-specific evidence.
