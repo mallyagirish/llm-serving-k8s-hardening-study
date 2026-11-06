@@ -39,18 +39,18 @@ jobs:
         run: python scripts/scan_candidates.py corpus/rendered --output results/raw_candidate_findings.jsonl
 
       - name: Build resource-level eligibility review queue
-        run: python scripts/build_workload_inventory.py
+        run: python scripts/build_workload_inventory.py --out-dir results/ci-generated
 
       - name: Upload reproducible outputs
         uses: actions/upload-artifact@v4
         with:
-          name: phase3-corpus-validation-and-candidates
+          name: phase3-ci-generated-review-queues
           path: |
             results/corpus_inventory.jsonl
             results/corpus_validation.json
             results/raw_candidate_findings.jsonl
-            results/resource_eligibility_review.csv
-            results/bundle_eligibility_review.csv
-            results/workload_inventory_summary.json
+            results/ci-generated/resource_eligibility_review.csv
+            results/ci-generated/bundle_eligibility_review.csv
+            results/ci-generated/workload_inventory_summary.json
           if-no-files-found: error
           retention-days: 30
