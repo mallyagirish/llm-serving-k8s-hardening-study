@@ -4,17 +4,101 @@
   "source_sheet_sha256": "808aa67727ff047b3dcf9391f6778cd9b40f3780aaec6240b9df540b5fe45deb",
   "source_reviewer_id": "AI-1",
   "provenance_warning": "r1_label values are AI-generated labels (reviewer AI-1, claude-ai-assist) used as the operational R1 set for workflow organization only. They are NOT a human reviewer's labels, and agreement with any other pass is not human inter-rater reliability.",
-  "guide_version": "0.3",
-  "adjudicator": "claude-ai-assist (Task 5, applying the author's adjudication positions)",
+  "guide_version": "0.4",
+  "adjudicator": "claude-ai-assist (Tasks 5-6, applying the author's adjudication positions)",
   "author_verification": "pending \u2014 Girish reviews everything once at the end",
   "rows": 840,
-  "changed_rows": 19,
+  "changed_rows": 43,
   "changes": [
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/litellm-git/default.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/hami-example-nvidia_vllm_cross_vgpu/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/infracloud-charts-text-generation-inference-0.3.0/default.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-naive/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-deepep-ht/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-s3/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-amd-scheduler-ref/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-nvidia-with-scheduler/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu/manifest.yaml"
+    },
     {
       "rule_id": "LLM-AUTH-03",
       "from": "ABSENT",
       "to": "U",
       "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-opt-125m-cpu-kv-cache-routing-simulator/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-opt-125m-cpu-kv-cache-routing-simulator/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-qwen2-7b-gpu-kv-cache-routing/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/otwld-ollama-1.8.0/default.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/otwld-ollama-git-examples/test-knative-values.yaml"
     },
     {
       "rule_id": "LLM-AUTH-03",
@@ -23,9 +107,27 @@
       "bundle_path": "rendered/kuberay-sample-ray-service.deepseek/manifest.yaml"
     },
     {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/kuberay-sample-ray-service.deepseek/manifest.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/sglang-k8s-sglang-service/manifest.yaml"
+    },
+    {
       "rule_id": "LLM-NET-04",
       "from": "PRESENT",
       "to": "U",
+      "bundle_path": "rendered/vllm-stack-0.1.12/default.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
       "bundle_path": "rendered/vllm-stack-0.1.12/default.yaml"
     },
     {
@@ -41,6 +143,12 @@
       "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-02-basic-config.yaml"
     },
     {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-02-basic-config.yaml"
+    },
+    {
       "rule_id": "LLM-NET-04",
       "from": "PRESENT",
       "to": "U",
@@ -50,6 +158,12 @@
       "rule_id": "LLM-SEC-03",
       "from": "U",
       "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-05-cpu-offloading.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
       "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-05-cpu-offloading.yaml"
     },
     {
@@ -62,6 +176,12 @@
       "rule_id": "LLM-SEC-03",
       "from": "U",
       "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-06-shared-storage.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
       "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-06-shared-storage.yaml"
     },
     {
@@ -74,6 +194,12 @@
       "rule_id": "LLM-SEC-03",
       "from": "U",
       "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-15-b-minimal-pipeline-parallel-example-multiple-modelspec.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
       "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-15-b-minimal-pipeline-parallel-example-multiple-modelspec.yaml"
     },
     {
@@ -95,6 +221,12 @@
       "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml"
     },
     {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "PRESENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml"
+    },
+    {
       "rule_id": "LLM-NET-04",
       "from": "PRESENT",
       "to": "U",
@@ -104,6 +236,12 @@
       "rule_id": "LLM-SEC-03",
       "from": "U",
       "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-22-gateway-api.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
       "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-22-gateway-api.yaml"
     },
     {
@@ -122,8 +260,25 @@
       "rule_id": "LLM-SEC-03",
       "from": "U",
       "to": "ABSENT",
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml"
+    },
+    {
+      "rule_id": "LLM-RES-02",
+      "from": "U",
+      "to": "NA",
       "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml"
     }
   ],
-  "pending_decision": "LLM-RES-02: observable predicate vs retained production intent; rows carried unchanged"
+  "res02_decision": {
+    "status": "decided 2026-11-06 by the author, before the full 105-bundle review",
+    "predicate": "Observable predicate replaces production intent: in scope when a workload configures replicas > 1 or autoscaling (HPA or equivalent); PRESENT = in-scope workload with no matching PodDisruptionBudget; ABSENT = matching PDB included; NA = no in-scope workload (single static replicas, or no workload in the bundle); U = scaling configuration not determinable from the bundle.",
+    "rows_resolved": 30,
+    "label_changes": 24,
+    "outcomes": {
+      "PRESENT": 10,
+      "ABSENT": 0,
+      "U": 0,
+      "NA": 20
+    }
+  }
 }
