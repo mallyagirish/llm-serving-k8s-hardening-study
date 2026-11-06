@@ -1,0 +1,201 @@
+{
+  "artifact": "blinded_labeling_sample_metadata",
+  "eligibility_reviewers": [
+    "claude-ai-assist"
+  ],
+  "eligible_primary_bundles": 105,
+  "generated_at_utc": "2026-11-06T01:48:59.371386+00:00",
+  "generator": {
+    "commit": "baa88bb86e512fa779cbcb85350544bdaed08a72",
+    "script": "scripts/create_blinded_labeling_sample.py",
+    "script_sha256": "ec313a39b173e6d46015cc3ea789074acda05babb35a3ab15f7701a027cd7eb0",
+    "version": "2.0.0"
+  },
+  "inputs": {
+    "corpus_lockfile": {
+      "path": "corpus/SOURCES.lock.json",
+      "sha256": "5d1d28942fbeba94c31b75e816a2023999e4253f372adc5811015016668e313e"
+    },
+    "corpus_root": ".",
+    "eligibility_csv": {
+      "path": "results/bundle_eligibility_review.csv",
+      "sha256": "3e2f486a1cfdae43c36ed0db3c13d71fe326bcebc8a91c12c47324dcd7c422ff"
+    },
+    "project_mapping": {
+      "script_sha256": "6d99acf1866126500d65e1e3fab96836281410395d0bf823be9e5c3c98ec75cd",
+      "source": "scripts/build_workload_inventory.py:upstream_project_for_bundle (pinned corpus/SOURCES.lock.json bundle mapping)"
+    },
+    "rules_catalog": {
+      "path": "rules/catalog.json",
+      "sha256": "0f3b23fd341afd6e954f9f9c193122655e1812eb30c7ee1b2a8d9106c068ff9e"
+    }
+  },
+  "label_rows": 840,
+  "label_semantics": "Reference classifications of rule conditions assigned by scanner-blind reviewers. PRESENT = rule condition present in the bundle; ABSENT = rule applies and the condition is absent; U = cannot determine from the bundle; NA = rule not applicable. PRESENT/ABSENT are not scanner TP/FP.",
+  "label_values": [
+    "PRESENT",
+    "ABSENT",
+    "U",
+    "NA"
+  ],
+  "reviewer_id": "R2",
+  "rules": 28,
+  "sample_size": 30,
+  "scanner_blind": true,
+  "scanner_output_used": false,
+  "seed": 20261105,
+  "selected_bundle_count": 30,
+  "selected_bundles": [
+    {
+      "bundle_path": "rendered/litellm-git/default.yaml",
+      "bundle_sha256": "e63032454bb21ff94fa6e3fa1d55cccbf4075049c90cb2cebde5dc49f3dde9fc",
+      "upstream_project": "BerriAI/litellm"
+    },
+    {
+      "bundle_path": "rendered/hami-example-nvidia_vllm_cross_vgpu/manifest.yaml",
+      "bundle_sha256": "ea402cee2d16ade10a5edea08d96d571087ea5ce456906109cb9f7810df685f3",
+      "upstream_project": "Project-HAMi/HAMi"
+    },
+    {
+      "bundle_path": "rendered/infracloud-charts-text-generation-inference-0.3.0/default.yaml",
+      "bundle_sha256": "c568a59a731be084d8090f62020031a89fcf8236348f04b98ad7955eea41a8f1",
+      "upstream_project": "infracloud/charts"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-decode-template/manifest.yaml",
+      "bundle_sha256": "bd67b8e9e75df6d095bb891ff17e5cf641f2aa00a0166dd9e6e8585bc8670657",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default-pd/manifest.yaml",
+      "bundle_sha256": "9ac70fb42b525755b532690b116754e5b1b07f35d32245e370114f0fb347a529",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-config_llmisvcconfig_config-llm-scheduler-eppconfig-default/manifest.yaml",
+      "bundle_sha256": "f533a5c5f2f16038e245c2c83a6b14d2f756633064415c2d28a7be2952db558a",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-config_runtimes_kserve-llm-omni/manifest.yaml",
+      "bundle_sha256": "e4e069d43d9326212bef99edafab03136c00211945795b51f66bc1120a60248b",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-config_runtimes_kserve-llm-sglang/manifest.yaml",
+      "bundle_sha256": "44e0320f0dd45a2e1f5fbedd31e00b4767d4ebdb1e3974dd9d1ac3cdaafd065b",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-gpu-naive/manifest.yaml",
+      "bundle_sha256": "f19474ed7bc72c8c686d9a4fb1b7a0e47c8ae2776516bf4e717ef9ef4bcc6964",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_dp-ep_deepseek-r1-gpu-rdma-roce_llm-inference-service-dp-ep-deepseek-r1-pd-gpu-p-deepep-ht-d-deepep-ht/manifest.yaml",
+      "bundle_sha256": "b606b007d99cb562a2fbbc10f7f1dec80ba614229dfb46324e3d9852c5746714",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_e2e-gpt-oss_llmisvc_config_default/manifest.yaml",
+      "bundle_sha256": "272398a0cba9f622938e459c2f66e5f054f268d6540b5416a8ff397bfe9ac365",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_modelexpress_llm-inference-service-modelexpress-native-s3/manifest.yaml",
+      "bundle_sha256": "6629baf752a1b3fa4e835fa81c024e251b2b4c65a3054c5c8aa636b89235198d",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-amd-scheduler-ref/manifest.yaml",
+      "bundle_sha256": "0ae41b891983b9717daeeb8acfa36dad04f0ba9fdb3f7c38cb5b1b6c0c8e61a5",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_multi-gpu-vendor_llm-inference-service-qwen2-7b-nvidia-with-scheduler/manifest.yaml",
+      "bundle_sha256": "341edf5b921f7736508328bd63575e302990a2db404243114f7f5f856bef5318",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_opt-125m-cpu_llm-inference-service-facebook-opt-125m-cpu/manifest.yaml",
+      "bundle_sha256": "a17c28ab42f2ea2e1e3c08de010c4eb98f7fcc0f364e93913ff1c32b8abbdc79",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-opt-125m-cpu-kv-cache-routing-simulator/manifest.yaml",
+      "bundle_sha256": "4005f5221d41065bb6174a28f1474358dd4ea9461def5bea371f5c88a290b5b1",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_precise-prefix-kv-cache-routing_llm-inference-service-qwen2-7b-gpu-kv-cache-routing/manifest.yaml",
+      "bundle_sha256": "73a7bcdb6f888f7e1bf3cf0751511ef38770fe5f758853781c03384d092e9f25",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/kserve-manifest-docs_samples_llmisvc_single-node-gpu_llm-inference-service-qwen2-7b-gpu/manifest.yaml",
+      "bundle_sha256": "9121bcc44f2dc740978d382a25cede95deda258d824d3bd7a77a395d4771521b",
+      "upstream_project": "kserve/kserve"
+    },
+    {
+      "bundle_path": "rendered/otwld-ollama-1.8.0/default.yaml",
+      "bundle_sha256": "a805730589995dddd47eb79c0e66e84cd3cb3d8710823e48009aa6e7828203c9",
+      "upstream_project": "otwld/ollama-helm"
+    },
+    {
+      "bundle_path": "rendered/otwld-ollama-git-examples/test-knative-values.yaml",
+      "bundle_sha256": "ad675ff46117d64a761dc1b6ad4a15520a1bd335be950c9557fa67ab1a3be1ee",
+      "upstream_project": "otwld/ollama-helm"
+    },
+    {
+      "bundle_path": "rendered/kuberay-sample-ray-service.deepseek/manifest.yaml",
+      "bundle_sha256": "1de80658a34764f1c73f0e569a3c8bdd281b4ab76ee7304dc3ca3054180b556a",
+      "upstream_project": "ray-project/kuberay"
+    },
+    {
+      "bundle_path": "rendered/sglang-k8s-sglang-service/manifest.yaml",
+      "bundle_sha256": "1a4c8ec247ef982caaab1e73f3639d472b676025ba568efb90a1076669ea9cc0",
+      "upstream_project": "sgl-project/sglang"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.12/default.yaml",
+      "bundle_sha256": "911d7ea4fb57d68c00667bff6a40eed70f0e25cb8cc2bff63d52f8e80fdc22fd",
+      "upstream_project": "vllm-project/production-stack"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-02-basic-config.yaml",
+      "bundle_sha256": "e3a7a214a600ba2dc883636d638c1b78dfe6026356ff7f278fd65d7e47a8f7b1",
+      "upstream_project": "vllm-project/production-stack"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-05-cpu-offloading.yaml",
+      "bundle_sha256": "fc79b7216438bd0452c931fca6f69743e392037fda4b9332babf93aae372b933",
+      "upstream_project": "vllm-project/production-stack"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-06-shared-storage.yaml",
+      "bundle_sha256": "b4cac46e64e5de4481bcc97d6fbe7dd92c75e2170097bec0686d0cfd129682e0",
+      "upstream_project": "vllm-project/production-stack"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-15-b-minimal-pipeline-parallel-example-multiple-modelspec.yaml",
+      "bundle_sha256": "a288e06dba6fe90316d26933d440d407d50117d2c697a48320f116cbf5b857b4",
+      "upstream_project": "vllm-project/production-stack"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-17-kv-aware.yaml",
+      "bundle_sha256": "d47962544ab07e89d7e169af0af0ad9586fe800ae270758f653c1b8abb928b9b",
+      "upstream_project": "vllm-project/production-stack"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-22-gateway-api.yaml",
+      "bundle_sha256": "b9257a671cdd596c9dd638c4f545e063fb08d2156969ed442b528ae00af05431",
+      "upstream_project": "vllm-project/production-stack"
+    },
+    {
+      "bundle_path": "rendered/vllm-stack-0.1.13-tutorials/values-25-v100-multi-gpu-tp4.yaml",
+      "bundle_sha256": "60754774dd4d553f1a6e14e2cf5734b399d4e956eb735031c6c20a0dbfe75d14",
+      "upstream_project": "vllm-project/production-stack"
+    }
+  ],
+  "source_blind": false
+}
