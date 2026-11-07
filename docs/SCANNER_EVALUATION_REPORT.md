@@ -16,7 +16,7 @@ The primary evaluation unit is one bundle × rule. Multiple resource-level scann
 ## Corpus and execution
 
 - 105 primary bundles × 28 rules = 2,940 AI-1 reference labels.
-- 202 parseable corpus bundles were scanned; evaluation was filtered to the frozen 105 primary bundles.
+- 202 locked corpus bundle files were scanned; the corpus validator reports 195 parseable standalone YAML bundles and 7 documented non-standalone/invalid inputs. Evaluation was filtered to the frozen 105 primary bundles.
 - 10 upstream project clusters.
 - 740 resource-level scanner candidate records in total; 733 were in primary bundles and 7 were outside the primary set.
 - 541 unique positive bundle-rule predictions in the primary set.
