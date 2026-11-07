@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
-import math
 import os
 import sys
 from collections import Counter, defaultdict
@@ -71,11 +71,16 @@ def main() -> int:
     ap.add_argument("--candidates", required=True, type=Path)
     ap.add_argument("--inventory", required=True, type=Path)
     ap.add_argument("--output-dir", required=True, type=Path)
+    ap.add_argument("--scanner-script", type=Path, default=Path("scripts/scan_candidates.py"))
     args = ap.parse_args()
 
     labels = read_csv(args.labels)
     candidates = read_jsonl(args.candidates)
     inventory = read_jsonl(args.inventory)
+    if not args.scanner_script.is_file():
+        raise ValueError(f"scanner script not found: {args.scanner_script}")
+    scanner_script_sha256 = hashlib.sha256(args.scanner_script.read_bytes()).hexdigest()
+    scanner_versions = dict(Counter(str(x.get("scanner_version", "unknown")) for x in candidates))
     out = args.output_dir
     out.mkdir(parents=True, exist_ok=True)
 
@@ -268,6 +273,9 @@ def main() -> int:
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "git_commit": os.environ.get("GITHUB_SHA", "unknown"),
         "script_version": VERSION,
+        "scanner_versions": scanner_versions,
+        "scanner_script": str(args.scanner_script),
+        "scanner_script_sha256": scanner_script_sha256,
         "input_paths": {
             "labels": str(args.labels), "candidates": str(args.candidates), "inventory": str(args.inventory)
         },
