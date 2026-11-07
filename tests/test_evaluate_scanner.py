@@ -61,8 +61,7 @@ class EvaluationTests(unittest.TestCase):
                 "--candidates", str(candidates_path), "--inventory", str(inventory_path),
                 "--output-dir", str(out),
             ]
-            with patch.object(sys, "argv", argv):
-                with patch("builtins.print"):
+            with patch.object(sys, "argv", argv), patch("builtins.print"):
                 self.assertEqual(module.main(), 0)
             metrics = list(csv.DictReader((out / "scanner_metrics.csv").open(encoding="utf-8")))
             wl01 = next(row for row in metrics if row["rule_id"] == "LLM-WL-01")
