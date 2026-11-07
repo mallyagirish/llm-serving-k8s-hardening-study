@@ -1,4 +1,4 @@
-name: Phase 3 corpus validation and candidate scan
+name: Phase 3 corpus validation, scanner evaluation, and review queues
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Run scanner unit tests
+      - name: Run unit tests
         run: python -m unittest discover -s tests -v
 
       - name: Validate pinned corpus and create inventory
@@ -41,10 +41,18 @@ jobs:
       - name: Build resource-level eligibility review queue
         run: python scripts/build_workload_inventory.py --out-dir results/ci-generated
 
+      - name: Compare scanner candidates with AI-1 reference labels and calculate descriptive prevalence
+        run: |
+          python scripts/evaluate_scanner.py \
+            --labels results/labels/reviewer_AI1_full.csv \
+            --candidates results/raw_candidate_findings.jsonl \
+            --inventory results/corpus_inventory.jsonl \
+            --output-dir results/ci-analysis
+
       - name: Upload reproducible outputs
         uses: actions/upload-artifact@v4
         with:
-          name: phase3-ci-generated-review-queues
+          name: phase3-scanner-evaluation-and-review-queues
           path: |
             results/corpus_inventory.jsonl
             results/corpus_validation.json
@@ -52,5 +60,9 @@ jobs:
             results/ci-generated/resource_eligibility_review.csv
             results/ci-generated/bundle_eligibility_review.csv
             results/ci-generated/workload_inventory_summary.json
+            results/ci-analysis/scanner_metrics.csv
+            results/ci-analysis/rule_prevalence.csv
+            results/ci-analysis/project_rule_prevalence.csv
+            results/ci-analysis/evaluation_summary.json
           if-no-files-found: error
           retention-days: 30
