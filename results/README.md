@@ -38,7 +38,7 @@ python scripts/evaluate_scanner.py \\
 - A scanner candidate is not proof of exploitability, reachability, or a confirmed vulnerability.
 - Scanner predictions are aggregated to one positive/negative prediction per bundle-rule pair; repeated resource candidates do not inflate the evaluation unit.
 - U and NA are excluded from binary confusion matrices and reported separately.
-- The current reference labels are AI-generated. Scanner metrics are exploratory AI-reference agreement, not human-validated precision/recall.
+- The current reference labels are AI-generated. Scanner metrics are exploratory AI-reference agreement, not human-validated precision/recall. The evaluation summary records the scanner version and SHA-256 of its source script.
 - Rules not implemented by the scanner receive no scanner performance metrics.
 - Prevalence estimates describe only the pinned public configuration corpus, not live clusters, production deployments, or the universe of LLM-serving systems.
 - The corpus has only a small number of upstream project clusters and is concentrated in a few projects. Initial outputs are descriptive point estimates; no cluster-bootstrap confidence intervals are claimed.
