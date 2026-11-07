@@ -19,7 +19,7 @@ import yaml
 
 LLM_HINT = re.compile(
     r"(vllm|text-generation|text_generation|tgi|sglang|ollama|llm|"
-    r"rayserve|ray-serve|litellm|deepseek|llama|qwen|mistral|gemma|bloom|falcon|mixtral|phi|granite)",
+    r"rayserve|ray-serve|litellm|deepseek|llama|qwen|mistral|gemma|bloom|falcon|mixtral|phi|granite|huggingface)",
     re.I,
 )
 IMAGE_DIGEST = re.compile(r"@sha256:[0-9a-f]{64}$", re.I)
@@ -33,6 +33,7 @@ NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
 AUX_RESOURCE_HINT = re.compile(r"(test[-_]?connection|testpod|env[-_]?test|migrations?|prisma|cache[-_]?server|wait[-_]?for[-_]?cache)", re.I)
 AUX_CONTAINER_HINT = re.compile(r"(^|[-_])(wget|curl|test|prisma-migrations|lmcache-server|wait-for-cache-server|mongodb|postgres(?:ql)?|redis|mysql)([-_]|$)", re.I)
 AUX_IMAGE_HINT = re.compile(r"(busybox|curlimages/curl|bitnami/(mongodb|postgresql|redis)|postgres(?:ql)?[:/]|mongo(?:db)?[:/])", re.I)
+CPU_OR_TPU_HINT = re.compile(r"(cpu(?:[-_ ]?only)?|intel-cpu|google\.com/tpu|tpu-v[0-9])", re.I)
 WORKLOAD_KINDS = {"Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob",
                   "LLMInferenceService", "LLMInferenceServiceConfig", "ServingRuntime",
                   "ClusterServingRuntime", "RayService"}
@@ -160,6 +161,16 @@ def container_has_llm_identity(container: dict[str, Any]) -> bool:
     return identity_matches(identity)
 
 
+def is_cpu_or_tpu_configuration(path: Path, obj: dict[str, Any], container: dict[str, Any]) -> bool:
+    meta = obj.get("metadata") or {}
+    text = " ".join([
+        str(path), str(meta.get("name", "")), str(meta.get("labels", "")),
+        str(meta.get("annotations", "")), str(container.get("image", "")),
+        str(container.get("command", "")), str(container.get("args", "")),
+        str(container.get("env", "")),
+    ])
+    return bool(CPU_OR_TPU_HINT.search(text))
+
 def emit(out: list[dict[str, Any]], rule: str, path: Path, digest: str,
          obj: dict[str, Any], evidence: str, caveat: str,
          container_name: str | None = None, document_index: int | None = None) -> None:
@@ -284,7 +295,9 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                 resources = c.get("resources") or {}
                 req = resources.get("requests") or {}
                 lim = resources.get("limits") or {}
-                if GPU_ENGINE_HINT.search(name + " " + image) and not any(key in req or key in lim for key in GPU_KEYS):
+                if (GPU_ENGINE_HINT.search(name + " " + image)
+                        and not is_cpu_or_tpu_configuration(path, obj, c)
+                        and not any(key in req or key in lim for key in GPU_KEYS)):
                     emit(findings, "LLM-GPU-01", path, digest, obj,
                          prefix + "known GPU-oriented serving engine has no vendor GPU resource request/limit",
                          "CPU execution or nonstandard device-plugin resources may be intentional; confirm hardware mode before labeling.",
