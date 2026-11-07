@@ -9,13 +9,13 @@
 
 ## Interpretation boundary
 
-The 2,940 reference labels are AI-1 generated. They are scanner-blind, but they are not independent human ground truth. The metrics below are **exploratory agreement between scanner candidates and AI-1 reference classifications**, not human-validated precision/recall. A scanner candidate is not proof of exploitability, reachability, or a confirmed vulnerability.
+The 2,940 reference labels were initially generated with AI assistance and subsequently **human-validated by the study author across all 2,940 bundle-rule entries** (105 primary bundles × 28 rules). The dataset is therefore described as an **AI-assisted, author-validated reference-label set**; see [the validation record](REFERENCE_LABEL_VALIDATION.md). The metrics below compare scanner candidates against this author-validated reference set. This was single-author validation, not independent double annotation, and no human inter-rater reliability statistic is claimed. A scanner candidate is not proof of exploitability, reachability, or a confirmed vulnerability.
 
 The primary evaluation unit is one bundle × rule. Multiple resource-level scanner candidates within a bundle-rule pair are collapsed to one positive prediction. U and NA are excluded from binary confusion matrices and reported separately. Only the 13 implemented rules receive scanner metrics.
 
 ## Corpus and execution
 
-- 105 primary bundles × 28 rules = 2,940 AI-1 reference labels.
+- 105 primary bundles × 28 rules = 2,940 AI-assisted, author-validated reference labels.
 - 202 locked corpus bundle files were scanned; the corpus validator reports 195 parseable standalone YAML bundles and 7 documented non-standalone/invalid inputs. Evaluation was filtered to the frozen 105 primary bundles.
 - 10 upstream project clusters.
 - 740 resource-level scanner candidate records in total; 733 were in primary bundles and 7 were outside the primary set.
@@ -60,7 +60,7 @@ Macro-F1 is 99.53% across the 10 implemented rules that have both PRESENT and AB
 | LLM-WL-04 | 78 | 0 | 0 | 12 | — |
 | LLM-WL-05 | 82 | 0 | 1 | 0 | No ABSENT examples; specificity not estimable |
 
-Do not interpret the pooled score as evidence of general scanner accuracy. The evaluation is a development-stage comparison on one pinned corpus, and the reference labels are AI-generated.
+Do not interpret the pooled score as evidence of general scanner accuracy. The evaluation is a development-stage comparison on one pinned corpus, and the reference labels were initially AI-assisted and subsequently validated by one study author.
 
 ### Scanner development comparison
 
@@ -70,7 +70,7 @@ The earlier and current results are **not a controlled benchmark comparison**: t
 
 ## Descriptive reference-label results
 
-These are AI-1 reference-label counts for the pinned public configuration corpus, not prevalence in deployed production clusters.
+These are author-validated reference-label counts for the pinned public configuration corpus, not prevalence in deployed production clusters.
 
 | Rule | PRESENT | ABSENT | U | NA | Interpretation |
 |---|---:|---:|---:|---:|---|
@@ -87,12 +87,12 @@ The RES-02 result remains sensitive to the definition of scaling: a Ray Serve ap
 
 ## Four remaining scanner/reference disagreements
 
-The current row-level disagreement artifact contains three FN and one FP. Raw manifests indicate that several are likely AI-1 labeling or scope errors rather than scanner defects. The original AI-1 CSV must remain immutable; these are author-review recommendations, not silently applied corrections.
+The current row-level scanner disagreement artifact contains three FN and one FP against the author-validated labels. The raw-manifest review queue flags these cases for transparent audit, but its proposed dispositions are not authoritative corrections and are not applied by this report. The original AI-assisted label CSV remains preserved; any change must be recorded separately with an explicit author decision and evidence.
 
-1. **LLM-WL-05 — KServe managed-DRA multi-device:** AI-1 labels PRESENT using \`busybox:1.36\`, but that image belongs to the \`sidecar\`; the \`main\` inference container has no image field. Recommended disposition: U for image immutability unless another source supplies the main image.
+1. **LLM-WL-05 — KServe managed-DRA multi-device:** The reference label is PRESENT using \`busybox:1.36\`, but that image belongs to the \`sidecar\`; the \`main\` inference container has no image field. Recommended disposition: U for image immutability unless another source supplies the main image.
 2. **LLM-RES-01 — same managed-DRA bundle:** AI-1 labels PRESENT, but the \`main\` container has CPU and memory requests and limits. Recommended disposition: ABSENT, assuming the displayed main container is the in-scope inference container.
 3. **LLM-RES-03 — KServe smoke-test-data CPU sample:** AI-1 labels PRESENT, but the main container has a \`readinessProbe\` as well as a liveness probe. Recommended disposition: ABSENT.
-4. **LLM-RES-03 — KServe PD-disaggregation config:** AI-1 labels ABSENT because a role template has a readiness probe, but the top-level main template has liveness only and no readiness/startup probe. Under the protocol's bundle aggregation rule (PRESENT if any in-scope serving template meets the positive predicate), recommended disposition: PRESENT. Confirm that both templates are in-scope before changing the reference label.
+4. **LLM-RES-03 — KServe PD-disaggregation config:** The reference label is ABSENT because a role template has a readiness probe, but the top-level main template has liveness only and no readiness/startup probe. Under the protocol's bundle aggregation rule (PRESENT if any in-scope serving template meets the positive predicate), recommended disposition: PRESENT. Confirm that both templates are in-scope before changing the reference label.
 
 These four cases should be reviewed and resolved in a separate author-adjudication artifact. Do not overwrite \`reviewer_AI1_full.csv\`.
 
@@ -119,4 +119,4 @@ python scripts/evaluate_scanner.py \\
   --output-dir results/ci-analysis
 \`\`\`
 
-The successful CI artifact for [run 42402372928](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/42402372928) contains the raw candidate JSONL, per-rule scanner metrics, prevalence tables, project-stratified metrics, row-level disagreements, and evaluator summary. The evaluator summary records the scanner version and source SHA-256.
+The author-validation provenance is recorded in [REFERENCE_LABEL_VALIDATION.md](REFERENCE_LABEL_VALIDATION.md). The successful CI artifact for [run 42402372928](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/42402372928) contains the raw candidate JSONL, per-rule scanner metrics, prevalence tables, project-stratified metrics, row-level disagreements, and evaluator summary. The evaluator summary records the scanner version and source SHA-256.
