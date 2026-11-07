@@ -17,6 +17,8 @@ from typing import Any, Iterable
 
 import yaml
 
+SCANNER_VERSION = "2.0.0"
+
 LLM_HINT = re.compile(
     r"(vllm|text-generation|text_generation|tgi|sglang|ollama|llm|"
     r"rayserve|ray-serve|litellm|deepseek|llama|qwen|mistral|gemma|bloom|falcon|mixtral|phi|granite|huggingface)",
@@ -178,6 +180,7 @@ def emit(out: list[dict[str, Any]], rule: str, path: Path, digest: str,
     meta = obj.get("metadata") or {}
     out.append({
         "rule_id": rule,
+        "scanner_version": SCANNER_VERSION,
         "status": "candidate_for_human_review",
         "source_file": str(path),
         "source_sha256": digest,
