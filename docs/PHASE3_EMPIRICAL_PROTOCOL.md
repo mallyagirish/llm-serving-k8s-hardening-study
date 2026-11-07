@@ -109,7 +109,7 @@ python scripts/evaluate_scanner.py \\
   --output-dir results/ci-analysis
 \`\`\`
 
-The first pass reports descriptive point estimates only. It does not calculate cluster-bootstrap confidence intervals. Because bundles are nested in a small number of upstream projects and project representation is imbalanced, report project-stratified results and avoid independent-binomial confidence intervals. Any later inferential analysis must pre-specify a cluster-aware method and explain the limitations of having few clusters.
+The first pass reports descriptive point estimates only. It emits row-level false-positive/false-negative evidence in `scanner_disagreements.csv` and project-stratified scanner metrics and prevalence tables. It does not calculate cluster-bootstrap confidence intervals. Because bundles are nested in a small number of upstream projects and project representation is imbalanced, report project-stratified results and avoid independent-binomial confidence intervals. Any later inferential analysis must pre-specify a cluster-aware method and explain the limitations of having few clusters.
 
 ## 6. Human reference labeling
 
