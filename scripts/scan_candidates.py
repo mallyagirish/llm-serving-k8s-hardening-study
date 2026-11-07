@@ -27,7 +27,8 @@ GPU_KEYS = ("nvidia.com/gpu", "nvidia.com/remote-gpu", "nvidia.com/remote-gpu-me
             "amd.com/gpu", "habana.ai/gaudi", "gpu.intel.com/i915", "hami.io/vgpu",
             "iluvatar.ai/vgpu", "enflame.com/vgcu", "huawei.com/Ascend910")
 GPU_ENGINE_HINT = re.compile(r"(vllm|text-generation|tgi|sglang)", re.I)
-SECRET_ENV_HINT = re.compile(r"(^|[_-])(API[_-]?KEY|TOKEN|PASSWORD|PASSWD|SECRET([_-]?(KEY|TOKEN|VALUE|DATA))?|DATABASE[_-]?URL|DB[_-]?URL|CONNECTION[_-]?STRING)([_-]|$)", re.I)
+SECRET_ENV_HINT = re.compile(r"(^|[_-])(API[_-]?KEY|ACCESS[_-]?KEY|PRIVATE[_-]?KEY|MASTER[_-]?KEY|TOKEN|PASSWORD|PASSWD|SECRET([_-]?(KEY|TOKEN|VALUE|DATA))?|DATABASE[_-]?URL|DB[_-]?URL|CONNECTION[_-]?STRING)([_-]|$)", re.I)
+NON_SECRET_ENV_HINT = re.compile(r"(ALLOW[_-]?EMPTY[_-]?PASSWORD|PASSWORD[_-]?ENABLED)", re.I)
 PLACEHOLDER_VALUE = re.compile(r"(YOUR[_ -]?|REPLACE[_ -]?ME|CHANGE[_ -]?ME|DUMMY|EXAMPLE|TEST[_ -]?TOKEN|^\$\{[^}]+\}$|^<[^>]+>$|^$)", re.I)
 NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
 AUX_RESOURCE_HINT = re.compile(r"(test[-_]?connection|testpod|env[-_]?test|migrations?|prisma|cache[-_]?server|wait[-_]?for[-_]?cache)", re.I)
@@ -324,7 +325,7 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                         continue
                     env_name = str(env.get("name", ""))
                     env_value = env.get("value")
-                    if SECRET_ENV_HINT.search(env_name) and isinstance(env_value, str) and env_value.strip():
+                    if SECRET_ENV_HINT.search(env_name) and not NON_SECRET_ENV_HINT.search(env_name) and isinstance(env_value, str) and env_value.strip():
                         if not PLACEHOLDER_VALUE.search(env_value.strip()) and not env.get("valueFrom"):
                             emit(findings, "LLM-SEC-02", path, digest, obj,
                                  prefix + "token-like environment variable uses a literal value: " + env_name,
