@@ -218,8 +218,12 @@ def main() -> int:
     fp = sum(int(r["fp"]) for r in binary)
     fn = sum(int(r["fn"]) for r in binary)
     tn = sum(int(r["tn"]) for r in binary)
-    estimable_f1 = [r["f1"] for r in binary if r["f1"] is not None]
+    # Macro averages include only rules with both positive and negative reference classes.
+    two_class = [r for r in binary if r["present"] > 0 and r["absent"] > 0]
+    estimable_f1 = [r["f1"] for r in two_class if r["f1"] is not None]
     macro_f1 = sum(estimable_f1) / len(estimable_f1) if estimable_f1 else None
+    macro_precision_values = [r["precision"] for r in two_class if r["precision"] is not None]
+    macro_recall_values = [r["recall"] for r in two_class if r["recall"] is not None]
 
     summary = {
         "schema_version": "1.0",
@@ -248,7 +252,14 @@ def main() -> int:
             "accuracy": safe_div(tp + tn, tp + fp + fn + tn),
         },
         "macro_f1_over_implemented_rules_with_binary_reference_units": macro_f1,
+        "macro_precision_over_rules_with_both_reference_classes": (
+            sum(macro_precision_values) / len(macro_precision_values) if macro_precision_values else None
+        ),
+        "macro_recall_over_rules_with_both_reference_classes": (
+            sum(macro_recall_values) / len(macro_recall_values) if macro_recall_values else None
+        ),
         "macro_f1_rule_count": len(estimable_f1),
+        "macro_metric_rule_ids": [r["rule_id"] for r in two_class],
         "limitations": [
             "Reference labels are AI-1 generated; author verification and independent human reference review remain pending.",
             "A candidate is aggregated to one positive prediction per bundle-rule pair; multiple resource candidates do not increase the unit count.",
