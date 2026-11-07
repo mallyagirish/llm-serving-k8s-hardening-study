@@ -488,5 +488,75 @@ spec:
         self.assertNotIn("LLM-GPU-01", {r["rule_id"] for r in rows})
 
 
+    def test_router_scheduler_helper_template_is_not_scanned_as_inference_container(self):
+        rows = self.scan_text("""
+apiVersion: serving.kserve.io/v1alpha2
+kind: LLMInferenceServiceConfig
+metadata: {name: llm-config}
+spec:
+  template:
+    containers:
+    - name: main
+      image: ghcr.io/llm-d/llm-d-cuda:v0.9.0
+      securityContext: {runAsNonRoot: true}
+      readinessProbe:
+        httpGet: {path: /health, port: 8000}
+  router:
+    scheduler:
+      template:
+        containers:
+        - name: main
+          image: ghcr.io/llm-d/llm-d-router-endpoint-picker:v1.0.0
+""")
+        ids = {r["rule_id"] for r in rows}
+        self.assertNotIn("LLM-WL-01", ids)
+        self.assertNotIn("LLM-RES-03", ids)
+
+    def test_boolean_allow_empty_password_is_not_a_literal_secret(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: litellm-api}
+spec:
+  containers:
+  - name: litellm
+    image: ghcr.io/berriai/litellm:v1.85.1
+    env:
+    - name: ALLOW_EMPTY_PASSWORD
+      value: "no"
+""")
+        self.assertNotIn("LLM-SEC-02", {r["rule_id"] for r in rows})
+
+    def test_master_key_literal_is_a_secret_candidate(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: litellm-api}
+spec:
+  containers:
+  - name: litellm
+    image: ghcr.io/berriai/litellm:v1.85.1
+    env:
+    - name: PROXY_MASTER_KEY
+      value: sk-test-literal-value
+""")
+        self.assertIn("LLM-SEC-02", {r["rule_id"] for r in rows})
+
+    def test_secrets_config_version_is_not_a_secret_candidate(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: vllm-api}
+spec:
+  containers:
+  - name: vllm
+    image: vllm/vllm-openai:latest
+    env:
+    - name: KSERVE_PULL_SECRETS_CONFIG_VERSION
+      value: "1"
+""")
+        self.assertNotIn("LLM-SEC-02", {r["rule_id"] for r in rows})
+
+
 if __name__ == "__main__":
     unittest.main()
