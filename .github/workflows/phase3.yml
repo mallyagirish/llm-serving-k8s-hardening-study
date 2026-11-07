@@ -63,6 +63,8 @@ jobs:
             results/ci-analysis/scanner_metrics.csv
             results/ci-analysis/rule_prevalence.csv
             results/ci-analysis/project_rule_prevalence.csv
+            results/ci-analysis/project_scanner_metrics.csv
+            results/ci-analysis/scanner_disagreements.csv
             results/ci-analysis/evaluation_summary.json
           if-no-files-found: error
           retention-days: 30
