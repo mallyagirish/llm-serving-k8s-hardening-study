@@ -23,12 +23,19 @@ LLM_HINT = re.compile(
     re.I,
 )
 IMAGE_DIGEST = re.compile(r"@sha256:[0-9a-f]{64}$", re.I)
-GPU_KEYS = ("nvidia.com/gpu", "amd.com/gpu", "habana.ai/gaudi", "gpu.intel.com/i915",
+GPU_KEYS = ("nvidia.com/gpu", "nvidia.com/remote-gpu", "nvidia.com/remote-gpu-memory",
+            "amd.com/gpu", "habana.ai/gaudi", "gpu.intel.com/i915", "hami.io/vgpu",
             "iluvatar.ai/vgpu", "enflame.com/vgcu", "huawei.com/Ascend910")
 GPU_ENGINE_HINT = re.compile(r"(vllm|text-generation|tgi|sglang)", re.I)
-SECRET_ENV_HINT = re.compile(r"(API[_-]?KEY|TOKEN|PASSWORD|SECRET|HF[_-]?TOKEN|HUGGING[_-]?FACE)", re.I)
-PLACEHOLDER_VALUE = re.compile(r"(YOUR[_ -]?|REPLACE[_ -]?ME|CHANGE[_ -]?ME|DUMMY|EXAMPLE|TEST[_ -]?TOKEN|^\$\{[^}]+\}$|^$)", re.I)
+SECRET_ENV_HINT = re.compile(r"(API[_-]?KEY|TOKEN|PASSWORD|SECRET|DATABASE[_-]?URL|DB[_-]?URL|CONNECTION[_-]?STRING)", re.I)
+PLACEHOLDER_VALUE = re.compile(r"(YOUR[_ -]?|REPLACE[_ -]?ME|CHANGE[_ -]?ME|DUMMY|EXAMPLE|TEST[_ -]?TOKEN|^\$\{[^}]+\}$|^<[^>]+>$|^$)", re.I)
 NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
+AUX_RESOURCE_HINT = re.compile(r"(test[-_]?connection|testpod|env[-_]?test|migrations?|prisma|cache[-_]?server|wait[-_]?for[-_]?cache)", re.I)
+AUX_CONTAINER_HINT = re.compile(r"(^|[-_])(wget|curl|test|prisma-migrations|lmcache-server|wait-for-cache-server|mongodb|postgres(?:ql)?|redis|mysql)([-_]|$)", re.I)
+AUX_IMAGE_HINT = re.compile(r"(busybox|curlimages/curl|bitnami/(mongodb|postgresql|redis)|postgres(?:ql)?[:/]|mongo(?:db)?[:/])", re.I)
+WORKLOAD_KINDS = {"Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob",
+                  "LLMInferenceService", "LLMInferenceServiceConfig", "ServingRuntime",
+                  "ClusterServingRuntime", "RayService"}
 EXPLICIT_SERVING_ENGINE = re.compile(r"(vllm|text-generation|text_generation|tgi|sglang|ollama|litellm)", re.I)
 
 
@@ -51,15 +58,58 @@ def docs_in(path: Path) -> Iterable[dict[str, Any]]:
 
 
 def workload_parts(obj: dict[str, Any]) -> tuple[str, dict[str, Any], list[dict[str, Any]]]:
+    """Extract regular serving containers from core and selected serving CRDs."""
     kind = obj.get("kind", "")
     spec = obj.get("spec") or {}
     if kind == "CronJob":
         spec = ((spec.get("jobTemplate") or {}).get("spec") or {})
-    template = spec.get("template") or {}
-    pod = template.get("spec") or (spec if kind == "Pod" else {})
-    containers = list(pod.get("containers") or []) + list(pod.get("initContainers") or [])
+        template = spec.get("template") or {}
+        pod = template.get("spec") or {}
+        containers = list(pod.get("containers") or [])
+    elif kind in {"LLMInferenceService", "LLMInferenceServiceConfig"}:
+        template = spec.get("template") or {}
+        pod = template.get("spec") or template
+        containers = list(pod.get("containers") or [])
+    elif kind in {"ServingRuntime", "ClusterServingRuntime"}:
+        pod = spec
+        containers = list(spec.get("containers") or [])
+    elif kind == "RayService":
+        cluster = spec.get("rayClusterConfig") or {}
+        groups = [cluster.get("headGroupSpec") or {}] + list(cluster.get("workerGroupSpecs") or [])
+        containers = []
+        for group in groups:
+            pod = (((group.get("template") or {}).get("spec")) or {})
+            pod_sc = pod.get("securityContext") or {}
+            for container in pod.get("containers") or []:
+                if isinstance(container, dict):
+                    copied = dict(container)
+                    copied["_pod_security_context"] = pod_sc
+                    containers.append(copied)
+        pod = {}
+    elif kind == "Service" and str(obj.get("apiVersion", "")).startswith("serving.knative.dev/"):
+        template = spec.get("template") or {}
+        pod = template.get("spec") or {}
+        containers = list(pod.get("containers") or [])
+    else:
+        template = spec.get("template") or {}
+        pod = template.get("spec") or (spec if kind == "Pod" else {})
+        containers = list(pod.get("containers") or [])
+    # Init containers are excluded: hardening checks target serving containers, not bootstrap helpers.
     return kind, pod, [c for c in containers if isinstance(c, dict)]
 
+
+def is_auxiliary_workload(obj: dict[str, Any]) -> bool:
+    meta = obj.get("metadata") or {}
+    name = str(meta.get("name", ""))
+    annotations = meta.get("annotations") or {}
+    hook = str(annotations.get("helm.sh/hook", ""))
+    return bool(AUX_RESOURCE_HINT.search(name) or (hook and "test" in hook.lower()))
+
+
+def is_auxiliary_container(container: dict[str, Any]) -> bool:
+    name = str(container.get("name", ""))
+    image = str(container.get("image", ""))
+    return bool(AUX_CONTAINER_HINT.search(name) or AUX_IMAGE_HINT.search(image))
 
 def identity_matches(text: str) -> bool:
     if NON_SERVING_HINT.search(text) and not EXPLICIT_SERVING_ENGINE.search(text):
