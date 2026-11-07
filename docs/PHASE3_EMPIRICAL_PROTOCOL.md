@@ -96,7 +96,7 @@ The unit is one **bundle × rule** pair. Multiple scanner candidates within the 
 
 U and NA are excluded from binary confusion matrices and remain visible in the per-rule outputs. Rules not implemented by the scanner receive no precision/recall metrics. The script emits per-rule confusion matrices and descriptive reference prevalence for all 28 rules, plus project-stratified counts.
 
-The initial comparison uses AI-1 labels as an **AI-generated reference classification**, not human ground truth. Therefore its precision, recall, specificity, F1, and accuracy are exploratory agreement measures against AI-1. They must not be described as validated scanner performance until a human-reviewed reference set is independently locked. The scanner remains a candidate generator; a positive candidate is not proof of exploitability.
+The full 2,940-row reference matrix was initially classified with AI assistance and then human-validated by the study author across every entry. It is therefore an **AI-assisted, author-validated reference-label set** (see `docs/REFERENCE_LABEL_VALIDATION.md`). Scanner precision, recall, specificity, F1, and accuracy are evaluated against this author-validated set. This is single-author validation, not independent double annotation; it does not support a human inter-rater reliability claim. The scanner remains a candidate generator; a positive candidate is not proof of exploitability.
 
 Reproduction:
 
@@ -122,7 +122,7 @@ Create a written labeling guide with rule-specific examples. Sample independentl
 - Record evidence paths and concise rationale for each label.
 - Adjudicate disagreements only after independent labels are locked.
 - Report raw agreement, class-wise agreement, and an appropriate chance-corrected statistic with confidence intervals.
-- Do not treat author adjudication of AI pre-labels as independent second-rater validation.
+- Do not treat author validation of AI-assisted labels as independent second-rater validation. The current full set has author validation of all 2,940 entries, but no independent second human annotation is claimed.
 - Keep an audit trail of label changes and reasons.
 
 If feasible, independently label all high-severity candidate findings and a representative sample of non-findings. Publish sampling weights and use them in population estimates.
@@ -169,7 +169,7 @@ Do not publish prevalence claims until:
 - [ ] all included bundles are reproducibly parsed;
 - [ ] rule predicates and fixtures are versioned;
 - [ ] static proxies are distinguished from security guarantees;
-- [ ] a blinded independent reference-label sample is completed;
+- [ ] the reference-label validation provenance is documented; (if independent inter-rater reliability is claimed, a separate blinded second-human review is completed);
 - [ ] agreement and adjudication are reported transparently;
 - [ ] denominators, weights, and clustering are documented;
 - [ ] primary results regenerate from scripts;
