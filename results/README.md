@@ -4,6 +4,8 @@ This directory contains reproducible empirical outputs and intermediate review a
 
 ## Canonical inputs
 
+- `docs/SCANNER_EVALUATION_REPORT.md` — exploratory scanner comparison, descriptive prevalence, and remaining disagreement review.
+
 - \`results/labels/reviewer_AI1_full.csv\` — frozen 105-bundle × 28-rule AI-1 reference classifications. These are AI-generated labels, not independent human ground truth.
 - \`corpus/SOURCES.lock.json\` — pinned public source/bundle snapshot.
 - \`rules/catalog.json\` and \`docs/LABELING_GUIDE.md\` — rule definitions and label semantics.
