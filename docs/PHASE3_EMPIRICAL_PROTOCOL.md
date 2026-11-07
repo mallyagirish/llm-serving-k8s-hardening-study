@@ -81,6 +81,36 @@ The current conservative candidate scanner emits candidates for 13 rule IDs: LLM
 
 The scanner intentionally emits candidates rather than TP/FP labels. It uses container/resource identity heuristics and can still miss or misclassify workloads. Candidate counts must not be presented as rule prevalence, scanner precision, or recall. The rule catalog's automation field is the authoritative coverage declaration for each rule version.
 
+
+## 5B. Bundle-level scanner comparison (exploratory implementation)
+
+The evaluation script is \`scripts/evaluate_scanner.py\`. It joins the scanner's raw JSONL candidates to the frozen reference matrix by normalized bundle path and rule ID, and verifies both candidate source hashes and bundle inventory hashes before calculating metrics.
+
+The unit is one **bundle × rule** pair. Multiple scanner candidates within the same pair are collapsed to one positive scanner prediction. For the 13 implemented rules only:
+- candidate present + reference PRESENT = TP;
+- candidate present + reference ABSENT = FP;
+- no candidate + reference PRESENT = FN;
+- no candidate + reference ABSENT = TN.
+
+U and NA are excluded from binary confusion matrices and remain visible in the per-rule outputs. Rules not implemented by the scanner receive no precision/recall metrics. The script emits per-rule confusion matrices and descriptive reference prevalence for all 28 rules, plus project-stratified counts.
+
+The initial comparison uses AI-1 labels as an **AI-generated reference classification**, not human ground truth. Therefore its precision, recall, specificity, F1, and accuracy are exploratory agreement measures against AI-1. They must not be described as validated scanner performance until a human-reviewed reference set is independently locked. The scanner remains a candidate generator; a positive candidate is not proof of exploitability.
+
+Reproduction:
+
+\`\`\`bash
+python scripts/validate_corpus.py
+python scripts/scan_candidates.py corpus/rendered --output results/raw_candidate_findings.jsonl
+python scripts/build_workload_inventory.py --out-dir results/ci-generated
+python scripts/evaluate_scanner.py \\
+  --labels results/labels/reviewer_AI1_full.csv \\
+  --candidates results/raw_candidate_findings.jsonl \\
+  --inventory results/corpus_inventory.jsonl \\
+  --output-dir results/ci-analysis
+\`\`\`
+
+The first pass reports descriptive point estimates only. It does not calculate cluster-bootstrap confidence intervals. Because bundles are nested in a small number of upstream projects and project representation is imbalanced, report project-stratified results and avoid independent-binomial confidence intervals. Any later inferential analysis must pre-specify a cluster-aware method and explain the limitations of having few clusters.
+
 ## 6. Human reference labeling
 
 Create a written labeling guide with rule-specific examples. Sample independently at workload/bundle level using a reproducible random seed and stratification across rule categories and source types.
