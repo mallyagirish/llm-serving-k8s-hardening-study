@@ -4,10 +4,12 @@ This directory contains reproducible empirical outputs and intermediate review a
 
 ## Canonical inputs
 
+- `docs/REFERENCE_LABEL_VALIDATION.md` — provenance record: AI-assisted initial classifications followed by author validation of all 2,940 bundle-rule entries.
+
 - `docs/SCANNER_EVALUATION_REPORT.md` — exploratory scanner comparison, descriptive prevalence, and remaining disagreement review.
 - `results/labels/AI1_full_author_review_queue.csv` — four proposed author-review decisions; original AI-1 labels remain unchanged.
 
-- \`results/labels/reviewer_AI1_full.csv\` — frozen 105-bundle × 28-rule AI-1 reference classifications. These are AI-generated labels, not independent human ground truth.
+- \`results/labels/reviewer_AI1_full.csv\` — frozen 105-bundle × 28-rule AI-assisted, author-validated reference classifications. Initial labels were AI-generated; the study author reports human validation of every entry. This is single-author validation, not independent double annotation.
 - \`corpus/SOURCES.lock.json\` — pinned public source/bundle snapshot.
 - \`rules/catalog.json\` and \`docs/LABELING_GUIDE.md\` — rule definitions and label semantics.
 
@@ -41,7 +43,7 @@ python scripts/evaluate_scanner.py \\
 - A scanner candidate is not proof of exploitability, reachability, or a confirmed vulnerability.
 - Scanner predictions are aggregated to one positive/negative prediction per bundle-rule pair; repeated resource candidates do not inflate the evaluation unit.
 - U and NA are excluded from binary confusion matrices and reported separately.
-- The current reference labels are AI-generated. Scanner metrics are exploratory AI-reference agreement, not human-validated precision/recall. The evaluation summary records the scanner version and SHA-256 of its source script.
+- The reference labels were initially AI-generated and then human-validated by the study author across all 2,940 entries. Scanner metrics are reported against this author-validated reference set; disclose the AI-assisted initial-labeling process and single-author validation. Do not claim independent double annotation or human inter-rater reliability. The evaluation summary records the scanner version and SHA-256 of its source script.
 - Rules not implemented by the scanner receive no scanner performance metrics.
 - Prevalence estimates describe only the pinned public configuration corpus, not live clusters, production deployments, or the universe of LLM-serving systems.
 - The corpus has only a small number of upstream project clusters and is concentrated in a few projects. Initial outputs are descriptive point estimates; no cluster-bootstrap confidence intervals are claimed.
