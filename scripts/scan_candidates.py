@@ -27,7 +27,7 @@ GPU_KEYS = ("nvidia.com/gpu", "nvidia.com/remote-gpu", "nvidia.com/remote-gpu-me
             "amd.com/gpu", "habana.ai/gaudi", "gpu.intel.com/i915", "hami.io/vgpu",
             "iluvatar.ai/vgpu", "enflame.com/vgcu", "huawei.com/Ascend910")
 GPU_ENGINE_HINT = re.compile(r"(vllm|text-generation|tgi|sglang)", re.I)
-SECRET_ENV_HINT = re.compile(r"(API[_-]?KEY|TOKEN|PASSWORD|SECRET|DATABASE[_-]?URL|DB[_-]?URL|CONNECTION[_-]?STRING)", re.I)
+SECRET_ENV_HINT = re.compile(r"(^|[_-])(API[_-]?KEY|TOKEN|PASSWORD|PASSWD|SECRET([_-]?(KEY|TOKEN|VALUE|DATA))?|DATABASE[_-]?URL|DB[_-]?URL|CONNECTION[_-]?STRING)([_-]|$)", re.I)
 PLACEHOLDER_VALUE = re.compile(r"(YOUR[_ -]?|REPLACE[_ -]?ME|CHANGE[_ -]?ME|DUMMY|EXAMPLE|TEST[_ -]?TOKEN|^\$\{[^}]+\}$|^<[^>]+>$|^$)", re.I)
 NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
 AUX_RESOURCE_HINT = re.compile(r"(test[-_]?connection|testpod|env[-_]?test|migrations?|prisma|cache[-_]?server|wait[-_]?for[-_]?cache)", re.I)
@@ -69,24 +69,24 @@ def workload_parts(obj: dict[str, Any]) -> tuple[str, dict[str, Any], list[dict[
         containers = list(pod.get("containers") or [])
     elif kind in {"LLMInferenceService", "LLMInferenceServiceConfig"}:
         containers = []
-        def collect_templates(node: Any) -> None:
-            if isinstance(node, dict):
-                template = node.get("template")
-                if isinstance(template, dict):
-                    pod_template = template.get("spec") or template
-                    pod_sc = pod_template.get("securityContext") or {}
-                    for container in pod_template.get("containers") or []:
-                        if isinstance(container, dict):
-                            copied = dict(container)
-                            copied["_pod_security_context"] = pod_sc
-                            containers.append(copied)
-                for key, value in node.items():
-                    if key != "template":
-                        collect_templates(value)
-            elif isinstance(node, list):
-                for value in node:
-                    collect_templates(value)
-        collect_templates(spec)
+        # Only model-serving templates are in scope. In an LLMInferenceServiceConfig,
+        # the top-level template and prefill/decode role templates describe inference
+        # containers; router/scheduler/tokenizer helper templates do not.
+        role_nodes = [spec]
+        if kind == "LLMInferenceServiceConfig":
+            role_nodes = [spec.get("template") or {}]
+            role_nodes += [spec.get(role) or {} for role in ("prefill", "decode", "draft", "target")]
+        for node in role_nodes:
+            if not isinstance(node, dict):
+                continue
+            template = node if "containers" in node else (node.get("template") or {})
+            pod_template = template.get("spec") or template
+            pod_sc = pod_template.get("securityContext") or {}
+            for container in pod_template.get("containers") or []:
+                if isinstance(container, dict):
+                    copied = dict(container)
+                    copied["_pod_security_context"] = pod_sc
+                    containers.append(copied)
         pod = {}
     elif kind in {"ServingRuntime", "ClusterServingRuntime"}:
         pod = spec
