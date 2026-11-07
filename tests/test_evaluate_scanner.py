@@ -62,9 +62,8 @@ class EvaluationTests(unittest.TestCase):
                 "--output-dir", str(out),
             ]
             with patch.object(sys, "argv", argv):
-                with self.assertRaises(SystemExit) as exit_code:
-                    module.main()
-            self.assertEqual(exit_code.exception.code, 0)
+                with patch("builtins.print"):
+                self.assertEqual(module.main(), 0)
             metrics = list(csv.DictReader((out / "scanner_metrics.csv").open(encoding="utf-8")))
             wl01 = next(row for row in metrics if row["rule_id"] == "LLM-WL-01")
             self.assertEqual((wl01["tp"], wl01["fp"], wl01["fn"], wl01["tn"]), ("1", "0", "0", "1"))
