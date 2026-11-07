@@ -67,9 +67,26 @@ def workload_parts(obj: dict[str, Any]) -> tuple[str, dict[str, Any], list[dict[
         pod = template.get("spec") or {}
         containers = list(pod.get("containers") or [])
     elif kind in {"LLMInferenceService", "LLMInferenceServiceConfig"}:
-        template = spec.get("template") or {}
-        pod = template.get("spec") or template
-        containers = list(pod.get("containers") or [])
+        containers = []
+        def collect_templates(node: Any) -> None:
+            if isinstance(node, dict):
+                template = node.get("template")
+                if isinstance(template, dict):
+                    pod_template = template.get("spec") or template
+                    pod_sc = pod_template.get("securityContext") or {}
+                    for container in pod_template.get("containers") or []:
+                        if isinstance(container, dict):
+                            copied = dict(container)
+                            copied["_pod_security_context"] = pod_sc
+                            containers.append(copied)
+                for key, value in node.items():
+                    if key != "template":
+                        collect_templates(value)
+            elif isinstance(node, list):
+                for value in node:
+                    collect_templates(value)
+        collect_templates(spec)
+        pod = {}
     elif kind in {"ServingRuntime", "ClusterServingRuntime"}:
         pod = spec
         containers = list(spec.get("containers") or [])
@@ -128,6 +145,7 @@ def workload_has_llm_identity(obj: dict[str, Any], pod: dict[str, Any]) -> bool:
         str(obj.get("kind", "")),
         str(meta.get("name", "")),
         str(meta.get("labels", "")),
+        str(meta.get("annotations", "")),
         str(pod_meta.get("labels", "")),
         str(pod.get("labels", "")),
     ])
@@ -190,6 +208,8 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                 target_containers = []
             elif matched:
                 target_containers = [c for c in matched if not is_auxiliary_container(c)]
+            elif kind in {"LLMInferenceService", "LLMInferenceServiceConfig"} and workload_hint:
+                target_containers = [c for c in containers if not is_auxiliary_container(c)]
             elif workload_hint and len(containers) == 1 and not is_auxiliary_container(containers[0]):
                 target_containers = containers
             else:
