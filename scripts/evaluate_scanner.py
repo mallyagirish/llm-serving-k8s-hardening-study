@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 SCANNER_RULES = {
     "LLM-NET-01", "LLM-NET-03", "LLM-NET-05", "LLM-SEC-02",
     "LLM-GPU-01", "LLM-GPU-03", "LLM-WL-01", "LLM-WL-02",
@@ -131,6 +131,7 @@ def main() -> int:
             raise ValueError(f"inventory/reference hash mismatch for {path}: {inv_hash} != {info['bundle_sha256']}")
 
     predicted: set[tuple[str, str]] = set()
+    candidate_details: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
     candidate_rows_in_primary = 0
     candidate_rows_outside_primary = 0
     candidate_hash_errors = []
@@ -151,6 +152,7 @@ def main() -> int:
             candidate_hash_errors.append({"path": path, "observed": observed_hash, "expected": expected_hash})
             continue
         predicted.add((path, rule))
+        candidate_details[(path, rule)].append(item)
     if candidate_hash_errors:
         raise ValueError(f"candidate source hash mismatch (first 5): {candidate_hash_errors[:5]}")
     if unknown_candidate_rules:
@@ -159,6 +161,7 @@ def main() -> int:
     per_rule = []
     prevalence = []
     project_rows = []
+    project_metrics = []
     project_names = sorted(set(projects.values()))
     all_rule_ids = sorted(expected_rules)
     for rule in all_rule_ids:
@@ -211,6 +214,39 @@ def main() -> int:
                 "present": pp, "absent": aa, "uncertain": uu, "not_applicable": nn,
                 "assessable_n": pp + aa, "prevalence": safe_div(pp, pp + aa),
             })
+            if rule in SCANNER_RULES:
+                project_tp = sum(1 for path in paths if label_by_key[(path, rule)]["label"] == "PRESENT" and (path, rule) in predicted)
+                project_fp = sum(1 for path in paths if label_by_key[(path, rule)]["label"] == "ABSENT" and (path, rule) in predicted)
+                project_fn = pp - project_tp
+                project_tn = aa - project_fp
+                project_metrics.append({
+                    "rule_id": rule, "upstream_project": project, "bundles": len(paths),
+                    "present": pp, "absent": aa, "uncertain": uu, "not_applicable": nn,
+                    "tp": project_tp, "fp": project_fp, "fn": project_fn, "tn": project_tn,
+                    "precision": safe_div(project_tp, project_tp + project_fp),
+                    "recall": safe_div(project_tp, project_tp + project_fn),
+                    "specificity": safe_div(project_tn, project_tn + project_fp),
+                    "f1": safe_div(2 * project_tp, 2 * project_tp + project_fp + project_fn),
+                })
+
+    disagreements = []
+    for (path, rule), ref_row in label_by_key.items():
+        ref_label = ref_row["label"]
+        if rule not in SCANNER_RULES or ref_label not in {"PRESENT", "ABSENT"}:
+            continue
+        prediction = (path, rule) in predicted
+        expected_positive = ref_label == "PRESENT"
+        if prediction != expected_positive:
+            error = "FP" if prediction else "FN"
+            evidence = [str(x.get("evidence", "")) for x in candidate_details.get((path, rule), []) if x.get("evidence")]
+            disagreements.append({
+                "error_type": error, "rule_id": rule, "bundle_path": path,
+                "upstream_project": projects[path], "reference_label": ref_label,
+                "scanner_predicted_candidate": prediction,
+                "reference_evidence_path": ref_row.get("evidence_path", ""),
+                "reference_rationale": ref_row.get("rationale", ""),
+                "scanner_candidate_evidence": " || ".join(evidence),
+            })
 
     implemented = [r for r in per_rule if r["scanner_implemented"]]
     binary = [r for r in implemented if r["present"] + r["absent"] > 0]
@@ -241,6 +277,9 @@ def main() -> int:
             "scanner_candidate_records_in_primary_bundles": candidate_rows_in_primary,
             "scanner_candidate_records_outside_primary_bundles": candidate_rows_outside_primary,
             "unique_candidate_bundle_rule_units_in_primary": len(predicted),
+            "scanner_reference_disagreements": len(disagreements),
+            "scanner_rule_coverage_count": len(SCANNER_RULES),
+            "scanner_rule_coverage_fraction": len(SCANNER_RULES) / len(expected_rules),
             "inventory_bundles": len(inventory),
         },
         "scanner_rule_ids": sorted(SCANNER_RULES),
@@ -274,6 +313,8 @@ def main() -> int:
     write_csv(out / "scanner_metrics.csv", per_rule, list(per_rule[0]))
     write_csv(out / "rule_prevalence.csv", prevalence, list(prevalence[0]))
     write_csv(out / "project_rule_prevalence.csv", project_rows, list(project_rows[0]))
+    write_csv(out / "project_scanner_metrics.csv", project_metrics, list(project_metrics[0]))
+    write_csv(out / "scanner_disagreements.csv", disagreements, list(disagreements[0]) if disagreements else ["error_type", "rule_id", "bundle_path", "upstream_project", "reference_label", "scanner_predicted_candidate", "reference_evidence_path", "reference_rationale", "scanner_candidate_evidence"])
     (out / "evaluation_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
