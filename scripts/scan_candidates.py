@@ -33,7 +33,7 @@ NON_SERVING_HINT = re.compile(r"(finetun|fine[-_ ]?tun|training|trainer)", re.I)
 AUX_RESOURCE_HINT = re.compile(r"(test[-_]?connection|testpod|env[-_]?test|migrations?|prisma|cache[-_]?server|wait[-_]?for[-_]?cache)", re.I)
 AUX_CONTAINER_HINT = re.compile(r"(^|[-_])(wget|curl|test|prisma-migrations|lmcache-server|wait-for-cache-server|mongodb|postgres(?:ql)?|redis|mysql)([-_]|$)", re.I)
 AUX_IMAGE_HINT = re.compile(r"(busybox|curlimages/curl|bitnami/(mongodb|postgresql|redis)|postgres(?:ql)?[:/]|mongo(?:db)?[:/])", re.I)
-CPU_OR_TPU_HINT = re.compile(r"(cpu(?:[-_ ]?only)?|intel-cpu|google\.com/tpu|(?:^|[-_])tpu(?:[-_]|$)|tpu-v[0-9])", re.I)
+CPU_OR_TPU_HINT = re.compile(r"(cpu(?:[-_ ]?only)?|intel-cpu|google\.com/tpu|\\btpu\\b|tpu-v[0-9])", re.I)
 WORKLOAD_KINDS = {"Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob",
                   "LLMInferenceService", "LLMInferenceServiceConfig", "ServingRuntime",
                   "ClusterServingRuntime", "RayService"}
