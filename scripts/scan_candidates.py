@@ -125,6 +125,7 @@ def workload_has_llm_identity(obj: dict[str, Any], pod: dict[str, Any]) -> bool:
     # Deliberately exclude namespace and arbitrary args: e.g. namespace=llm-scan
     # must not make an unrelated operator look like an inference workload.
     identity = " ".join([
+        str(obj.get("kind", "")),
         str(meta.get("name", "")),
         str(meta.get("labels", "")),
         str(pod_meta.get("labels", "")),
@@ -172,7 +173,8 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
     digest = sha256(path)
     for document_index, obj in enumerate(docs_in(path)):
         kind, pod, containers = workload_parts(obj)
-        if kind in {"Pod", "Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob"}:
+        is_knative_service = kind == "Service" and str(obj.get("apiVersion", "")).startswith("serving.knative.dev/")
+        if kind in WORKLOAD_KINDS or is_knative_service:
             if not containers:
                 continue
             workload_hint = workload_has_llm_identity(obj, pod)
@@ -184,9 +186,11 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
             # serving-engine identity. If a workload is clearly LLM-serving
             # but has a single generic container, that sole container is the
             # target. Do not blindly flag sidecars in multi-container pods.
-            if matched:
-                target_containers = matched
-            elif workload_hint and len(containers) == 1:
+            if is_auxiliary_workload(obj):
+                target_containers = []
+            elif matched:
+                target_containers = [c for c in matched if not is_auxiliary_container(c)]
+            elif workload_hint and len(containers) == 1 and not is_auxiliary_container(containers[0]):
                 target_containers = containers
             else:
                 target_containers = []
@@ -213,6 +217,7 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                 name = str(c.get("name", "container"))
                 image = str(c.get("image", ""))
                 sc = c.get("securityContext") or {}
+                container_pod_sc = c.get("_pod_security_context") or pod_sc
                 prefix = f"container={name}: "
                 common = {"container_name": name, "document_index": document_index}
                 if sc.get("privileged") is True:
@@ -235,28 +240,17 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                          prefix + "allowPrivilegeEscalation is not explicitly false",
                          "Runtime defaults and admission policies are not evaluated; this is an explicit-hardening candidate.",
                          **common)
-                if effective_pod_or_container_value(sc, pod_sc, "runAsNonRoot") is not True:
+                if effective_pod_or_container_value(sc, container_pod_sc, "runAsNonRoot") is not True:
                     emit(findings, "LLM-WL-01", path, digest, obj,
                          prefix + "effective runAsNonRoot is not explicitly true",
                          "Image USER, runtime identity, and admission policy are not evaluated.",
                          **common)
-                if effective_pod_or_container_value(sc, pod_sc, "seccompProfile") is None:
+                if effective_pod_or_container_value(sc, container_pod_sc, "seccompProfile") is None:
                     emit(findings, "LLM-WL-04", path, digest, obj,
                          prefix + "no explicit seccompProfile at container or pod level",
                          "Admission policy or node defaults may enforce seccomp externally; this is a manifest evidence candidate.",
                          **common)
-                for env in c.get("env") or []:
-                    if not isinstance(env, dict):
-                        continue
-                    env_name = str(env.get("name", ""))
-                    env_value = env.get("value")
-                    if SECRET_ENV_HINT.search(env_name) and isinstance(env_value, str) and env_value.strip():
-                        if not PLACEHOLDER_VALUE.search(env_value.strip()):
-                            if not env.get("valueFrom"):
-                                emit(findings, "LLM-SEC-02", path, digest, obj,
-                                     prefix + "token-like environment variable uses a literal value: " + env_name,
-                                     "The literal value is deliberately redacted; verify it is not a placeholder and is not protected by an external mechanism.",
-                                     **common)
+
                 if sc.get("readOnlyRootFilesystem") is not True:
                     emit(findings, "LLM-WL-02", path, digest, obj,
                          prefix + "readOnlyRootFilesystem is not explicitly true",
@@ -285,7 +279,24 @@ def scan_file(path: Path) -> list[dict[str, Any]]:
                     emit(findings, "LLM-RES-03", path, digest, obj,
                          prefix + "no readinessProbe or startupProbe",
                          "A probe may be defined externally; startup/readiness semantics require workload review.",
-                         **common)
+                         **common)            # Credentials may also appear in related migration Jobs. Keep this
+            # rule separate from serving-container hardening to avoid counting
+            # auxiliary test/migration resources as missing workload controls.
+            for c in matched:
+                name = str(c.get("name", "container"))
+                prefix = f"container={name}: "
+                common = {"container_name": name, "document_index": document_index}
+                for env in c.get("env") or []:
+                    if not isinstance(env, dict):
+                        continue
+                    env_name = str(env.get("name", ""))
+                    env_value = env.get("value")
+                    if SECRET_ENV_HINT.search(env_name) and isinstance(env_value, str) and env_value.strip():
+                        if not PLACEHOLDER_VALUE.search(env_value.strip()) and not env.get("valueFrom"):
+                            emit(findings, "LLM-SEC-02", path, digest, obj,
+                                 prefix + "token-like environment variable uses a literal value: " + env_name,
+                                 "The literal value is deliberately redacted; verify it is not a placeholder and is not protected by an external mechanism.",
+                                 **common)
         elif kind == "Ingress":
             spec = obj.get("spec") or {}
             meta = obj.get("metadata") or {}
