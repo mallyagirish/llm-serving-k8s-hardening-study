@@ -19,7 +19,7 @@ The Phase 3 CI workflow produces a downloadable artifact named \`phase3-scanner-
 
 - \`raw_candidate_findings.jsonl\` — conservative scanner candidates; multiple resource-level candidates may occur within one bundle-rule unit.
 - \`corpus_inventory.jsonl\` and \`corpus_validation.json\` — pinned file hashes, parseability, and resource-kind inventory.
-- \`scanner_metrics.csv\` — bundle-rule confusion matrices for the 13 implemented scanner rules, comparing candidates with AI-1 reference labels.
+- \`scanner_metrics.csv\` — bundle-rule confusion matrices for the 13 implemented scanner rules, comparing candidates with the author-validated reference labels.
 - \`rule_prevalence.csv\` — descriptive PRESENT/(PRESENT+ABSENT), U, and NA rates for all 28 rules in this pinned corpus.
 - \`project_rule_prevalence.csv\` — the same descriptive counts stratified by upstream project.
 - \`evaluation_summary.json\` — run provenance, aggregate counts, pooled exploratory metrics, and limitations.
