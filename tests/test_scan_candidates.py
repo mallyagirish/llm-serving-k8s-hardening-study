@@ -281,5 +281,144 @@ spec:
         self.assertNotIn("metrics-sidecar", {r["container_name"] for r in rows})
 
 
+    def test_llm_inference_service_crd_is_scanned(self):
+        rows = self.scan_text("""
+apiVersion: serving.kserve.io/v1alpha1
+kind: LLMInferenceService
+metadata: {name: qwen-llm}
+spec:
+  template:
+    containers:
+    - name: main
+      image: ghcr.io/llm-d/llm-d-cuda:v0.9.0
+      resources:
+        limits: {nvidia.com/gpu: "1"}
+""")
+        self.assertIn("LLM-WL-01", {r["rule_id"] for r in rows})
+        self.assertIn("LLM-WL-02", {r["rule_id"] for r in rows})
+
+    def test_ray_service_worker_containers_are_scanned(self):
+        rows = self.scan_text("""
+apiVersion: ray.io/v1
+kind: RayService
+metadata: {name: deepseek-r1}
+spec:
+  rayClusterConfig:
+    workerGroupSpecs:
+    - groupName: gpu
+      template:
+        spec:
+          securityContext: {runAsNonRoot: true}
+          containers:
+          - name: ray-worker
+            image: rayproject/ray-llm:2.52.0
+            securityContext: {allowPrivilegeEscalation: false}
+            resources:
+              limits: {nvidia.com/gpu: "1"}
+""")
+        ids = {r["rule_id"] for r in rows}
+        self.assertNotIn("LLM-WL-01", ids)
+        self.assertIn("LLM-WL-02", ids)
+
+    def test_helm_test_connection_pod_is_excluded_from_serving_checks(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: scan-vllm-test-connection}
+spec:
+  containers:
+  - name: wget
+    image: busybox
+""")
+        self.assertEqual(rows, [])
+
+    def test_migration_job_secret_is_detected_but_workload_hardening_is_not(self):
+        rows = self.scan_text("""
+apiVersion: batch/v1
+kind: Job
+metadata: {name: scan-litellm-migrations}
+spec:
+  template:
+    spec:
+      containers:
+      - name: prisma-migrations
+        image: ghcr.io/berriai/litellm:v1.85.1
+        env:
+        - name: DATABASE_URL
+          value: postgresql://user:password@db/litellm
+""")
+        ids = {r["rule_id"] for r in rows}
+        self.assertIn("LLM-SEC-02", ids)
+        self.assertNotIn("LLM-WL-01", ids)
+        self.assertNotIn("LLM-RES-03", ids)
+
+    def test_redacted_secret_placeholder_is_not_flagged(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: sglang-api}
+spec:
+  containers:
+  - name: sglang
+    image: lmsysorg/sglang:latest
+    env:
+    - name: HF_TOKEN
+      value: "<secret>"
+""")
+        self.assertNotIn("LLM-SEC-02", {r["rule_id"] for r in rows})
+
+    def test_huggingface_offline_flag_is_not_a_secret(self):
+        rows = self.scan_text("""
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: huggingface-model}
+spec:
+  template:
+    spec:
+      containers:
+      - name: mongodb
+        image: bitnami/mongodb:7
+        env:
+        - name: HUGGINGFACE_OFFLINE
+          value: "false"
+""")
+        self.assertNotIn("LLM-SEC-02", {r["rule_id"] for r in rows})
+
+    def test_remote_gpu_resource_is_recognized(self):
+        rows = self.scan_text("""
+apiVersion: v1
+kind: Pod
+metadata: {name: vllm-remote-gpu}
+spec:
+  containers:
+  - name: vllm
+    image: vllm/vllm-openai:latest
+    resources:
+      limits:
+        nvidia.com/remote-gpu: 2
+        nvidia.com/remote-gpu-memory: 20480
+""")
+        self.assertNotIn("LLM-GPU-01", {r["rule_id"] for r in rows})
+
+    def test_init_container_does_not_create_missing_probe_candidate(self):
+        rows = self.scan_text("""
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: vllm-api}
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: vllm-init
+        image: vllm/vllm-openai:latest
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:latest
+        readinessProbe:
+          httpGet: {path: /health, port: 8000}
+""")
+        self.assertNotIn("LLM-RES-03", {r["rule_id"] for r in rows})
+
+
 if __name__ == "__main__":
     unittest.main()
