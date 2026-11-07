@@ -64,7 +64,7 @@ Do not interpret the pooled score as evidence of general scanner accuracy. The e
 
 ### Scanner development comparison
 
-An earlier scanner pass (core Kubernetes workload kinds only) produced 288 TP, 26 FP, 202 FN, and 473 TN on its assessable AI-1 reference units. The current 2.0.0 scanner adds selected KServe/Ray serving CRDs, excludes auxiliary test/migration/cache workloads from workload-hardening checks, recognizes remote GPU resource keys, and narrows credential detection.
+An earlier scanner pass (core Kubernetes workload kinds only) produced 288 TP, 26 FP, 202 FN, and 473 TN on the corresponding assessable reference units. The current 2.0.0 scanner adds selected KServe/Ray serving CRDs, excludes auxiliary test/migration/cache workloads from workload-hardening checks, recognizes remote GPU resource keys, and narrows credential detection.
 
 The earlier and current results are **not a controlled benchmark comparison**: the scanner's supported resource surface and candidate scope changed. The change is useful evidence that resource-kind coverage and workload identity were major sources of the earlier false negatives, but the two scores must not be presented as a clean before/after performance experiment.
 
