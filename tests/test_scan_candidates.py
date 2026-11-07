@@ -420,5 +420,73 @@ spec:
         self.assertNotIn("LLM-RES-03", {r["rule_id"] for r in rows})
 
 
+    def test_llm_inference_service_config_nested_prefill_template_is_scanned(self):
+        rows = self.scan_text("""
+apiVersion: serving.kserve.io/v1alpha2
+kind: LLMInferenceServiceConfig
+metadata: {name: llm-config}
+spec:
+  prefill:
+    template:
+      containers:
+      - name: main
+        image: ghcr.io/llm-d/llm-d-cuda:v0.9.0
+  decode:
+    template:
+      containers:
+      - name: main
+        image: vllm/vllm-openai:v0.31.0
+""")
+        ids = {r["rule_id"] for r in rows}
+        self.assertIn("LLM-WL-01", ids)
+        self.assertIn("LLM-WL-05", ids)
+
+    def test_cluster_serving_runtime_with_huggingface_annotation_is_scanned(self):
+        rows = self.scan_text("""
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-huggingfaceserver
+  annotations:
+    serving.kserve.io/server-type: huggingfaceserver
+spec:
+  containers:
+  - name: kserve-container
+    image: huggingfaceserver:replace
+""")
+        self.assertIn("LLM-WL-05", {r["rule_id"] for r in rows})
+
+    def test_cpu_only_vllm_sample_does_not_get_gpu_candidate(self):
+        rows = self.scan_text("""
+apiVersion: serving.kserve.io/v1alpha2
+kind: LLMInferenceService
+metadata: {name: facebook-opt-125m-cpu}
+spec:
+  template:
+    containers:
+    - name: main
+      image: vllm/vllm-openai:latest
+""")
+        self.assertNotIn("LLM-GPU-01", {r["rule_id"] for r in rows})
+
+    def test_tpu_ray_service_does_not_get_gpu_candidate(self):
+        rows = self.scan_text("""
+apiVersion: ray.io/v1
+kind: RayService
+metadata: {name: vllm-tpu}
+spec:
+  rayClusterConfig:
+    workerGroupSpecs:
+    - template:
+        spec:
+          containers:
+          - name: ray-worker
+            image: "$VLLM_IMAGE"
+            resources:
+              limits: {google.com/tpu: "8"}
+""")
+        self.assertNotIn("LLM-GPU-01", {r["rule_id"] for r in rows})
+
+
 if __name__ == "__main__":
     unittest.main()
