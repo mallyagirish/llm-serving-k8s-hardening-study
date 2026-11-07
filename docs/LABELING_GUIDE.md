@@ -85,3 +85,8 @@ Each row in the human reference-label dataset should include:
 Two human reviewers independently label the same blinded sample. They must not see scanner candidates or AI-generated pre-labels during the independent pass. Lock labels before adjudication. Report raw agreement, class-wise agreement, a chance-corrected statistic with confidence intervals, and the disagreement/adjudication process.
 
 AI-assisted triage can help locate evidence, but it must not be counted as a second human reviewer.
+
+
+## 6. Phase 3 full-reference validation status
+
+The full Phase 3 matrix was initially classified with AI assistance. The study author reports having human-validated all 2,940 entries (105 primary bundles × 28 rules). The appropriate description is **AI-assisted, author-validated reference labels**. This is a single-author validation workflow, not independent double annotation; it does not support a human inter-rater reliability statistic. See `docs/REFERENCE_LABEL_VALIDATION.md` for the validation provenance record. Preserve the original AI-assisted label file and record any later label changes in a separate author-adjudication artifact.
