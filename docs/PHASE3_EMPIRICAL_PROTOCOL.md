@@ -79,6 +79,8 @@ If a rule's intended claim cannot be tested from available artifacts, downgrade 
 
 The current conservative candidate scanner emits candidates for 13 rule IDs: LLM-NET-01, LLM-NET-03, LLM-NET-05, LLM-SEC-02, LLM-GPU-01, LLM-GPU-03, LLM-WL-01, LLM-WL-02, LLM-WL-03, LLM-WL-04, LLM-WL-05, LLM-RES-01, and LLM-RES-03. The remaining 15 rules are not yet automatically assessed by this script and require rule-specific manual evidence review or future tested extractors.
 
+The scanner now extracts serving-container evidence from core Kubernetes workloads and selected serving CRDs: `LLMInferenceService`, `LLMInferenceServiceConfig` (top-level, prefill, decode, draft, and target templates), `ServingRuntime`, `ClusterServingRuntime`, `RayService`, and Knative Services. Router/scheduler helper templates, init containers, and recognized auxiliary test/migration/cache workloads are excluded from workload-hardening checks; credential checks remain separate so literal credentials in related migration Jobs can still be surfaced. CPU-only and TPU configurations are excluded from the GPU-resource candidate predicate. The scanner version and source hash are recorded in evaluation metadata.
+
 The scanner intentionally emits candidates rather than TP/FP labels. It uses container/resource identity heuristics and can still miss or misclassify workloads. Candidate counts must not be presented as rule prevalence, scanner precision, or recall. The rule catalog's automation field is the authoritative coverage declaration for each rule version.
 
 
