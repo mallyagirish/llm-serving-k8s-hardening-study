@@ -2,7 +2,7 @@
 
 **Evaluation commit:** \`2248fe4163a5a74c9bddcb5b0548cf4520fa22cb\`  
 **Current branch head when this report was written:** \`7adb2d221944edbd44ffd68ae76f1f693354744e\`  
-**CI:** [run 42402372928](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/42402372928) — success  
+**Dual-evaluation CI:** [run 43089354140](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43089354140) — success; both pre- and post-adjudication evaluator passes completed  
 **Scanner:** 2.0.0  
 **Evaluator:** 1.1.0  
 **Scanner SHA-256:** \`c5572a9db1a3690423f2b3b94358e0bc3c2a437a73bd33427de3d628cb4f644a\`
