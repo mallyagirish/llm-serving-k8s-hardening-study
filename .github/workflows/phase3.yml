@@ -41,13 +41,21 @@ jobs:
       - name: Build resource-level eligibility review queue
         run: python scripts/build_workload_inventory.py --out-dir results/ci-generated
 
-      - name: Compare scanner candidates with AI-1 reference labels and calculate descriptive prevalence
+      - name: Evaluate against pre-adjudication author-validated labels
         run: |
           python scripts/evaluate_scanner.py \
             --labels results/labels/reviewer_AI1_full.csv \
             --candidates results/raw_candidate_findings.jsonl \
             --inventory results/corpus_inventory.jsonl \
-            --output-dir results/ci-analysis
+            --output-dir results/ci-analysis/pre-adjudication
+
+      - name: Evaluate against frozen author-adjudicated labels
+        run: |
+          python scripts/evaluate_scanner.py \
+            --labels results/labels/reference_labels_author_validated_v1.csv \
+            --candidates results/raw_candidate_findings.jsonl \
+            --inventory results/corpus_inventory.jsonl \
+            --output-dir results/ci-analysis/post-adjudication
 
       - name: Upload reproducible outputs
         uses: actions/upload-artifact@v4
@@ -60,11 +68,17 @@ jobs:
             results/ci-generated/resource_eligibility_review.csv
             results/ci-generated/bundle_eligibility_review.csv
             results/ci-generated/workload_inventory_summary.json
-            results/ci-analysis/scanner_metrics.csv
-            results/ci-analysis/rule_prevalence.csv
-            results/ci-analysis/project_rule_prevalence.csv
-            results/ci-analysis/project_scanner_metrics.csv
-            results/ci-analysis/scanner_disagreements.csv
-            results/ci-analysis/evaluation_summary.json
+            results/ci-analysis/pre-adjudication/scanner_metrics.csv
+            results/ci-analysis/post-adjudication/scanner_metrics.csv
+            results/ci-analysis/pre-adjudication/rule_prevalence.csv
+            results/ci-analysis/post-adjudication/rule_prevalence.csv
+            results/ci-analysis/pre-adjudication/project_rule_prevalence.csv
+            results/ci-analysis/post-adjudication/project_rule_prevalence.csv
+            results/ci-analysis/pre-adjudication/project_scanner_metrics.csv
+            results/ci-analysis/post-adjudication/project_scanner_metrics.csv
+            results/ci-analysis/pre-adjudication/scanner_disagreements.csv
+            results/ci-analysis/post-adjudication/scanner_disagreements.csv
+            results/ci-analysis/pre-adjudication/evaluation_summary.json
+            results/ci-analysis/post-adjudication/evaluation_summary.json
           if-no-files-found: error
           retention-days: 30
