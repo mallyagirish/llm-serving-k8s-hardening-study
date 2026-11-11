@@ -30,17 +30,17 @@ Across the 989 assessable bundle-rule units for the 13 implemented rules:
 
 | Metric | Result |
 |---|---:|
-| TP | 487 |
-| FP | 1 |
-| FN | 3 |
-| TN | 498 |
-| Precision | 99.80% |
-| Recall | 99.39% |
-| Specificity | 99.80% |
-| F1 | 99.59% |
-| Accuracy | 99.60% |
+| TP | 488 |
+| FP | 0 |
+| FN | 0 |
+| TN | 500 |
+| Precision | 100.00% |
+| Recall | 100.00% |
+| Specificity | 100.00% |
+| F1 | 100.00% |
+| Accuracy | 100.00% |
 
-Macro-F1 is 99.53% across the 10 implemented rules that have both PRESENT and ABSENT reference examples. The other three implemented rules do not have both reference classes and are excluded from that macro average.
+Macro-F1 is 100.00% across the 10 implemented rules that have both PRESENT and ABSENT reference examples. The other three implemented rules do not have both reference classes and are excluded from that macro average.
 
 ### Per-rule confusion counts
 
@@ -51,14 +51,14 @@ Macro-F1 is 99.53% across the 10 implemented rules that have both PRESENT and AB
 | LLM-NET-01 | 2 | 0 | 0 | 44 | Only 2 PRESENT examples |
 | LLM-NET-03 | 0 | 0 | 0 | 1 | Only 1 ABSENT; no PRESENT examples |
 | LLM-NET-05 | 2 | 0 | 0 | 90 | Only 2 PRESENT examples |
-| LLM-RES-01 | 51 | 0 | 1 | 26 | — |
-| LLM-RES-03 | 26 | 1 | 1 | 55 | One remaining disagreement requires adjudication |
+| LLM-RES-01 | 51 | 0 | 0 | 27 | — |
+| LLM-RES-03 | 27 | 0 | 0 | 56 | — |
 | LLM-SEC-02 | 2 | 0 | 0 | 97 | Only 2 PRESENT examples |
 | LLM-WL-01 | 77 | 0 | 0 | 13 | — |
 | LLM-WL-02 | 88 | 0 | 0 | 2 | Only 2 ABSENT examples |
 | LLM-WL-03 | 77 | 0 | 0 | 13 | — |
 | LLM-WL-04 | 78 | 0 | 0 | 12 | — |
-| LLM-WL-05 | 82 | 0 | 1 | 0 | No ABSENT examples; specificity not estimable |
+| LLM-WL-05 | 82 | 0 | 0 | 0 | No ABSENT examples; specificity not estimable |
 
 Do not interpret the pooled score as evidence of general scanner accuracy. The evaluation is a development-stage comparison on one pinned corpus, and the reference labels were initially AI-assisted and subsequently validated by one study author.
 
@@ -85,16 +85,14 @@ Across all 2,940 rows, U is 696 (23.67%). Among non-NA rows, U is 696 / (648 + 7
 
 The RES-02 result remains sensitive to the definition of scaling: a Ray Serve application-level autoscaling template is present in one KubeRay configuration even though the Kubernetes worker group is not autoscaled. The current guide's predicate and the application-level interpretation should be resolved before final publication.
 
-## Four remaining scanner/reference disagreements
+## Scanner/reference disagreements — resolved 2026-11-11
 
-The current row-level scanner disagreement artifact contains three FN and one FP against the author-validated labels. The raw-manifest review queue flags these cases for transparent audit, but its proposed dispositions are not authoritative corrections and are not applied by this report. The original AI-assisted label CSV remains preserved; any change must be recorded separately with an explicit author decision and evidence.
+The row-level scanner disagreement artifact contained three FN and one FP against the pre-adjudication labels. Each case was resolved explicitly by the author against the raw manifest and the frozen labeling-guide predicates, and the four dispositions were applied to a frozen copy of the reference set, `results/labels/reference_labels_author_validated_v1.csv` (PRESENT 646 / ABSENT 738 / U 697 / NA 859; SHA-256 in its `.meta.json` sidecar). The original AI-assisted file `reviewer_AI1_full.csv` is preserved unmodified, and every change is recorded with evidence in the separate adjudication history, `results/labels/author_adjudication_history.csv`. The metrics above were recomputed against the frozen labels; no scanner/reference disagreements remain. In all four cases the manifest evidence under the frozen predicates supported the scanner's call; the adjudications were decided on the artifacts and predicates, and the preserved history keeps the prior labels auditable.
 
-1. **LLM-WL-05 — KServe managed-DRA multi-device:** The reference label is PRESENT using \`busybox:1.36\`, but that image belongs to the \`sidecar\`; the \`main\` inference container has no image field. Recommended disposition: U for image immutability unless another source supplies the main image.
-2. **LLM-RES-01 — same managed-DRA bundle:** AI-1 labels PRESENT, but the \`main\` container has CPU and memory requests and limits. Recommended disposition: ABSENT, assuming the displayed main container is the in-scope inference container.
-3. **LLM-RES-03 — KServe smoke-test-data CPU sample:** AI-1 labels PRESENT, but the main container has a \`readinessProbe\` as well as a liveness probe. Recommended disposition: ABSENT.
-4. **LLM-RES-03 — KServe PD-disaggregation config:** The reference label is ABSENT because a role template has a readiness probe, but the top-level main template has liveness only and no readiness/startup probe. Under the protocol's bundle aggregation rule (PRESENT if any in-scope serving template meets the positive predicate), recommended disposition: PRESENT. Confirm that both templates are in-scope before changing the reference label.
-
-These four cases should be reviewed and resolved in a separate author-adjudication artifact. Do not overwrite \`reviewer_AI1_full.csv\`.
+1. **LLM-WL-05 — KServe managed-DRA multi-device:** PRESENT → **U**. The `busybox:1.36` image belongs to the `sidecar`; the `main` inference container has no image field, so image immutability is undecidable for the in-scope container.
+2. **LLM-RES-01 — same managed-DRA bundle:** PRESENT → **ABSENT**. The `main` container has CPU and memory requests and limits explicitly configured.
+3. **LLM-RES-03 — KServe smoke-test-data CPU sample:** PRESENT → **ABSENT**. The main container has a `readinessProbe` as well as a liveness probe.
+4. **LLM-RES-03 — KServe PD-disaggregation config:** ABSENT → **PRESENT**. The top-level template is the decode serving pool; its main container has liveness only and no readiness/startup probe. Under the protocol's bundle aggregation rule (PRESENT if any in-scope serving template meets the positive predicate), the prefill pool's readiness probe does not cure the decode pool.
 
 ## Remaining validity limits
 

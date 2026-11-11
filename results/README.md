@@ -7,9 +7,11 @@ This directory contains reproducible empirical outputs and intermediate review a
 - `docs/REFERENCE_LABEL_VALIDATION.md` — provenance record: AI-assisted initial classifications followed by author validation of all 2,940 bundle-rule entries.
 
 - `docs/SCANNER_EVALUATION_REPORT.md` — exploratory scanner comparison, descriptive prevalence, and remaining disagreement review.
-- `results/labels/AI1_full_author_review_queue.csv` — four proposed author-review decisions; original AI-1 labels remain unchanged.
+- `results/labels/AI1_full_author_review_queue.csv` — scanner/reference disagreement queue; all four rows resolved by the author 2026-11-11.
+- `results/labels/author_adjudication_history.csv` — machine-readable change log for the four adjudicated labels (prior label, final label, evidence, rationale).
+- `results/labels/reference_labels_author_validated_v1.csv` — frozen author-validated reference set (2,940 rows) with the four adjudications applied; `reviewer_AI1_full.csv` preserved unmodified. Hashes in the `.meta.json` sidecar.
 
-- \`results/labels/reviewer_AI1_full.csv\` — frozen 105-bundle × 28-rule AI-assisted, author-validated reference classifications. Initial labels were AI-generated; the study author reports human validation of every entry. This is single-author validation, not independent double annotation.
+- \`results/labels/reviewer_AI1_full.csv\` — 105-bundle × 28-rule AI-assisted reference classifications (preserved source file; the frozen author-validated set is `reference_labels_author_validated_v1.csv`). Initial labels were AI-generated; the study author reports human validation of every entry. This is single-author validation, not independent double annotation.
 - \`corpus/SOURCES.lock.json\` — pinned public source/bundle snapshot.
 - \`rules/catalog.json\` and \`docs/LABELING_GUIDE.md\` — rule definitions and label semantics.
 

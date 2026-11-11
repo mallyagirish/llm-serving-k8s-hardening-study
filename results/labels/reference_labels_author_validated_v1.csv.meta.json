@@ -1,0 +1,24 @@
+{
+ "artifact": "author_validated_reference_labels_frozen",
+ "frozen_at": "2026-11-11",
+ "status": "FROZEN \u2014 author-confirmed 2026-11-11",
+ "source_file": "results/labels/reviewer_AI1_full.csv",
+ "source_sha256": "20106826c23ca637028fcdf1e69445bdb9397b7efb77d739b9252e7bc1f5d3c5",
+ "frozen_file": "results/labels/reference_labels_author_validated_v1.csv",
+ "frozen_sha256": "d8774402e20fd13f6796cf87981db4f228855403a84965b86889d36bdd41f3ef",
+ "adjudication_history": "results/labels/author_adjudication_history.csv",
+ "changes_applied": 4,
+ "base_counts": {
+  "PRESENT": 648,
+  "ABSENT": 737,
+  "U": 696,
+  "NA": 859
+ },
+ "frozen_counts": {
+  "ABSENT": 738,
+  "U": 697,
+  "NA": 859,
+  "PRESENT": 646
+ },
+ "provenance": "Initial labels AI-assisted (reviewer AI-1); full set author-validated 2026-11-07 (docs/REFERENCE_LABEL_VALIDATION.md); these four scanner-disagreement dispositions resolved explicitly and recorded in the separate adjudication history; the source AI-assisted file is preserved unmodified."
+}

@@ -28,3 +28,7 @@ The scanner disagreement queue remains a separate audit aid. Its proposed dispos
 ## Recommended manuscript wording
 
 > Initial bundle-rule classifications were generated with AI assistance. The study author then human-validated all 2,940 entries (105 primary configuration bundles × 28 rules) against the source artifacts and the labeling guide. We therefore use the term *AI-assisted, author-validated reference labels* for the final reference set. This was a single-author validation process, not independent double annotation; no human inter-rater reliability statistic is claimed.
+
+## Update 2026-11-11 — scanner disagreements adjudicated; reference set frozen
+
+The four scanner/reference disagreements in `results/labels/AI1_full_author_review_queue.csv` were resolved explicitly by the author on 2026-11-11 against the raw manifests and the labeling guide. All four dispositions are recorded, with prior label, final label, evidence, and rationale, in the separate machine-readable adjudication history `results/labels/author_adjudication_history.csv`; the queue rows are marked resolved with the author's decisions. The resulting frozen reference set is `results/labels/reference_labels_author_validated_v1.csv` (2,940 rows; PRESENT 646 / ABSENT 738 / U 697 / NA 859), with source and frozen SHA-256 hashes in its `.meta.json` sidecar. The original AI-assisted file `reviewer_AI1_full.csv` remains preserved and unmodified. Scanner metrics in `docs/SCANNER_EVALUATION_REPORT.md` were recomputed against the frozen set; no scanner/reference disagreements remain.
