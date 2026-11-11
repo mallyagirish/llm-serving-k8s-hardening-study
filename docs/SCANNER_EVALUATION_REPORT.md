@@ -26,23 +26,23 @@ The primary evaluation unit is one bundle × rule. Multiple resource-level scann
 
 ## Scanner comparison
 
-Across the 989 assessable bundle-rule units for the 13 implemented rules:
+Across the 989 assessable bundle-rule units for the 13 implemented rules, the **primary, pre-adjudication comparison** is against the author-validated labels as they stood before scanner-disagreement review. This avoids using scanner-visible disagreement decisions as the primary benchmark.
 
-| Metric | Result |
-|---|---:|
-| TP | 488 |
-| FP | 0 |
-| FN | 0 |
-| TN | 500 |
-| Precision | 100.00% |
-| Recall | 100.00% |
-| Specificity | 100.00% |
-| F1 | 100.00% |
-| Accuracy | 100.00% |
+| Metric | Pre-adjudication (primary) | Post-adjudication (sensitivity only) |
+|---|---:|---:|
+| TP | 487 | 488 |
+| FP | 1 | 0 |
+| FN | 3 | 0 |
+| TN | 498 | 500 |
+| Precision | 99.80% | 100.00% |
+| Recall | 99.39% | 100.00% |
+| Specificity | 99.80% | 100.00% |
+| F1 | 99.59% | 100.00% |
+| Accuracy | 99.60% | 100.00% |
 
-Macro-F1 is 100.00% across the 10 implemented rules that have both PRESENT and ABSENT reference examples. The other three implemented rules do not have both reference classes and are excluded from that macro average.
+Pre-adjudication macro-F1 is 99.53% across the 10 implemented rules with both PRESENT and ABSENT reference examples. The other three implemented rules do not have both reference classes and are excluded from that macro average. The post-adjudication 100% result is a sensitivity analysis only: the four disputed rows were selected because they disagreed with scanner predictions, and those predictions were visible during author review. It is therefore not an independent estimate of scanner accuracy.
 
-### Per-rule confusion counts
+### Per-rule confusion counts (pre-adjudication primary comparison)
 
 | Rule | TP | FP | FN | TN | Reference limitation |
 |---|---:|---:|---:|---:|---|
@@ -51,14 +51,14 @@ Macro-F1 is 100.00% across the 10 implemented rules that have both PRESENT and A
 | LLM-NET-01 | 2 | 0 | 0 | 44 | Only 2 PRESENT examples |
 | LLM-NET-03 | 0 | 0 | 0 | 1 | Only 1 ABSENT; no PRESENT examples |
 | LLM-NET-05 | 2 | 0 | 0 | 90 | Only 2 PRESENT examples |
-| LLM-RES-01 | 51 | 0 | 0 | 27 | — |
-| LLM-RES-03 | 27 | 0 | 0 | 56 | — |
+| LLM-RES-01 | 51 | 0 | 1 | 26 | — |
+| LLM-RES-03 | 26 | 1 | 1 | 55 | — |
 | LLM-SEC-02 | 2 | 0 | 0 | 97 | Only 2 PRESENT examples |
 | LLM-WL-01 | 77 | 0 | 0 | 13 | — |
 | LLM-WL-02 | 88 | 0 | 0 | 2 | Only 2 ABSENT examples |
 | LLM-WL-03 | 77 | 0 | 0 | 13 | — |
 | LLM-WL-04 | 78 | 0 | 0 | 12 | — |
-| LLM-WL-05 | 82 | 0 | 0 | 0 | No ABSENT examples; specificity not estimable |
+| LLM-WL-05 | 82 | 0 | 1 | 0 | No ABSENT examples; specificity not estimable |
 
 Do not interpret the pooled score as evidence of general scanner accuracy. The evaluation is a development-stage comparison on one pinned corpus, and the reference labels were initially AI-assisted and subsequently validated by one study author.
 
@@ -81,13 +81,13 @@ These are author-validated reference-label counts for the pinned public configur
 | LLM-RES-02 | 21 | 0 | 0 | 84 | 21/21 applicable scaled bundles have no matching PDB under the current predicate |
 | LLM-SEC-01 | 0 | 105 | 0 | 0 | No in-scope secret-like literal finding in this reference pass |
 
-Across all 2,940 rows, U is 696 (23.67%). Among non-NA rows, U is 696 / (648 + 737 + 696) = 33.45%. Always state which denominator is used.
+Across the frozen 2,940 rows, U is 697 (23.71%). Among non-NA rows, U is 697 / (646 + 738 + 697) = 33.49%. Always state which denominator is used.
 
 The RES-02 result remains sensitive to the definition of scaling: a Ray Serve application-level autoscaling template is present in one KubeRay configuration even though the Kubernetes worker group is not autoscaled. The current guide's predicate and the application-level interpretation should be resolved before final publication.
 
 ## Scanner/reference disagreements — resolved 2026-11-11
 
-The row-level scanner disagreement artifact contained three FN and one FP against the pre-adjudication labels. Each case was resolved explicitly by the author against the raw manifest and the frozen labeling-guide predicates, and the four dispositions were applied to a frozen copy of the reference set, `results/labels/reference_labels_author_validated_v1.csv` (PRESENT 646 / ABSENT 738 / U 697 / NA 859; SHA-256 in its `.meta.json` sidecar). The original AI-assisted file `reviewer_AI1_full.csv` is preserved unmodified, and every change is recorded with evidence in the separate adjudication history, `results/labels/author_adjudication_history.csv`. The metrics above were recomputed against the frozen labels; no scanner/reference disagreements remain. In all four cases the manifest evidence under the frozen predicates supported the scanner's call; the adjudications were decided on the artifacts and predicates, and the preserved history keeps the prior labels auditable.
+The row-level scanner disagreement artifact contained three FN and one FP against the pre-adjudication author-validated labels. The author reviewed these four rows against raw manifests and the labeling guide, with scanner predictions visible in the review queue, and recorded all decisions in `results/labels/author_adjudication_history.csv`. The resulting frozen set is `results/labels/reference_labels_author_validated_v1.csv` (PRESENT 646 / ABSENT 738 / U 697 / NA 859; SHA-256 in `reference_labels_author_validated_v1.csv.meta.json`). The original AI-assisted source file `reviewer_AI1_full.csv` remains unmodified. Because the four rows were selected by disagreement and scanner predictions were visible during review, the post-adjudication 100% score is potentially optimistic and is reported only as sensitivity analysis. The pre-adjudication metrics above remain the primary scanner comparison. The four final decisions are evidence-backed author adjudications, but not blinded independent labels.
 
 1. **LLM-WL-05 — KServe managed-DRA multi-device:** PRESENT → **U**. The `busybox:1.36` image belongs to the `sidecar`; the `main` inference container has no image field, so image immutability is undecidable for the in-scope container.
 2. **LLM-RES-01 — same managed-DRA bundle:** PRESENT → **ABSENT**. The `main` container has CPU and memory requests and limits explicitly configured.
@@ -114,7 +114,14 @@ python scripts/evaluate_scanner.py \\
   --labels results/labels/reviewer_AI1_full.csv \\
   --candidates results/raw_candidate_findings.jsonl \\
   --inventory results/corpus_inventory.jsonl \\
-  --output-dir results/ci-analysis
+  --output-dir results/ci-analysis/pre-adjudication
+
+# Repeat against the frozen post-adjudication reference set for sensitivity analysis:
+python scripts/evaluate_scanner.py \\
+  --labels results/labels/reference_labels_author_validated_v1.csv \\
+  --candidates results/raw_candidate_findings.jsonl \\
+  --inventory results/corpus_inventory.jsonl \\
+  --output-dir results/ci-analysis/post-adjudication
 \`\`\`
 
-The author-validation provenance is recorded in [REFERENCE_LABEL_VALIDATION.md](REFERENCE_LABEL_VALIDATION.md). The successful CI artifact for [run 42402372928](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/42402372928) contains the raw candidate JSONL, per-rule scanner metrics, prevalence tables, project-stratified metrics, row-level disagreements, and evaluator summary. The evaluator summary records the scanner version and source SHA-256.
+The author-validation provenance is recorded in [REFERENCE_LABEL_VALIDATION.md](REFERENCE_LABEL_VALIDATION.md). The Phase 3 CI workflow now runs both comparisons and uploads separate `pre-adjudication/` and `post-adjudication/` outputs, preserving the primary and sensitivity analyses. The evaluator summary records the scanner version and source SHA-256.
