@@ -37,7 +37,13 @@ python scripts/evaluate_scanner.py \\
   --labels results/labels/reviewer_AI1_full.csv \\
   --candidates results/raw_candidate_findings.jsonl \\
   --inventory results/corpus_inventory.jsonl \\
-  --output-dir results/ci-analysis
+  --output-dir results/ci-analysis/pre-adjudication
+
+python scripts/evaluate_scanner.py \\
+  --labels results/labels/reference_labels_author_validated_v1.csv \\
+  --candidates results/raw_candidate_findings.jsonl \\
+  --inventory results/corpus_inventory.jsonl \\
+  --output-dir results/ci-analysis/post-adjudication
 \`\`\`
 
 ## Interpretation guardrails
