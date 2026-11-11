@@ -108,10 +108,17 @@ python scripts/evaluate_scanner.py \\
   --labels results/labels/reviewer_AI1_full.csv \\
   --candidates results/raw_candidate_findings.jsonl \\
   --inventory results/corpus_inventory.jsonl \\
-  --output-dir results/ci-analysis
+  --output-dir results/ci-analysis/pre-adjudication
+
+# Sensitivity analysis against the frozen post-adjudication labels:
+python scripts/evaluate_scanner.py \\
+  --labels results/labels/reference_labels_author_validated_v1.csv \\
+  --candidates results/raw_candidate_findings.jsonl \\
+  --inventory results/corpus_inventory.jsonl \\
+  --output-dir results/ci-analysis/post-adjudication
 \`\`\`
 
-The first pass reports descriptive point estimates only. It emits row-level false-positive/false-negative evidence in `scanner_disagreements.csv` and project-stratified scanner metrics and prevalence tables. It does not calculate cluster-bootstrap confidence intervals. Because bundles are nested in a small number of upstream projects and project representation is imbalanced, report project-stratified results and avoid independent-binomial confidence intervals. Any later inferential analysis must pre-specify a cluster-aware method and explain the limitations of having few clusters.
+The workflow evaluates both the pre-adjudication author-validated reference labels (primary comparison) and the frozen post-adjudication labels (sensitivity analysis). The four disagreement decisions were made with scanner predictions visible, so the post-adjudication score is not an independent accuracy estimate. The first pass reports descriptive point estimates only. It emits row-level false-positive/false-negative evidence in `scanner_disagreements.csv` and project-stratified scanner metrics and prevalence tables. It does not calculate cluster-bootstrap confidence intervals. Because bundles are nested in a small number of upstream projects and project representation is imbalanced, report project-stratified results and avoid independent-binomial confidence intervals. Any later inferential analysis must pre-specify a cluster-aware method and explain the limitations of having few clusters.
 
 ## 6. Human reference labeling
 
