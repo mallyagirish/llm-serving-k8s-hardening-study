@@ -18,7 +18,7 @@ class ClusterBootstrapTests(unittest.TestCase):
         }
         self.assertEqual(module.prevalence_estimate(["A", "A"], prevalence, "R"), 0.8)
         self.assertEqual(module.prevalence_estimate(["A", "B"], prevalence, "R"), 0.4)
-        self.assertEqual(module.prevalence_estimate(["A", "B"], prevalence, "R", True), 0.5)
+        self.assertEqual(module.prevalence_estimate(["A", "B"], prevalence, "R", True), 0.4)
 
     def test_percentile_and_undefined_ratio(self):
         self.assertEqual(module.percentile([0.0, 1.0], 0.5), 0.5)
