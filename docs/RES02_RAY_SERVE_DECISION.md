@@ -1,6 +1,6 @@
 # RES-02 × Ray Serve — decision memo
 
-**Prepared:** 2026-11-11 · **Status:** awaiting author decision
+**Prepared:** 2026-11-11 · **Status:** RESOLVED 2026-11-11 — author chose Option A; implemented as guide v0.5 + frozen set v2 (see the Resolution section at the end)
 **Scope:** guide v0.4 predicate for LLM-RES-02 vs Ray Serve `serveConfigV2`
 application-level autoscaling. Flagged earlier in
 `docs/SCANNER_EVALUATION_REPORT.md` ("should be resolved before final
@@ -101,3 +101,7 @@ originals preserved).
 
 No other rule reads `serveConfigV2` scaling today, and no other primary
 bundle declares it, so the blast radius is provably this one cell.
+
+## Resolution — 2026-11-11
+
+**The author chose Option A** (confirmed in chat, 2026-11-11). Implemented the same day: labeling guide v0.5 (RES-02 predicate extended to `serveConfigV2` autoscaling in both dialects, with a post-freeze amendment record in §3); one adjudication-history row; frozen set v2 (`reference_labels_author_validated_v2.csv`, PRESENT 647 / ABSENT 738 / U 697 / NA 858; v1 preserved); validation record, scanner report, protocol doc, results README, manuscript draft, and the CI frozen-set evaluation all updated to v2. LLM-RES-02 has no scanner implementation, and the scanner evaluation was re-run against v2 locally to confirm no confusion-matrix metric changed. This item is closed.

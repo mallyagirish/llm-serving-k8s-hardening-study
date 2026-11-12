@@ -13,7 +13,7 @@ Kubernetes has become a common deployment substrate for large language model (LL
 
 We assembled a pinned corpus of 202 rendered or collected configuration bundles from 27 source entries and identified 105 primary bundles containing in-scope LLM inference workloads. These bundles represent 10 upstream project clusters. We defined 28 rules across authentication, networking, secrets and RBAC, GPU isolation, workload hardening, model storage, resource management, and observability. Each primary bundle was assessed against each rule, yielding 2,940 bundle–rule labels with four outcomes: PRESENT, ABSENT, uncertain (U), and not applicable (NA). Initial classifications were AI-assisted; the study author subsequently human-validated all entries. We therefore describe the labels as an AI-assisted, author-validated reference set, not as independently double-annotated ground truth.
 
-The frozen reference set contains 646 PRESENT, 738 ABSENT, 697 U, and 859 NA labels. Uncertainty is 23.71% of all labels and 33.49% of non-NA labels. Three authentication rules were non-estimable from static artifacts for nearly all bundles. For example, all 80 assessable bundles for the NetworkPolicy rule lacked an included policy selecting the inference workload, while all 21 assessable scaled bundles for the PodDisruptionBudget rule lacked a matching PDB under the study predicate. These observations describe the sampled public artifacts, not deployed production clusters.
+The frozen reference set contains 647 PRESENT, 738 ABSENT, 697 U, and 858 NA labels. Uncertainty is 23.71% of all labels and 33.48% of non-NA labels. Three authentication rules were non-estimable from static artifacts for nearly all bundles. For example, all 80 assessable bundles for the NetworkPolicy rule lacked an included policy selecting the inference workload, while all 22 assessable scaled bundles for the PodDisruptionBudget rule lacked a matching PDB under the study predicate. These observations describe the sampled public artifacts, not deployed production clusters.
 
 A conservative scanner implemented 13 of the 28 rules. Against the pre-adjudication author-validated labels, it produced 487 true positives, one false positive, three false negatives, and 498 true negatives across 989 assessable bundle–rule units (precision 99.80%, recall 99.39%, and F1 99.59%). A project-cluster bootstrap yielded exploratory 95% percentile intervals of 99.54–100.00% for precision, 98.63–100.00% for recall, and 99.09–100.00% for F1. All four disagreements were concentrated in one project cluster, and only 10 clusters were available. A post-adjudication 100% score is reported only as a sensitivity analysis because the four disputed rows were selected by scanner disagreement and reviewed with scanner predictions visible.
 
@@ -148,7 +148,7 @@ The corpus lockfile pins source revisions and artifact metadata. The scanner, ev
 
 The pinned Phase 2 snapshot contains 202 bundles from 27 source entries. After parsing and eligibility review, 105 primary bundles were included in the analysis. These primary bundles represent 10 upstream project clusters. KServe and vLLM Production Stack account for 83 of the 105 bundles (79%), indicating substantial concentration in two project families.
 
-The assessment matrix contains 105 × 28 = 2,940 bundle–rule labels. In the frozen author-validated reference set, 646 labels are PRESENT, 738 ABSENT, 697 U, and 859 NA. U represents 23.71% of all bundle–rule labels. Among non-NA labels, U represents 33.49% (697/(646 + 738 + 697)). These denominators answer different questions and should not be conflated.
+The assessment matrix contains 105 × 28 = 2,940 bundle–rule labels. In the frozen author-validated reference set, 647 labels are PRESENT, 738 ABSENT, 697 U, and 858 NA. U represents 23.71% of all bundle–rule labels. Among non-NA labels, U represents 33.48% (697/(647 + 738 + 697)). These denominators answer different questions and should not be conflated.
 
 ### 4.2 Rule-level configuration patterns and assessability
 
@@ -173,7 +173,7 @@ Table 1 reports the frozen four-valued outcomes for all 28 rules. Prevalence is 
 | NET-05 | 2 | 90 | 0 | 13 | 92 | 2.2% |
 | OBS-01 | 2 | 47 | 31 | 25 | 49 | 4.1% |
 | RES-01 | 51 | 27 | 14 | 13 | 78 | 65.4% |
-| RES-02 | 21 | 0 | 0 | 84 | 21 | 100.0% |
+| RES-02 | 22 | 0 | 0 | 83 | 22 | 100.0% |
 | RES-03 | 27 | 56 | 7 | 15 | 83 | 32.5% |
 | SEC-01 | 0 | 105 | 0 | 0 | 105 | 0.0% |
 | SEC-02 | 2 | 97 | 0 | 6 | 99 | 2.0% |
@@ -191,7 +191,7 @@ The authentication results for AUTH-02, AUTH-03, and AUTH-04 are non-estimable, 
 
 For NET-02, all 80 applicable bundles were labeled PRESENT because no included NetworkPolicy selected the in-scope inference workload. This is a statement about the policies included in the sampled bundle. It does not prove that the deployed workload is reachable from untrusted networks or that external network controls are absent.
 
-For RES-02, all 21 assessable scaled bundles lacked a matching PodDisruptionBudget under the current predicate. The rule remains sensitive to how scaling is defined. In particular, one Ray Serve configuration includes application-level autoscaling in serveConfigV2 even though the Kubernetes worker group is not autoscaled. The current predicate and the treatment of application-level scaling require resolution before submission.
+For RES-02, all 22 assessable scaled bundles lacked a matching PodDisruptionBudget under the study predicate. The scaling definition was resolved during review (guide v0.5): Ray Serve application-level autoscaling declared in serveConfigV2 counts as autoscaling for the workload, which moved one KubeRay bundle from NA to PRESENT; see §5.3.
 
 For workload-security rules WL-01 through WL-04, PRESENT counts are high among assessable bundles (77–88 of 90). WL-05 has 82 PRESENT and 15 U labels, with eight NA; no ABSENT labels were recorded under the current immutable-image predicate. These are observations about declared configuration, not direct measurements of exploitability or runtime enforcement.
 
@@ -260,7 +260,7 @@ The NET-02 result indicates that no included NetworkPolicy selected the in-scope
 
 ### 5.3 Availability controls and the RES-02 definition
 
-The RES-02 finding is operationally relevant but definition-sensitive. A PodDisruptionBudget is a Kubernetes-level availability control; application-level scaling in Ray Serve does not necessarily imply a Kubernetes disruption budget is required or semantically equivalent. The Ray Serve example identified during review demonstrates that scaling can occur at different layers. Before submission, the rule definition should state whether the target is Kubernetes-replicated workloads only or also application-level autoscaled services. We recommend reporting the current 21/21 result as a predicate-specific observation until this is resolved, and then rerunning labels and analyses if the rule changes.
+The RES-02 finding is operationally relevant but definition-sensitive. A PodDisruptionBudget is a Kubernetes-level availability control; application-level scaling in Ray Serve does not necessarily imply a Kubernetes disruption budget is required or semantically equivalent, because the framework manages its own replica placement. The Ray Serve example identified during review demonstrates that scaling can be declared at different layers. We resolved the definition in favor of the declared configuration (guide v0.5, decided 2026-11-11): autoscaling declared in a RayService serveConfigV2 counts as scaling for the workload, on the same footing as controller autoscaling fields, so the rule measures "scaled workload without an included PDB" at whichever layer the scaling is declared. Under this definition the result is 22/22. The residual caveat is construct-level, not definitional: for framework-managed replicas, an included PDB may not be the mechanism a practitioner would actually choose, so the label records the configuration pattern the rule operationalizes, not a proven availability gap.
 
 ### 5.4 Scanner agreement is a development result, not external validation
 
@@ -285,7 +285,7 @@ The study points to a need for multi-layer validation. Static configuration anal
 
 ### 6.1 Construct validity
 
-The 28 rules operationalize selected security-relevant properties, but some are proxies for broader claims. A LoadBalancer Service does not prove internet exposure; missing NetworkPolicy selection does not prove unrestricted reachability; absence of GPU isolation declarations does not prove tenant co-location; and absence of a PDB may not be meaningful for every application-level scaling design. We mitigate this by using four-valued labels, retaining rule-specific predicates, and avoiding claims of exploitability. RES-02 remains a known definition issue that must be resolved before submission.
+The 28 rules operationalize selected security-relevant properties, but some are proxies for broader claims. A LoadBalancer Service does not prove internet exposure; missing NetworkPolicy selection does not prove unrestricted reachability; absence of GPU isolation declarations does not prove tenant co-location; and absence of a PDB may not be meaningful for every application-level scaling design. We mitigate this by using four-valued labels, retaining rule-specific predicates, and avoiding claims of exploitability. For RES-02, the scaling definition was amended during review to include framework-level autoscaling declarations (guide v0.5); the construct caveat for framework-managed replicas is discussed in §5.3.
 
 ### 6.2 Internal validity
 
@@ -335,7 +335,7 @@ The scanner agrees closely with the pre-adjudication author-validated reference 
 
 ## Submission-blocking author actions
 
-1. **Resolve RES-02.** Decide whether Ray Serve application-level autoscaling qualifies under the PDB rule. If the predicate changes, update the labeling guide, affected labels, and all derived results before freezing the manuscript.
+1. **Resolve RES-02.** — **Resolved 2026-11-11.** The author extended the predicate (guide v0.5): Ray Serve application-level autoscaling in serveConfigV2 qualifies as scaling under the PDB rule. One label changed (NA → PRESENT); guide, adjudication history, the v2 frozen set, and all derived results in this draft were updated. See `docs/RES02_RAY_SERVE_DECISION.md`.
 2. **Verify corpus flow.** Generate a flow diagram and reconcile all inclusion/exclusion counts against the canonical eligibility CSV and lockfile.
 3. **Add source/project tables.** Report the 10 primary project clusters and their bundle counts, plus source-type and serving-stack breakdowns where supported.
 4. **Audit prevalence tables.** Generate a complete 28-rule table from the frozen label file, including denominators, U rate, applicability, and project-stratified counts. Table 1 above is illustrative, not a complete result table.

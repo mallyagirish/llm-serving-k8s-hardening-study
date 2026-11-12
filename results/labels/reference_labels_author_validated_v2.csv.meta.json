@@ -1,0 +1,24 @@
+{
+ "artifact": "author_validated_reference_labels_frozen_v2",
+ "frozen_at": "2026-11-11",
+ "status": "FROZEN \u2014 author-confirmed 2026-11-11 (supersedes v1; v1 preserved unmodified)",
+ "source_file": "results/labels/reference_labels_author_validated_v1.csv",
+ "source_sha256": "d8774402e20fd13f6796cf87981db4f228855403a84965b86889d36bdd41f3ef",
+ "frozen_file": "results/labels/reference_labels_author_validated_v2.csv",
+ "frozen_sha256": "c7eeb2ea5f62d3e01724137de30ea6cbe769ba66d936e4a437155def7410aebe",
+ "adjudication_history": "results/labels/author_adjudication_history.csv",
+ "changes_applied": 1,
+ "base_counts": {
+  "PRESENT": 646,
+  "ABSENT": 738,
+  "U": 697,
+  "NA": 859
+ },
+ "frozen_counts": {
+  "ABSENT": 738,
+  "U": 697,
+  "NA": 858,
+  "PRESENT": 647
+ },
+ "provenance": "v2 = v1 plus exactly one author-confirmed change under the guide v0.5 RES-02 amendment (Ray Serve serveConfigV2 autoscaling, decided 2026-11-11, post-freeze): kuberay-sample-ray-service.llm-serve / LLM-RES-02 NA -> PRESENT. Recorded in the adjudication history; see docs/RES02_RAY_SERVE_DECISION.md and the v0.5 amendment record in docs/LABELING_GUIDE.md. v1 and the original AI-assisted file are preserved unmodified."
+}

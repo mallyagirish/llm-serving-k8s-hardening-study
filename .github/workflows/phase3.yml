@@ -52,7 +52,7 @@ jobs:
       - name: Evaluate against frozen author-adjudicated labels
         run: |
           python scripts/evaluate_scanner.py \
-            --labels results/labels/reference_labels_author_validated_v1.csv \
+            --labels results/labels/reference_labels_author_validated_v2.csv \
             --candidates results/raw_candidate_findings.jsonl \
             --inventory results/corpus_inventory.jsonl \
             --output-dir results/ci-analysis/post-adjudication

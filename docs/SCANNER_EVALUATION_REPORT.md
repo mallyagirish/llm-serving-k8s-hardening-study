@@ -78,12 +78,12 @@ These are author-validated reference-label counts for the pinned public configur
 | LLM-AUTH-03 | 0 | 0 | 99 | 6 | Non-estimable from static artifacts |
 | LLM-AUTH-04 | 0 | 0 | 99 | 6 | Non-estimable from static artifacts |
 | LLM-NET-02 | 80 | 0 | 0 | 25 | 80/80 applicable bundles have no included NetworkPolicy selecting their inference workload |
-| LLM-RES-02 | 21 | 0 | 0 | 84 | 21/21 applicable scaled bundles have no matching PDB under the current predicate |
+| LLM-RES-02 | 22 | 0 | 0 | 83 | 22/22 applicable scaled bundles have no matching PDB under the v0.5 predicate (see the amendment note below) |
 | LLM-SEC-01 | 0 | 105 | 0 | 0 | No in-scope secret-like literal finding in this reference pass |
 
-Across the frozen 2,940 rows, U is 697 (23.71%). Among non-NA rows, U is 697 / (646 + 738 + 697) = 33.49%. Always state which denominator is used.
+Across the frozen 2,940 rows (v2; see the amendment note below), U is 697 (23.71%). Among non-NA rows, U is 697 / (647 + 738 + 697) = 33.48%. Always state which denominator is used.
 
-The RES-02 result remains sensitive to the definition of scaling: a Ray Serve application-level autoscaling template is present in one KubeRay configuration even though the Kubernetes worker group is not autoscaled. The current guide's predicate and the application-level interpretation should be resolved before final publication.
+**RES-02 amendment — resolved 2026-11-11.** The sensitivity flagged in the v1 version of this report is resolved: the author amended the RES-02 predicate (guide v0.5) so Ray Serve application-level autoscaling declared in a RayService `serveConfigV2` counts as autoscaling for the workload. One label changed (`kuberay-sample-ray-service.llm-serve`, NA → PRESENT; Serve autoscaling 1 → 4, no PDB), recorded in `results/labels/author_adjudication_history.csv` and issued as the v2 frozen set `reference_labels_author_validated_v2.csv` (PRESENT 647 / ABSENT 738 / U 697 / NA 858). LLM-RES-02 has no scanner implementation, so no confusion-matrix metric in this report changes. See `docs/RES02_RAY_SERVE_DECISION.md` for the full evidence and rationale.
 
 ## Scanner/reference disagreements — resolved 2026-11-11
 
