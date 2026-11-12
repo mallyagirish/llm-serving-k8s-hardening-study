@@ -199,7 +199,7 @@ def main() -> int:
             "clusters": n, "replicates_with_estimable_value": len(pooled_draws[metric]),
         })
     for rule in scanner_rules:
-        _, point_by_rule, _ = scanner_estimates(projects, metrics, [rule])
+        _, point_by_rule, _ = scanner_estimates(projects, metrics, [rule], [rule])
         for metric, estimate in point_by_rule[rule].items():
             lo, hi = ci(rule_draws[rule][metric])
             scanner_rows.append({
