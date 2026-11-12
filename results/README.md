@@ -54,7 +54,19 @@ python scripts/evaluate_scanner.py \\
 - The reference labels were initially AI-generated and then human-validated by the study author across all 2,940 entries. Scanner metrics are reported against this author-validated reference set; disclose the AI-assisted initial-labeling process and single-author validation. Do not claim independent double annotation or human inter-rater reliability. The evaluation summary records the scanner version and SHA-256 of its source script.
 - Rules not implemented by the scanner receive no scanner performance metrics.
 - Prevalence estimates describe only the pinned public configuration corpus, not live clusters, production deployments, or the universe of LLM-serving systems.
-- The corpus has only a small number of upstream project clusters and is concentrated in a few projects. Initial outputs are descriptive point estimates; no cluster-bootstrap confidence intervals are claimed.
+- The corpus has only 10 upstream project clusters and is concentrated in a few projects. Bootstrap intervals resample projects, not bundles; they remain exploratory and potentially unstable with so few clusters. Always report project-stratified values and leave-one-project-out sensitivity.
 - Do not replace the canonical label CSV with CI artifacts or overwrite the original AI-1 reference labels during adjudication.
 
 The workflow writes freshly generated preliminary eligibility queues under \`results/ci-generated/\`. These are disposable triage outputs, not the frozen eligibility decisions. The canonical bundle decisions remain \`results/bundle_eligibility_review.csv\`.
+
+
+Run the cluster-aware analysis after both evaluator passes:
+
+```bash
+python scripts/cluster_bootstrap.py \
+  --project-prevalence results/ci-analysis/pre-adjudication/project_rule_prevalence.csv \
+  --project-metrics results/ci-analysis/pre-adjudication/project_scanner_metrics.csv \
+  --output-dir results/ci-analysis/pre-adjudication/cluster-analysis
+```
+
+Repeat with the post-adjudication project tables only as a sensitivity analysis. Defaults are 10,000 replicates and seed 20261111.
