@@ -1,8 +1,8 @@
 # Phase 3 — Scanner comparison and descriptive prevalence (exploratory)
 
 **Evaluation commit:** \`2248fe4163a5a74c9bddcb5b0548cf4520fa22cb\`  
-**Current branch head at this update:** \`e270689f3626b3881e7b249be8c2164f9499a66f\`  
-**Dual-evaluation + cluster-bootstrap CI:** [run 43135233875](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43135233875) — success; tests, corpus validation, both evaluator passes, both cluster-bootstrap passes, and artifact upload completed  
+**Current branch head at this update:** \`82c33c831b1134678eeb690ca3a2162fdc7cf3df\`  
+**Dual-evaluation + cluster-bootstrap CI:** [run 43135687751](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43135233875) — success; tests, corpus validation, both evaluator passes, both cluster-bootstrap passes, and artifact upload completed  
 **Scanner:** 2.0.0  
 **Evaluator:** 1.1.0  
 **Scanner SHA-256:** \`c5572a9db1a3690423f2b3b94358e0bc3c2a437a73bd33427de3d628cb4f644a\`
@@ -142,7 +142,7 @@ The pre-adjudication primary scanner metrics have the following project-bootstra
 | Specificity | 99.80% | 99.60–100.00% |
 | F1 | 99.59% | 99.09–100.00% |
 | Accuracy | 99.60% | 99.15–100.00% |
-| Macro-F1 | 99.53% | 98.83–100.00% |
+| Macro-F1 | 99.53% | 99.07–100.00% |
 
 These pooled intervals should not obscure project influence. In leave-one-project-out analysis, pooled accuracy ranges from 99.37% (omitting vLLM Production Stack) to 100.00% (omitting KServe); precision ranges from 99.67% to 100.00%, recall from 99.03% to 100.00%, and macro-F1 from 99.40% to 100.00%. All four pre-adjudication scanner disagreements (three FN and one FP) occur in the KServe project cluster; omitting KServe therefore removes all four errors. This concentration is an important limitation, not evidence that performance generalizes.
 
