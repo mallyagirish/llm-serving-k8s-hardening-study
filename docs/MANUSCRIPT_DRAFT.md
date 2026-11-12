@@ -152,26 +152,51 @@ The assessment matrix contains 105 × 28 = 2,940 bundle–rule labels. In the fr
 
 ### 4.2 Rule-level configuration patterns and assessability
 
-Table 1 summarizes selected rules that illustrate the distinction between observed configuration patterns and static assessability.
+Table 1 reports the frozen four-valued outcomes for all 28 rules. Prevalence is PRESENT/(PRESENT + ABSENT); a dash denotes a non-estimable rule with no assessable binary observations.
 
-**Table 1. Selected rule-level outcomes in the frozen 105-bundle reference set**
+**Table 1. Rule-level outcomes in the frozen 105-bundle reference set**
 
-| Rule | PRESENT | ABSENT | U | NA | Interpretation |
-|---|---:|---:|---:|---:|---|
-| AUTH-02 | 0 | 0 | 99 | 6 | Static artifacts did not establish sibling-route authentication behavior |
-| AUTH-03 | 0 | 0 | 99 | 6 | Static artifacts did not establish whether tokenizer/admin/development endpoints were enabled |
-| AUTH-04 | 0 | 0 | 99 | 6 | Static artifacts did not establish CORS/auth middleware behavior |
-| NET-02 | 80 | 0 | 0 | 25 | No included NetworkPolicy selected the in-scope inference workload in any assessable bundle |
-| RES-02 | 21 | 0 | 0 | 84 | No matching PDB was found for the 21 assessable scaled bundles under the current predicate |
-| SEC-01 | 0 | 105 | 0 | 0 | No in-scope secret-like literal was identified under the current predicate |
+| Rule | PRESENT | ABSENT | U | NA | Assessable | Prevalence |
+|---|---:|---:|---:|---:|---:|---:|
+| AUTH-01 | 51 | 3 | 45 | 6 | 54 | 94.4% |
+| AUTH-02 | 0 | 0 | 99 | 6 | 0 | — |
+| AUTH-03 | 0 | 0 | 99 | 6 | 0 | — |
+| AUTH-04 | 0 | 0 | 99 | 6 | 0 | — |
+| AUTH-05 | 1 | 0 | 0 | 104 | 1 | 100.0% |
+| GPU-01 | 0 | 57 | 30 | 18 | 57 | 0.0% |
+| GPU-02 | 0 | 0 | 67 | 38 | 0 | — |
+| GPU-03 | 2 | 88 | 0 | 15 | 90 | 2.2% |
+| NET-01 | 2 | 44 | 33 | 26 | 46 | 4.3% |
+| NET-02 | 80 | 0 | 0 | 25 | 80 | 100.0% |
+| NET-03 | 0 | 1 | 0 | 104 | 1 | 0.0% |
+| NET-04 | 1 | 36 | 58 | 10 | 37 | 2.7% |
+| NET-05 | 2 | 90 | 0 | 13 | 92 | 2.2% |
+| OBS-01 | 2 | 47 | 31 | 25 | 49 | 4.1% |
+| RES-01 | 51 | 27 | 14 | 13 | 78 | 65.4% |
+| RES-02 | 21 | 0 | 0 | 84 | 21 | 100.0% |
+| RES-03 | 27 | 56 | 7 | 15 | 83 | 32.5% |
+| SEC-01 | 0 | 105 | 0 | 0 | 105 | 0.0% |
+| SEC-02 | 2 | 97 | 0 | 6 | 99 | 2.0% |
+| SEC-03 | 0 | 30 | 50 | 25 | 30 | 0.0% |
+| STOR-01 | 0 | 0 | 30 | 75 | 0 | — |
+| STOR-02 | 2 | 15 | 20 | 68 | 17 | 11.8% |
+| STOR-03 | 0 | 2 | 0 | 103 | 2 | 0.0% |
+| WL-01 | 77 | 13 | 0 | 15 | 90 | 85.6% |
+| WL-02 | 88 | 2 | 0 | 15 | 90 | 97.8% |
+| WL-03 | 77 | 13 | 0 | 15 | 90 | 85.6% |
+| WL-04 | 78 | 12 | 0 | 15 | 90 | 86.7% |
+| WL-05 | 82 | 0 | 15 | 8 | 82 | 100.0% |
 
-The authentication results are non-estimable, not zero-prevalence results. Static Kubernetes artifacts generally do not reveal the full route-level behavior of application middleware or external gateways. The 99 U and six NA outcomes for each of AUTH-02, AUTH-03, and AUTH-04 should therefore not be interpreted as evidence that authentication controls are absent.
+The authentication results for AUTH-02, AUTH-03, and AUTH-04 are non-estimable, not zero-prevalence results. Static Kubernetes artifacts generally do not reveal the full route-level behavior of application middleware or external gateways. The 99 U and six NA outcomes for each rule should therefore not be interpreted as evidence that authentication controls are absent. AUTH-01 is assessable in 54 bundles; 51 were PRESENT and three ABSENT, while 45 were uncertain and six not applicable.
 
 For NET-02, all 80 applicable bundles were labeled PRESENT because no included NetworkPolicy selected the in-scope inference workload. This is a statement about the policies included in the sampled bundle. It does not prove that the deployed workload is reachable from untrusted networks or that external network controls are absent.
 
 For RES-02, all 21 assessable scaled bundles lacked a matching PodDisruptionBudget under the current predicate. The rule remains sensitive to how scaling is defined. In particular, one Ray Serve configuration includes application-level autoscaling in serveConfigV2 even though the Kubernetes worker group is not autoscaled. The current predicate and the treatment of application-level scaling require resolution before submission.
 
-For SEC-01, no in-scope secret-like literal was identified in this reference pass. This result does not establish that credentials are managed securely in deployment systems, external secret stores, runtime environment variables, or repositories outside the sampled artifacts.
+For workload-security rules WL-01 through WL-04, PRESENT counts are high among assessable bundles (77–88 of 90). WL-05 has 82 PRESENT and 15 U labels, with eight NA; no ABSENT labels were recorded under the current immutable-image predicate. These are observations about declared configuration, not direct measurements of exploitability or runtime enforcement.
+
+For SEC-01, no in-scope secret-like literal was identified in this reference pass. This result does not establish that credentials are managed securely in deployment systems, external secret stores, runtime environment variables, or repositories outside the sampled artifacts. Several storage, RBAC, authentication, and distributed-network rules have substantial U or NA counts, illustrating that static artifact availability constrains what can be concluded.
+
 
 ### 4.3 Scanner agreement against the primary reference labels
 
