@@ -194,3 +194,8 @@ Do not publish prevalence claims until:
 - docs/deviations.md: timestamped protocol changes.
 
 No numerical findings should be added until generated from the frozen pipeline.
+
+
+## 12. Cluster-aware uncertainty analysis (Phase 3 implementation)
+
+The reproducible analysis in `scripts/cluster_bootstrap.py` consumes project-stratified sufficient-statistic CSVs emitted by `scripts/evaluate_scanner.py`. It resamples upstream projects with replacement, preserving all bundle counts within each selected project, with 10,000 replicates and a fixed seed (20261111). It reports percentile 95% intervals for bundle-weighted and equal-project-weighted rule prevalence, pooled and per-rule scanner metrics, and leave-one-project-out sensitivity. Run it separately on pre-adjudication and post-adjudication tables; the latter remains sensitivity-only. With only 10 project clusters, intervals are exploratory and should not be interpreted as precise population coverage. Do not resample bundles independently or convert U/NA to binary labels.
