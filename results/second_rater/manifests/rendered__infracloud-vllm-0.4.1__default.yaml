@@ -1,0 +1,146 @@
+---
+# Source: vllm/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scan-infra-vllm
+  labels:
+    helm.sh/chart: vllm-0.4.1
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/instance: scan-infra-vllm
+    app.kubernetes.io/version: "v0.28.0"
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+---
+# Source: vllm/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: scan-infra-vllm
+  labels:
+    helm.sh/chart: vllm-0.4.1
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/instance: scan-infra-vllm
+    app.kubernetes.io/version: "v0.28.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/instance: scan-infra-vllm
+---
+# Source: vllm/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-infra-vllm
+  labels:
+    helm.sh/chart: vllm-0.4.1
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/instance: scan-infra-vllm
+    app.kubernetes.io/version: "v0.28.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy:
+    {}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vllm
+      app.kubernetes.io/instance: scan-infra-vllm
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: vllm-0.4.1
+        app.kubernetes.io/name: vllm
+        app.kubernetes.io/instance: scan-infra-vllm
+        app.kubernetes.io/version: "v0.28.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      serviceAccountName: scan-infra-vllm
+      securityContext:
+        {}
+      containers:
+        - name: vllm
+          securityContext:
+            {}
+          image: "vllm/vllm-openai:v0.28.0"
+          imagePullPolicy: IfNotPresent
+          args:
+            - --model
+            - bigscience/bloom-560m
+            - --max-model-len
+            - "4192"
+            - --port
+            - "8000"
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: HF_API_TOKEN
+                  name: hf-api-token
+            - name: HF_HUB_OFFLINE
+              value: "1"
+            - name: HF_HUB_CACHE
+              value: /model
+            - name: VLLM_NO_USAGE_STATS
+              value: "1"
+            - name: DO_NOT_TRACK
+              value: "1"
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          startupProbe:
+            failureThreshold: 240
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 2
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 2
+          readinessProbe:
+            failureThreshold: 4
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            {}
+---
+# Source: vllm/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "scan-infra-vllm-test-connection"
+  labels:
+    helm.sh/chart: vllm-0.4.1
+    app.kubernetes.io/name: vllm
+    app.kubernetes.io/instance: scan-infra-vllm
+    app.kubernetes.io/version: "v0.28.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['scan-infra-vllm:80']
+  restartPolicy: Never

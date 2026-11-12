@@ -1,0 +1,398 @@
+---
+# Source: huggingface-model/charts/mongodb/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scan-shalb-mongodb
+  namespace: "llm-scan"
+  labels:
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/version: 7.0.3
+    helm.sh/chart: mongodb-14.3.0
+secrets:
+  - name: scan-shalb-mongodb
+automountServiceAccountToken: true
+---
+# Source: huggingface-model/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scan-shalb-demo
+  labels:
+    helm.sh/chart: huggingface-model-0.2.1
+    app.kubernetes.io/name: demo
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: huggingface-model/charts/mongodb/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: scan-shalb-mongodb
+  namespace: llm-scan
+  labels:
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/version: 7.0.3
+    helm.sh/chart: mongodb-14.3.0
+    app.kubernetes.io/component: mongodb
+type: Opaque
+data:
+  mongodb-root-password: "NUhJM0FSN2pBeA=="
+---
+# Source: huggingface-model/charts/mongodb/templates/common-scripts-cm.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scan-shalb-mongodb-common-scripts
+  namespace: "llm-scan"
+  labels:
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/version: 7.0.3
+    helm.sh/chart: mongodb-14.3.0
+    app.kubernetes.io/component: mongodb
+data:
+  startup-probe.sh: |
+    #!/bin/bash
+    mongosh  $TLS_OPTIONS --port $MONGODB_PORT_NUMBER --eval 'db.hello().isWritablePrimary || db.hello().secondary' | grep 'true'
+  readiness-probe.sh: |
+    #!/bin/bash
+    # Run the proper check depending on the version
+    [[ $(mongod -version | grep "db version") =~ ([0-9]+\.[0-9]+\.[0-9]+) ]] && VERSION=${BASH_REMATCH[1]}
+    . /opt/bitnami/scripts/libversion.sh
+    VERSION_MAJOR="$(get_sematic_version "$VERSION" 1)"
+    VERSION_MINOR="$(get_sematic_version "$VERSION" 2)"
+    VERSION_PATCH="$(get_sematic_version "$VERSION" 3)"
+    readiness_test='db.isMaster().ismaster || db.isMaster().secondary'
+    if [[ ( "$VERSION_MAJOR" -ge 5 ) || ( "$VERSION_MAJOR" -ge 4 && "$VERSION_MINOR" -ge 4 && "$VERSION_PATCH" -ge 2 ) ]]; then
+        readiness_test='db.hello().isWritablePrimary || db.hello().secondary'
+    fi
+    mongosh  $TLS_OPTIONS --port $MONGODB_PORT_NUMBER --eval "${readiness_test}" | grep 'true'
+  ping-mongodb.sh: |
+    #!/bin/bash
+    mongosh  $TLS_OPTIONS --port $MONGODB_PORT_NUMBER --eval "db.adminCommand('ping')"
+---
+# Source: huggingface-model/charts/mongodb/templates/standalone/pvc.yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: scan-shalb-mongodb
+  namespace: "llm-scan"
+  labels:
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/version: 7.0.3
+    helm.sh/chart: mongodb-14.3.0
+    app.kubernetes.io/component: mongodb
+  annotations:
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "8Gi"
+---
+# Source: huggingface-model/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scan-shalb-demo
+spec:
+  accessModes: 
+    - ReadWriteOnce
+  storageClassName: gp2
+  resources:
+    requests:
+      storage: 100Gi
+---
+# Source: huggingface-model/charts/mongodb/templates/standalone/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: scan-shalb-mongodb
+  namespace: "llm-scan"
+  labels:
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/version: 7.0.3
+    helm.sh/chart: mongodb-14.3.0
+    app.kubernetes.io/component: mongodb
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: "mongodb"
+      port: 27017
+      targetPort: mongodb
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/component: mongodb
+---
+# Source: huggingface-model/templates/chat/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: scan-shalb-demo-chat
+  labels:
+    helm.sh/chart: huggingface-model-0.2.1
+    app.kubernetes.io/name: demo
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/name: demo-chat-ui
+    app.kubernetes.io/instance: scan-shalb-chat
+---
+# Source: huggingface-model/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: scan-shalb-demo
+  labels:
+    helm.sh/chart: huggingface-model-0.2.1
+    app.kubernetes.io/name: demo
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: demo
+    app.kubernetes.io/instance: scan-shalb
+---
+# Source: huggingface-model/charts/mongodb/templates/standalone/dep-sts.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-shalb-mongodb
+  namespace: "llm-scan"
+  labels:
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/version: 7.0.3
+    helm.sh/chart: mongodb-14.3.0
+    app.kubernetes.io/component: mongodb
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: scan-shalb
+      app.kubernetes.io/name: mongodb
+      app.kubernetes.io/component: mongodb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: scan-shalb
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: mongodb
+        app.kubernetes.io/version: 7.0.3
+        helm.sh/chart: mongodb-14.3.0
+        app.kubernetes.io/component: mongodb
+    spec:
+      
+      serviceAccountName: scan-shalb-mongodb
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: scan-shalb
+                    app.kubernetes.io/name: mongodb
+                    app.kubernetes.io/component: mongodb
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        sysctls: []
+      
+      enableServiceLinks: true
+      containers:
+        - name: mongodb
+          image: docker.io/bitnami/mongodb:7.0.3-debian-11-r6
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MONGODB_ROOT_USER
+              value: "root"
+            - name: MONGODB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scan-shalb-mongodb
+                  key: mongodb-root-password
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "no"
+            - name: MONGODB_SYSTEM_LOG_VERBOSITY
+              value: "0"
+            - name: MONGODB_DISABLE_SYSTEM_LOG
+              value: "no"
+            - name: MONGODB_DISABLE_JAVASCRIPT
+              value: "no"
+            - name: MONGODB_ENABLE_JOURNAL
+              value: "yes"
+            - name: MONGODB_PORT_NUMBER
+              value: "27017"
+            - name: MONGODB_ENABLE_IPV6
+              value: "no"
+            - name: MONGODB_ENABLE_DIRECTORY_PER_DB
+              value: "no"
+          ports:
+            - name: mongodb
+              containerPort: 27017
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 10
+            exec:
+              command:
+                - /bitnami/scripts/ping-mongodb.sh
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bitnami/scripts/readiness-probe.sh
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: datadir
+              mountPath: /bitnami/mongodb
+              subPath: 
+            - name: common-scripts
+              mountPath: /bitnami/scripts
+      volumes:
+        - name: common-scripts
+          configMap:
+            name: scan-shalb-mongodb-common-scripts
+            defaultMode: 0550
+        - name: datadir
+          persistentVolumeClaim:
+            claimName: scan-shalb-mongodb
+---
+# Source: huggingface-model/templates/application.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-shalb-demo
+  labels:
+    helm.sh/chart: huggingface-model-0.2.1
+    app.kubernetes.io/name: demo
+    app.kubernetes.io/instance: scan-shalb
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: demo
+      app.kubernetes.io/instance: scan-shalb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: demo
+        app.kubernetes.io/instance: scan-shalb
+    spec:
+      serviceAccountName: scan-shalb-demo
+      initContainers:
+        - name: init
+          image: alpine:3.18.4
+          imagePullPolicy: "IfNotPresent"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - |
+              set -x
+              if [ -f "/usr/src/demo/config.json" ]; then echo "Model demo is already downloaded. Skipping init..."; exit 0; fi
+              echo "Files present before init:"
+              ls -al /usr/src/demo  # Add this line to check directory contents
+              rm -rf /usr/src/demo/*
+              rm -rf /usr/src/demo/.*
+              echo "Files present after cleaning the path:"
+              ls -al /usr/src/demo
+              apk add --update git-lfs
+              git clone --progress --depth=1 https://huggingface.co/mycompany/demo /usr/src/demo
+              echo "Cloning Successfully Finished. May start Main container"
+          volumeMounts:
+            - name: model-storage
+              mountPath: "/usr/src/demo"
+          resources:
+            requests:
+              cpu: "0.5"
+      containers:
+        - name: model
+          image: ghcr.io/huggingface/text-generation-inference:latest
+          imagePullPolicy: IfNotPresent
+          command: [ "text-generation-launcher" ]
+          args:
+            - "--model-id"
+            - "mycompany/demo"
+            - "--huggingface-hub-cache"
+            - "/usr/src/demo"
+            - "--weights-cache-override"
+            - "/usr/src/demo"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: HUGGINGFACE_OFFLINE
+              value: "1"
+          volumeMounts:
+            - name: model-storage
+              mountPath: "/usr/src/demo"
+            - name: shm
+              mountPath: /dev/shm
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+            requests:
+              cpu: "3"
+              memory: 10Gi
+      volumes:
+        - name: model-storage
+          persistentVolumeClaim:
+            claimName: scan-shalb-demo
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
