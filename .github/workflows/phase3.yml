@@ -59,13 +59,13 @@ jobs:
 
       - name: Project-cluster bootstrap and influence analysis
         run: |
-          python scripts/cluster_bootstrap.py \\
-            --project-prevalence results/ci-analysis/pre-adjudication/project_rule_prevalence.csv \\
-            --project-metrics results/ci-analysis/pre-adjudication/project_scanner_metrics.csv \\
+          python scripts/cluster_bootstrap.py \
+            --project-prevalence results/ci-analysis/pre-adjudication/project_rule_prevalence.csv \
+            --project-metrics results/ci-analysis/pre-adjudication/project_scanner_metrics.csv \
             --output-dir results/ci-analysis/pre-adjudication/cluster-analysis
-          python scripts/cluster_bootstrap.py \\
-            --project-prevalence results/ci-analysis/post-adjudication/project_rule_prevalence.csv \\
-            --project-metrics results/ci-analysis/post-adjudication/project_scanner_metrics.csv \\
+          python scripts/cluster_bootstrap.py \
+            --project-prevalence results/ci-analysis/post-adjudication/project_rule_prevalence.csv \
+            --project-metrics results/ci-analysis/post-adjudication/project_scanner_metrics.csv \
             --output-dir results/ci-analysis/post-adjudication/cluster-analysis
 
       - name: Upload reproducible outputs
