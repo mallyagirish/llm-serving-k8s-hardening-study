@@ -125,3 +125,14 @@ python scripts/evaluate_scanner.py \\
 \`\`\`
 
 The author-validation provenance is recorded in [REFERENCE_LABEL_VALIDATION.md](REFERENCE_LABEL_VALIDATION.md). The Phase 3 CI workflow now runs both comparisons and uploads separate `pre-adjudication/` and `post-adjudication/` outputs, preserving the primary and sensitivity analyses. The evaluator summary records the scanner version and source SHA-256.
+
+
+## Project-cluster uncertainty analysis (new Phase 3 analysis)
+
+The CI pipeline now runs a deterministic project-cluster bootstrap separately for the pre-adjudication primary comparison and the post-adjudication sensitivity analysis. It consumes the evaluator's project-stratified sufficient-statistic tables, resamples the 10 upstream projects with replacement (10 projects per replicate), and retains all counts belonging to each sampled project. It does not resample individual bundles as if they were independent. The default is 10,000 replicates with seed 20261111 and percentile 95% intervals.
+
+For each rule, the analysis reports (a) bundle-weighted prevalence, PRESENT/(PRESENT+ABSENT), and (b) an equal-project-weighted mean of project-specific prevalence among projects with assessable observations. Scanner uncertainty is reported for pooled micro precision, recall, specificity, F1, accuracy, pooled macro-F1, and per-rule metrics. A leave-one-project-out table exposes project influence. Rules with no assessable units or missing positive/negative classes can have undefined or degenerate intervals; these must not be interpreted as certainty.
+
+The bootstrap intervals are exploratory: there are only 10 project clusters, the corpus is concentrated in a small number of projects, and project clusters may not be a random sample of all LLM-serving ecosystems. The post-adjudication bootstrap remains sensitivity-only because the four label changes were selected from scanner disagreements with scanner predictions visible. Do not use it as an independent scanner-accuracy interval.
+
+CI artifacts are written under each analysis directory's `cluster-analysis/` folder: `cluster_bootstrap_prevalence.csv`, `cluster_bootstrap_scanner_metrics.csv`, `leave_one_project_out.csv`, and `cluster_bootstrap_summary.json`. The numerical interval values should be copied into the manuscript only after inspecting the successful run artifact and the leave-one-project-out range.
