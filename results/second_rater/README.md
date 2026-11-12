@@ -1,12 +1,13 @@
 # Independent second-annotator packet
 
-**Prepared:** 2026-11-11 · **Status:** prepared, **not yet fielded** — no
-second annotator has labeled anything yet, and nothing in this folder is
-evidence until a completed sheet comes back.
+**Prepared:** 2026-11-11 · **Status: will not be fielded** — author decision
+2026-11-11: no independent second annotator for this submission. This packet
+is retained as an unused prepared instrument; no second annotator has labeled
+anything, and nothing in this folder is evidence.
 
 ## Why this exists
 
-The frozen reference set (`results/labels/reference_labels_author_validated_v1.csv`,
+The frozen reference set (`results/labels/reference_labels_author_validated_v2.csv`,
 2,940 cells) is **AI-assisted, author-validated**: one author validated
 every cell. That is single-author validation, not independent double
 annotation, and it supports no human inter-rater reliability claim (see
