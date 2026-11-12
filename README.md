@@ -94,6 +94,10 @@ cd llm-serving-k8s-hardening-study
 
 Rendered outputs land under `corpus/rendered/`. Phase 3 candidate scans are preliminary review queues, not adjudicated findings or prevalence estimates.
 
+## Manuscript draft
+
+The current working paper is [docs/MANUSCRIPT_DRAFT.md](docs/MANUSCRIPT_DRAFT.md) with a BibTeX bibliography at [docs/references.bib](docs/references.bib). This is a working draft, not a submission-ready manuscript; unresolved methodological and literature-review tasks are listed in the draft.
+
 ## Phase 3 empirical evaluation (research branch)
 
 The Phase 3 pipeline is under active validation on branch `research/phase3-empirical-evaluation`.
