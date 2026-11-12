@@ -83,7 +83,7 @@ def prevalence_estimate(sample, project_rows, rule, equal_project=False):
     return ratio(present, present + absent)
 
 
-def scanner_estimates(sample, metric_rows, scanner_rules):
+def scanner_estimates(sample, metric_rows, scanner_rules, macro_rules):
     totals = {k: 0 for k in ("tp", "fp", "fn", "tn")}
     per_rule = {}
     for rule in scanner_rules:
@@ -99,10 +99,17 @@ def scanner_estimates(sample, metric_rows, scanner_rules):
         "f1": ratio(2 * tp, 2 * tp + fp + fn),
         "accuracy": ratio(tp + tn, tp + fp + fn + tn),
     }
-    f1s = [ratio(2*c["tp"], 2*c["tp"]+c["fp"]+c["fn"])
-           for c in per_rule.values() if c["tp"] + c["fp"] + c["fn"] + c["tn"] > 0
-           and c["tp"] + c["fn"] > 0 and c["tn"] + c["fp"] > 0]
-    pooled["macro_f1"] = statistics.mean(f1s) if f1s else None
+    # Keep the macro-F1 rule set fixed from the full reference corpus. If a
+    # bootstrap draw loses either class for any included rule, macro-F1 is
+    # undefined for that draw rather than silently averaging fewer rules.
+    macro_values = []
+    for rule in macro_rules:
+        c = per_rule[rule]
+        if c["tp"] + c["fn"] == 0 or c["tn"] + c["fp"] == 0:
+            macro_values = []
+            break
+        macro_values.append(ratio(2*c["tp"], 2*c["tp"]+c["fp"]+c["fn"]))
+    pooled["macro_f1"] = statistics.mean(macro_values) if macro_values else None
     per_rule_metrics = {}
     for rule, c in per_rule.items():
         per_rule_metrics[rule] = {
@@ -128,6 +135,11 @@ def main() -> int:
         args.project_prevalence, args.project_metrics
     )
     n = len(projects)
+    macro_rules = [
+        rule for rule in scanner_rules
+        if sum(metrics[p][rule]["present"] for p in projects) > 0
+        and sum(metrics[p][rule]["absent"] for p in projects) > 0
+    ]
     rng = random.Random(args.seed)
     samples = [[rng.choice(projects) for _ in range(n)] for _ in range(args.replicates)]
     out = args.output_dir
@@ -169,7 +181,7 @@ def main() -> int:
     pooled_draws = defaultdict(list)
     rule_draws = {r: defaultdict(list) for r in scanner_rules}
     for sample in samples:
-        pooled, per_rule, _ = scanner_estimates(sample, metrics, scanner_rules)
+        pooled, per_rule, _ = scanner_estimates(sample, metrics, scanner_rules, macro_rules)
         for key, value in pooled.items():
             if value is not None:
                 pooled_draws[key].append(value)
@@ -177,7 +189,7 @@ def main() -> int:
             for key, value in values.items():
                 if value is not None:
                     rule_draws[rule][key].append(value)
-    pooled_point, _, totals = scanner_estimates(projects, metrics, scanner_rules)
+    pooled_point, _, totals = scanner_estimates(projects, metrics, scanner_rules, macro_rules)
     for metric, estimate in pooled_point.items():
         lo, hi = ci(pooled_draws[metric])
         scanner_rows.append({
@@ -201,7 +213,7 @@ def main() -> int:
     for project in projects:
         remaining = [p for p in projects if p != project]
         p_est = {r: prevalence_estimate(remaining, prev, r, False) for r in rules}
-        s_est, _, counts = scanner_estimates(remaining, metrics, scanner_rules)
+        s_est, _, counts = scanner_estimates(remaining, metrics, scanner_rules, macro_rules)
         sensitivity.append({
             "omitted_project": project,
             "remaining_clusters": len(remaining),
@@ -226,7 +238,8 @@ def main() -> int:
         "analysis_version": VERSION, "seed": args.seed, "replicates": args.replicates,
         "resampling_unit": "upstream_project", "project_clusters": n,
         "projects": projects, "prevalence_rules": len(rules),
-        "scanner_rules": len(scanner_rules), "pooled_scanner_confusion": totals,
+        "scanner_rules": len(scanner_rules), "macro_f1_fixed_rule_ids": macro_rules,
+        "pooled_scanner_confusion": totals,
         "pooled_scanner_point_estimates": pooled_point,
         "interpretation": [
             "Percentile intervals resample upstream projects with replacement, retaining each sampled project's complete aggregate counts.",
