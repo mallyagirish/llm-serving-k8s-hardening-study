@@ -1,8 +1,8 @@
 # Phase 3 — Scanner comparison and descriptive prevalence (exploratory)
 
 **Evaluation commit:** \`2248fe4163a5a74c9bddcb5b0548cf4520fa22cb\`  
-**Current branch head at this update:** \`82c33c831b1134678eeb690ca3a2162fdc7cf3df\`  
-**Dual-evaluation + cluster-bootstrap CI:** [run 43135687751](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43135233875) — success; tests, corpus validation, both evaluator passes, both cluster-bootstrap passes, and artifact upload completed  
+**Bootstrap implementation commit:** \`82c33c831b1134678eeb690ca3a2162fdc7cf3df\`  
+**Dual-evaluation + cluster-bootstrap CI:** [run 43135876649](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43135876649) — success; tests, corpus validation, both evaluator passes, both cluster-bootstrap passes, and artifact upload completed  
 **Scanner:** 2.0.0  
 **Evaluator:** 1.1.0  
 **Scanner SHA-256:** \`c5572a9db1a3690423f2b3b94358e0bc3c2a437a73bd33427de3d628cb4f644a\`
