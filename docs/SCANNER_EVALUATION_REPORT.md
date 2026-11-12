@@ -1,8 +1,8 @@
 # Phase 3 — Scanner comparison and descriptive prevalence (exploratory)
 
 **Evaluation commit:** \`2248fe4163a5a74c9bddcb5b0548cf4520fa22cb\`  
-**Current branch head when this report was written:** \`7adb2d221944edbd44ffd68ae76f1f693354744e\`  
-**Dual-evaluation CI:** [run 43089354140](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43089354140) — success; both pre- and post-adjudication evaluator passes completed  
+**Current branch head at this update:** \`e270689f3626b3881e7b249be8c2164f9499a66f\`  
+**Dual-evaluation + cluster-bootstrap CI:** [run 43135233875](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43135233875) — success; tests, corpus validation, both evaluator passes, both cluster-bootstrap passes, and artifact upload completed  
 **Scanner:** 2.0.0  
 **Evaluator:** 1.1.0  
 **Scanner SHA-256:** \`c5572a9db1a3690423f2b3b94358e0bc3c2a437a73bd33427de3d628cb4f644a\`
@@ -97,7 +97,7 @@ The row-level scanner disagreement artifact contained three FN and one FP agains
 ## Remaining validity limits
 
 - Only 10 project clusters; KServe and vLLM Production Stack account for 83/105 bundles (79%). Project-level results are required; do not treat bundles as independent projects.
-- No cluster-bootstrap confidence intervals are produced in this first pass.
+- Cluster-bootstrap percentile intervals are now generated (see below), but only 10 upstream project clusters are available; intervals are exploratory and cannot establish representativeness of all LLM-serving projects.
 - Public charts, examples, and rendered configurations do not represent all private or production deployments.
 - AUTH-02/03/04 are non-estimable from this static-artifact corpus; do not turn U into ABSENT or report zero prevalence.
 - GPU-01 has no PRESENT reference examples, and NET-03 has only one ABSENT example. Their scanner sensitivity cannot be evaluated from this sample.
@@ -133,6 +133,21 @@ The CI pipeline now runs a deterministic project-cluster bootstrap separately fo
 
 For each rule, the analysis reports (a) bundle-weighted prevalence, PRESENT/(PRESENT+ABSENT), and (b) an equal-project-weighted mean of project-specific prevalence among projects with assessable observations. Scanner uncertainty is reported for pooled micro precision, recall, specificity, F1, accuracy, pooled macro-F1, and per-rule metrics. A leave-one-project-out table exposes project influence. Rules with no assessable units or missing positive/negative classes can have undefined or degenerate intervals; these must not be interpreted as certainty.
 
-The bootstrap intervals are exploratory: there are only 10 project clusters, the corpus is concentrated in a small number of projects, and project clusters may not be a random sample of all LLM-serving ecosystems. The post-adjudication bootstrap remains sensitivity-only because the four label changes were selected from scanner disagreements with scanner predictions visible. Do not use it as an independent scanner-accuracy interval.
+The pre-adjudication primary scanner metrics have the following project-bootstrap percentile intervals (10,000 replicates; 10 clusters):
 
-CI artifacts are written under each analysis directory's `cluster-analysis/` folder: `cluster_bootstrap_prevalence.csv`, `cluster_bootstrap_scanner_metrics.csv`, `leave_one_project_out.csv`, and `cluster_bootstrap_summary.json`. The numerical interval values should be copied into the manuscript only after inspecting the successful run artifact and the leave-one-project-out range.
+| Pooled scanner metric | Point estimate | Project-bootstrap 95% interval |
+|---|---:|---:|
+| Precision | 99.80% | 99.54–100.00% |
+| Recall | 99.39% | 98.63–100.00% |
+| Specificity | 99.80% | 99.60–100.00% |
+| F1 | 99.59% | 99.09–100.00% |
+| Accuracy | 99.60% | 99.15–100.00% |
+| Macro-F1 | 99.53% | 98.83–100.00% |
+
+These pooled intervals should not obscure project influence. In leave-one-project-out analysis, pooled accuracy ranges from 99.37% (omitting vLLM Production Stack) to 100.00% (omitting KServe); precision ranges from 99.67% to 100.00%, recall from 99.03% to 100.00%, and macro-F1 from 99.40% to 100.00%. All four pre-adjudication scanner disagreements (three FN and one FP) occur in the KServe project cluster; omitting KServe therefore removes all four errors. This concentration is an important limitation, not evidence that performance generalizes.
+
+Selected prevalence intervals illustrate the effect of project heterogeneity: LLM-RES-01 bundle-weighted prevalence is 66.7% (30.1–98.0%) versus 74.4% equal-project weighted (53.3–95.0%); LLM-RES-03 is 32.5% (0–63.0%) versus 24.4% equal-project weighted (0–50.8%); LLM-WL-01 is 85.6% (72.0–100.0%) versus 86.8% equal-project weighted (66.8–100.0%). LLM-NET-02 is 100% in the assessable corpus and in all 10 project clusters; its degenerate 100–100% bootstrap interval reflects the observed all-positive cluster pattern, not certainty about other projects. Rules with no assessable projects (including AUTH-02/03/04) remain non-estimable and receive no interval.
+
+The bootstrap intervals are exploratory: there are only 10 project clusters, the corpus is concentrated in a small number of projects, and project clusters may not be a random sample of all LLM-serving ecosystems. The post-adjudication bootstrap produces 100% point estimates and degenerate intervals but remains sensitivity-only because the four label changes were selected from scanner disagreements with scanner predictions visible. Do not use it as an independent scanner-accuracy interval.
+
+CI artifacts are written under each analysis directory's `cluster-analysis/` folder: `cluster_bootstrap_prevalence.csv`, `cluster_bootstrap_scanner_metrics.csv`, `leave_one_project_out.csv`, and `cluster_bootstrap_summary.json`. Full per-rule intervals and all leave-one-project-out results are available in [successful CI run 43135233875](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/43135233875).
