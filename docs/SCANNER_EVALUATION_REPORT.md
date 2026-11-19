@@ -40,7 +40,7 @@ Across the 989 assessable bundle-rule units for the 13 implemented rules, the **
 | F1 | 99.59% | 100.00% |
 | Accuracy | 99.60% | 100.00% |
 
-Pre-adjudication macro-F1 is 99.53% across the 10 implemented rules with both PRESENT and ABSENT reference examples. The other three implemented rules do not have both reference classes and are excluded from that macro average. The post-adjudication 100% result is a sensitivity analysis only: the four disputed rows were selected because they disagreed with scanner predictions, and those predictions were visible during author review. It is therefore not an independent estimate of scanner accuracy.
+Pre-adjudication macro-F1 is 99.53% across the 10 implemented rules with both PRESENT and ABSENT reference examples. The other three implemented rules do not have both reference classes and are excluded from that macro average. The binary evaluation denominator is **989 pre-adjudication** and **988 post-adjudication** (488 TP + 500 TN). One formerly PRESENT WL-05 row became U and is therefore excluded from the post-adjudication confusion matrix. The later v2 RES-02 amendment does not affect these metrics because RES-02 is not scanner-implemented. The post-adjudication 100% result is a sensitivity analysis only: the four disputed rows were selected because they disagreed with scanner predictions, and those predictions were visible during author review. It is therefore not an independent estimate of scanner accuracy.
 
 ### Per-rule confusion counts (pre-adjudication primary comparison)
 
