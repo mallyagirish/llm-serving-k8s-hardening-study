@@ -1,0 +1,49 @@
+name: Publication frozen-label integrity
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - publication/manuscript-readiness-2026-11
+    paths:
+      - 'scripts/verify_frozen_labels.py'
+      - 'tests/test_verify_frozen_labels.py'
+      - 'results/labels/reference_labels_author_validated_v2.csv'
+      - 'results/labels/reference_labels_author_validated_v2.csv.meta.json'
+      - '.github/workflows/publication-frozen-label-integrity.yml'
+  pull_request:
+    paths:
+      - 'scripts/verify_frozen_labels.py'
+      - 'tests/test_verify_frozen_labels.py'
+      - 'results/labels/reference_labels_author_validated_v2.csv'
+      - 'results/labels/reference_labels_author_validated_v2.csv.meta.json'
+      - '.github/workflows/publication-frozen-label-integrity.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-frozen-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run synthetic verifier regression tests
+        run: python -m unittest discover -s tests -p 'test_verify_frozen_labels.py' -v
+      - name: Verify actual frozen v2 reference file and SHA-256
+        run: python scripts/verify_frozen_labels.py --repo-root . | tee publication-frozen-label-verification.json
+      - name: Upload verification record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-frozen-label-verification
+          path: publication-frozen-label-verification.json
+          if-no-files-found: ignore
+          retention-days: 90
