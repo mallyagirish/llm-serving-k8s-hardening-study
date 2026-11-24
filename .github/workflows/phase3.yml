@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - research/phase3-empirical-evaluation
+      - publication/manuscript-readiness-2026-11
   pull_request:
     branches:
       - main
@@ -20,6 +21,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+        with:
+          persist-credentials: false
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -31,6 +35,19 @@ jobs:
 
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
+
+      - name: Record and verify frozen inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p results/ci-analysis
+          python scripts/verify_frozen_labels.py --repo-root . > results/ci-analysis/frozen-label-verification.json
+          {
+            git rev-parse HEAD
+            python --version
+            python -m pip freeze
+            sha256sum corpus/SOURCES.lock.json rules/catalog.json docs/LABELING_GUIDE.md results/labels/reviewer_AI1_full.csv results/labels/reference_labels_author_validated_v2.csv results/labels/reference_labels_author_validated_v2.csv.meta.json scripts/validate_corpus.py scripts/scan_candidates.py scripts/evaluate_scanner.py scripts/cluster_bootstrap.py
+          } > results/ci-analysis/input-provenance.txt
 
       - name: Validate pinned corpus and create inventory
         run: python scripts/validate_corpus.py
@@ -68,11 +85,20 @@ jobs:
             --project-metrics results/ci-analysis/post-adjudication/project_scanner_metrics.csv \
             --output-dir results/ci-analysis/post-adjudication/cluster-analysis
 
+      - name: Record output checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          find results/ci-analysis -type f ! -name output-sha256.txt -print0 | sort -z | xargs -0 sha256sum > results/ci-analysis/output-sha256.txt
+
       - name: Upload reproducible outputs
         uses: actions/upload-artifact@v4
         with:
           name: phase3-scanner-evaluation-and-review-queues
           path: |
+            results/ci-analysis/frozen-label-verification.json
+            results/ci-analysis/input-provenance.txt
+            results/ci-analysis/output-sha256.txt
             results/corpus_inventory.jsonl
             results/corpus_validation.json
             results/raw_candidate_findings.jsonl
@@ -94,4 +120,4 @@ jobs:
             results/ci-analysis/pre-adjudication/cluster-analysis/*
             results/ci-analysis/post-adjudication/cluster-analysis/*
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 90
