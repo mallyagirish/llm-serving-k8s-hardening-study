@@ -41,7 +41,12 @@ This branch prepares the existing study for peer review. Do not alter frozen cor
 - [ ] Final technical, ethical, statistical and copyediting review before submission.
 
 ## Publication-ready claim wording
-The reference set was initially AI-assisted and then validated by the study author. A second person reportedly reviewed the full matrix and methodology, but no independent blind second annotation matrix or quantified human inter-rater reliability is currently documented. Findings describe the sampled public configuration artifacts, not actual production deployments. Scanner agreement is measured against this reference set and must not be presented as independent proof of ground truth.
+The reference set was initially AI-assisted and then validated by the study author. A second person reportedly reviewed the full matrix and methodology, but no independent blind second annotation matrix or quantified human inter-rater reliability is currently documented. Findings describe the sampled public configuration artifacts, not actual production deployments. Primary scanner agreement is measured against the original AI-assisted comparator, whose exact pre-adjudication human-validation status is undocumented; it must not be presented as independent proof of ground truth. The frozen author-validated reference set is used for descriptive findings, and scanner-visible adjudication is a separate sensitivity analysis.
 
 ## Immediate next deliverable
 A versioned reproducibility audit recording exact file paths, hashes, commands and discrepancies, followed by manuscript revisions and figure generation. Do not mark a gate complete solely because CI passed.
+
+## Progress ledger — 24 November 2026
+
+- Fresh reproduction evidence: [run 45380849713](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/45380849713), input commit `b3d346cabc780e09b5dc66a20d3c3a1bff800526`, artifact 14912794691. See `docs/PUBLICATION_TABLE_RECONCILIATION_2026-11-24.md`: all 28 rule rows, denominators and displayed prevalence match. This is numerical reconciliation, not validation of labels.
+- Manuscript now distinguishes primary comparator agreement from author-reported validation of frozen labels. The provenance gate remains open; see `docs/EXTERNAL_REVIEW_PROVENANCE.md`.
