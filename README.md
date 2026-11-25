@@ -79,20 +79,19 @@ rules/                            # rule probes (growing; Phase 3)
 results/                          # prevalence outputs (Phase 3)
 ```
 
-## Reproduce
+## Reproduction versus corpus regeneration
 
-Requires: `helm`, `git`, `curl`, `jq`.
+For publication verification, use the immutable analysis input commit and archived outputs identified in [the November 24 reconciliation](docs/PUBLICATION_TABLE_RECONCILIATION_2026-11-24.md). Consult the [publication readiness plan](docs/PUBLICATION_READINESS_PLAN.md) for outstanding integrity and execution requirements. Do not refresh the lockfile, regenerate eligibility decisions, or overwrite frozen labels when reproducing reported results.
+
+The historical collection commands below are for corpus reconstruction in a separate checkout, not frozen-result verification. They require `helm`, `git`, `curl`, and `jq`.
 
 ```bash
-git clone https://github.com/mallyagirish/llm-serving-k8s-hardening-study.git
-cd llm-serving-k8s-hardening-study
-
 ./scripts/fetch_and_render.sh   # full fetch + render + lockfile refresh
 # or, if charts are already under corpus/charts/:
 ./scripts/render_all.sh
 ```
 
-Rendered outputs land under `corpus/rendered/`. Phase 3 candidate scans are preliminary review queues, not adjudicated findings or prevalence estimates.
+Candidate scans are review queues, not adjudicated findings or prevalence estimates.
 
 ## Manuscript draft
 
@@ -100,20 +99,20 @@ The current working paper is [docs/MANUSCRIPT_DRAFT.md](docs/MANUSCRIPT_DRAFT.md
 
 ## Phase 3 empirical evaluation (research branch)
 
-The Phase 3 pipeline is under active validation on branch `research/phase3-empirical-evaluation`.
+The research branch `research/phase3-empirical-evaluation` contains the empirical pipeline. The publication branch documents the frozen evaluation and outstanding release gates.
 
 - The lockfile contains 202 bundle entries from 27 sources; all 202 paths are tracked.
 - 195 bundles parse as standalone YAML. Seven inputs are explicitly recorded in `corpus/parse_exceptions.json` (six unrendered Helm fragments and one invalid non-LLM sample) and excluded from static YAML scanning.
 - The 195 parseable bundles contain 617 YAML documents. These are inventory counts, not independent deployments.
-- The 27 lockfile source entries group into 11 upstream project clusters. The current resource-aware triage proposes 102 primary candidates, 86 supporting candidates, 7 unclear bundles, and 7 parse exclusions; all decisions remain pending human review.
+- The manuscript reports 105 primary bundles from 10 upstream project clusters, assessed against 28 rules (2,940 labels). Earlier candidate triage is historical, not the final inclusion decision.
 - See [Phase 3 screening progress](docs/SCREENING_PROGRESS.md) for project-level counts and next gates.
 - The conservative scanner currently emits candidates for 13 of the 28 rules. Candidate counts are not prevalence estimates and must be independently adjudicated before publication.
 
 See [the empirical protocol](docs/PHASE3_EMPIRICAL_PROTOCOL.md), [corpus screening guide](docs/CORPUS_SCREENING_GUIDE.md), [human labeling guide](docs/LABELING_GUIDE.md), [related-work review](docs/RELATED_WORK_AND_NOVELTY.md), and [exploratory literature search log](docs/LITERATURE_SEARCH_LOG.md).
 
-### Run the Phase 3 validation locally
+### Historical Phase 3 pipeline (separate working checkout)
 
-After fetching/rendering the corpus, install the scanner dependency and run:
+These commands generate working outputs and review queues; they are not a frozen-input reproduction recipe. In a separate checkout, after fetching/rendering the corpus, install the scanner dependency and run:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -134,10 +133,10 @@ The GitHub Actions workflow runs the same pipeline and uploads a 30-day artifact
 | --- | --- | --- |
 | 1 | Rule catalog (28) + corpus design | Done — [docs/PHASE1_RULES_AND_CORPUS.md](docs/PHASE1_RULES_AND_CORPUS.md) |
 | 2 | Fetch + render pinned public corpus | Done — 27 sources, 202 rendered bundles (2026-10-28, America/Los_Angeles) |
-| 3 | Corpus validation + candidate scan + reference labeling | In progress — protocol, conservative scanner, and CI pipeline on research branch |
-| 4+ | Case studies, upstream issues/PRs, preprint draft | Planned |
+| 3 | Corpus validation + candidate scan + reference labeling | Frozen evaluation reported; publication verification and provenance gates remain open |
+| 4+ | Manuscript and publication package | Draft; not submission-ready |
 
-No prevalence results, CVE claims, or paper citations are asserted in this README beyond the Phase 1–2 artifacts in-tree.
+See the manuscript and reconciliation record for reported descriptive results and their limitations. The scanner comparison is against an AI-assisted comparator, not independent ground truth. External review is author-reported; detailed provenance remains pending. No production prevalence or CVE claims are made here.
 
 ## Ethics and scope
 
