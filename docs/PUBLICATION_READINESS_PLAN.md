@@ -50,3 +50,9 @@ A versioned reproducibility audit recording exact file paths, hashes, commands a
 
 - Fresh reproduction evidence: [run 45380849713](https://github.com/mallyagirish/llm-serving-k8s-hardening-study/actions/runs/45380849713), input commit `b3d346cabc780e09b5dc66a20d3c3a1bff800526`, artifact 14912794691. See `docs/PUBLICATION_TABLE_RECONCILIATION_2026-11-24.md`: all 28 rule rows, denominators and displayed prevalence match. This is numerical reconciliation, not validation of labels.
 - Manuscript now distinguishes primary comparator agreement from author-reported validation of frozen labels. The provenance gate remains open; see `docs/EXTERNAL_REVIEW_PROVENANCE.md`.
+
+## Progress ledger — 25 November 2026
+
+- Local audit of archived CI artifact 14912794691: independently summed PRESENT/ABSENT/U/NA counts across all 10 project rows for each of 28 rules, separately for pre- and post-adjudication outputs (280 project-rule rows per phase). All 56 pooled rule rows reconciled exactly. This checks aggregation of archived outputs, not raw-label correctness or fresh pipeline execution.
+- Archived leave-one-project-out scanner F1 ranges from 0.9934853420 to 1.0 for the original comparator; post-adjudication range is 1.0 to 1.0 (sensitivity only). These are archived values, not independently rerun bootstrap estimates. KServe contributes 53/105 bundles and vLLM production-stack 30/105 (together 83/105); explicitly retain concentration and limited-cluster caveats.
+- Frozen source-input hash verification and reviewer provenance remain open; no gate is closed by this output-level audit.
